@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "jsx": "react-jsx",
+    "declarationDir": "build/types",
+    "baseUrl": ".",
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true, // Often helpful for React projects
+    "esModuleInterop": true // Also helpful
+  },
+  "include": [
+    "./src/**/*" // Ensure this includes your source files
+  ]
+}
