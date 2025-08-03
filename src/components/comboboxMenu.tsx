@@ -1,24 +1,27 @@
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, Search } from "lucide-react";
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Input from "./input";
 
-export interface ComboboxOption {
+interface ComboboxOption {
   value: string;
   label: string;
 }
 
-interface ComboboxProps {
+interface ComboboxMenuProps {
   options: ComboboxOption[];
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
+  setOpen: (open: boolean) => void;
+  setSearchValue: (value: string) => void;
+  searchValue: string;
   searchPlaceholder?: string;
-  label?: string;
   name?: string;
+  triggerRef: React.RefObject<HTMLButtonElement>;
+  futuristicClipPath?: React.CSSProperties;
 }
 
-const ComboboxMenu = ({
+const ComboboxMenu: React.FC<ComboboxMenuProps> = ({
   options,
   value,
   onChange,
@@ -126,72 +129,4 @@ const ComboboxMenu = ({
   );
 };
 
-const Combobox: React.FC<ComboboxProps> = ({
-  options,
-  value,
-  onChange,
-  placeholder,
-  searchPlaceholder,
-  label,
-  name,
-}) => {
-  const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const selectedOption = options.find((option) => option.value === value);
-
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  const futuristicClipPath = {
-    clipPath:
-      "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
-  };
-
-  return (
-    <div className="w-full space-y-3">
-      {label && (
-        <label
-          htmlFor={name}
-          className="text-sm font-bold text-cyan-300/80 block tracking-wider mb-1"
-        >
-          {label}
-        </label>
-      )}
-      <div className="relative w-full">
-        <div className="p-[2px]" style={futuristicClipPath}>
-          <button
-            ref={triggerRef}
-            role="combobox"
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
-            className="relative flex h-12 w-full items-center justify-between bg-[#0A192F] px-3 py-2 text-base text-cyan-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            style={futuristicClipPath}
-          >
-            {selectedOption ? (
-              <span className="truncate">{selectedOption.label}</span>
-            ) : (
-              <span className="text-cyan-400/50">{placeholder}</span>
-            )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </button>
-        </div>
-
-        {open && (
-          <ComboboxMenu
-            options={options}
-            value={value}
-            onChange={onChange}
-            setOpen={setOpen}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            searchPlaceholder={searchPlaceholder}
-            name={name}
-            triggerRef={triggerRef}
-            futuristicClipPath={futuristicClipPath}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default Combobox;
+export default ComboboxMenu;

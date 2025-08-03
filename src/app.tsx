@@ -4,7 +4,10 @@ import WorldComponent from "./ts/index";
 import "./app.css";
 import Input from "./components/input";
 import Combobox, { ComboboxOption } from "./components/combobox";
-import "leaflet/dist/leaflet.css";
+import { Funnel } from "lucide-react";
+import { Modal } from "./components/modal";
+import { Button } from "./components/button";
+import { FilterButton } from "./components/filterButton";
 
 export type DataType = {
   name: string;
@@ -15,7 +18,10 @@ export type DataType = {
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const toggleFilterModal = useCallback(() => {
+    setFilterModalVisible((prev) => !prev);
+  }, []);
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [clubData, setClubData] = useState<DataType>([
     { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
@@ -37,10 +43,11 @@ const App: React.FC = () => {
   }, []);
 
   // This function can be passed to the WorldComponent to show the modal
+  const [modalVisible, setModalVisible] = useState(false);
   const showCityModal = useCallback((name: string, data: string) => {
     setModalData({ name, data });
     setModalVisible(true);
-  }, []); // Empty dependency array means the function is created once and never changes.
+  }, []);
 
   const hideCityModal = useCallback(() => {
     setModalVisible(false);
@@ -62,22 +69,44 @@ const App: React.FC = () => {
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
 
-      <div className="absolute top-8 left-8 z-[999] w-full max-w-sm space-y-8 bg-white">
-        <Input
-          name="technoSector"
-          label="TECHNO SECTOR"
-          placeholder="Enter sector name..."
-        />
-
-        <Combobox
-          name="sportType"
-          label="SPORT TYPE"
-          options={sportTypes}
-          value={selectedSport}
-          onChange={setSelectedSport}
-          placeholder="Choose one..."
-          searchPlaceholder="Search sports..."
-        />
+      <div className=" absolute top-8 left-8 w-full max-w-sm space-y-8 ">
+        <FilterButton onClick={toggleFilterModal} />
+        {filterModalVisible && (
+          <Modal>
+            <Input placeholder="anything...." />
+            <Combobox
+              options={sportTypes}
+              value={selectedSport}
+              onChange={setSelectedSport}
+              placeholder="choose one"
+            />
+            <Combobox
+              options={sportTypes}
+              value={selectedSport}
+              onChange={setSelectedSport}
+              placeholder="choose one"
+            />
+            <Combobox
+              options={sportTypes}
+              value={selectedSport}
+              onChange={setSelectedSport}
+              placeholder="choose one"
+            />
+            <Combobox
+              options={sportTypes}
+              value={selectedSport}
+              onChange={setSelectedSport}
+              placeholder="choose one"
+            />
+            <Combobox
+              options={sportTypes}
+              value={selectedSport}
+              onChange={setSelectedSport}
+              placeholder="choose one"
+            />
+            <Button>confirm</Button>
+          </Modal>
+        )}
       </div>
 
       {/* Loading Indicator (can remain outside the main container) */}
