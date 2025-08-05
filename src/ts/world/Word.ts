@@ -79,6 +79,8 @@ export default class World {
 
       // Add the event listener for zoom changes
       this.controls.addEventListener("change", this.handleZoom.bind(this));
+
+      this.handleZoom();
       // 开始渲染
       this.render();
     });
@@ -92,17 +94,23 @@ export default class World {
   private handleZoom() {
     const distance = this.controls.getDistance();
 
-    // 👉 Check if we need to swap to the DETAILED texture
+    // Check if we have an earth object with city labels yet
+    if (!this.earth || !this.earth.cityLabels) {
+      return;
+    }
+
     if (distance < this.zoomThreshold && !this.isZoomedIn) {
       this.isZoomedIn = true;
-      // Correct way to update the texture on a ShaderMaterial
+      // Swap to detailed texture
       this.earth.earth.material.uniforms.map.value = this.detailedTexture;
-    }
-    // 👉 Check if we need to swap back to the ORIGINAL texture
-    else if (distance >= this.zoomThreshold && this.isZoomedIn) {
+      // 👇 SHOW LABELS
+      this.earth.cityLabels.forEach((label) => (label.visible = true));
+    } else if (distance >= this.zoomThreshold && this.isZoomedIn) {
       this.isZoomedIn = false;
-      // Correct way to update the texture on a ShaderMaterial
+      // Swap back to original texture
       this.earth.earth.material.uniforms.map.value = this.originalTexture;
+      // 👇 HIDE LABELS
+      this.earth.cityLabels.forEach((label) => (label.visible = false));
     }
   }
 

@@ -24,10 +24,27 @@ const App: React.FC = () => {
   }, []);
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [clubData, setClubData] = useState<DataType>([
-    { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
     { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
-    { name: "Tokyo", E: 139.6503, N: 35.6762, color: 0xffa500 },
-    // Add more cities here
+    { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
+    { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
+    { name: "Madrid", E: -3.7038, N: 40.4168, color: 0xffa500 },
+    { name: "Rome", E: 12.4964, N: 41.9028, color: 0xffa500 },
+    { name: "Lisbon", E: -9.1393, N: 38.7223, color: 0xffa500 },
+    { name: "Dublin", E: -6.2603, N: 53.3498, color: 0xffa500 },
+    { name: "Amsterdam", E: 4.8952, N: 52.3702, color: 0xffa500 },
+    { name: "Prague", E: 14.4378, N: 50.0755, color: 0xffa500 },
+    { name: "Vienna", E: 16.3738, N: 48.2082, color: 0xffa500 },
+    { name: "Warsaw", E: 21.0122, N: 52.2297, color: 0xffa500 },
+    { name: "Budapest", E: 19.0402, N: 47.4979, color: 0xffa500 },
+    { name: "Athens", E: 23.7275, N: 37.9838, color: 0xffa500 },
+    { name: "Istanbul", E: 28.9784, N: 41.0082, color: 0xffa500 },
+    { name: "Moscow", E: 37.6173, N: 55.7558, color: 0xffa500 },
+    { name: "Kiev", E: 30.5234, N: 50.4501, color: 0xffa500 },
+    { name: "Cairo", E: 31.2357, N: 30.0444, color: 0xffa500 },
+    { name: "Algiers", E: 3.0588, N: 36.7762, color: 0xffa500 },
+    { name: "Tunis", E: 10.1815, N: 36.8065, color: 0xffa500 },
+    { name: "Tripoli", E: 13.1913, N: 32.8872, color: 0xffa500 },
+    { name: "Casablanca", E: -7.5898, N: 33.5731, color: 0xffa500 },
   ]);
 
   // This effect hides the loading screen after a delay.
@@ -52,8 +69,6 @@ const App: React.FC = () => {
   const hideCityModal = useCallback(() => {
     setModalVisible(false);
   }, []);
-
-  console.log("modalData", modalData);
 
   const sportTypes: ComboboxOption[] = [
     { value: "football", label: "Football" },

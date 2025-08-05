@@ -18,6 +18,7 @@ import {
   Texture,
   TextureLoader,
   Vector3,
+  CanvasTexture,
 } from "three";
 
 import html2canvas from "html2canvas";
@@ -100,6 +101,7 @@ export default class earth {
   public flyLineArcGroup: Group;
   public clickablePoints: THREE.Mesh[] = [];
   public data: DataType;
+  public cityLabels: Sprite[] = [];
 
   constructor(options: options) {
     this.options = options;
@@ -364,12 +366,6 @@ export default class earth {
   // }
 
   async createMarkupPoint() {
-    // const cities = [
-    //   { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
-    //   { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
-    //   // Add more cities here
-    // ];
-
     await Promise.all(
       this.data.map(async (item) => {
         const radius = this.options.earth.radius;
@@ -415,6 +411,14 @@ export default class earth {
         this.markupPoint.add(WaveMesh);
         this.waveMeshArr.push(WaveMesh);
 
+        const label = this.createCityLabel(item.name);
+        // Position the label slightly above the surface and offset to the side
+        const labelPos = lon2xyz(radius + 1.5, lon, lat); // Adjust radius offset as needed
+        label.position.set(labelPos.x, labelPos.y, labelPos.z);
+
+        this.markupPoint.add(label);
+        this.cityLabels.push(label);
+
         this.earthGroup.add(this.markupPoint);
       })
     );
@@ -457,6 +461,46 @@ export default class earth {
   //     })
   //   );
   // }
+  private createCityLabel(text: string): Sprite {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const fontSize = 10;
+    const fontFamily = "Arial";
+
+    // To get a crisp texture, we'll set the font on the context BEFORE measuring the text
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+
+    // Measure text to dynamically size the canvas
+    const metrics = context.measureText(text);
+    canvas.width = metrics.width;
+    canvas.height = fontSize * 1.2; // Add some padding
+
+    // Re-apply the font as context is reset when canvas dimensions change
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+    context.fillStyle = "#FFC900"; // A nice golden yellow color
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new CanvasTexture(canvas);
+    const material = new SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false, // Don't block other objects behind it
+    });
+
+    const sprite = new Sprite(material);
+
+    // Scale the sprite to an appropriate size in the scene
+    const spriteWidth = canvas.width * 0.15;
+    const spriteHeight = canvas.height * 0.15;
+    sprite.scale.set(spriteWidth, spriteHeight, 1);
+
+    // Initially hide the label
+    sprite.visible = false;
+
+    return sprite;
+  }
 
   createAnimateCircle() {
     // 创建 圆环 点
