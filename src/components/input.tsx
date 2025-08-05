@@ -28,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {/* Wrapper for the glowing border effect */}
         <div className="relative p-[2px] w-full" style={futuristicClipPath}>
           <div
-            className="absolute inset-0 bg-gradient-to-br from-cyan-400/50 to-blue-600/50 blur-[1px] shadow-[var(--shadow-neon)]"
+            className="absolute inset-0 bg-gradient-to-br from-cyan-400/50 to-blue-600/50 blur-[1px] "
             style={futuristicClipPath}
           ></div>
           <div
@@ -43,7 +43,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               name={name}
               id={name}
               className={cn(
-                "flex h-12 w-full bg-transparent px-3 py-2 text-base  text-cyan-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-cyan-400/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                "flex h-12 w-full bg-transparent shadow-[var(--shadow-neon)] border-1 border-primary-200 px-3 py-2 text-base  text-cyan-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-cyan-400/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
                 Icon ? "pl-10" : "",
                 className
               )}

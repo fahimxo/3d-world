@@ -163,7 +163,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             role="combobox"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-            className="relative flex h-12 w-full items-center justify-between bg-[#0A192F] px-3 py-2 text-base text-cyan-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="relative flex h-12 w-full shadow-[var(--shadow-neon)] items-center justify-between bg-[#0A192F] px-3 py-2 text-base text-cyan-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             style={futuristicClipPath}
           >
             {selectedOption ? (

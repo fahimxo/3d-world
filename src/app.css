@@ -224,5 +224,6 @@ h2 a {
 }
 
 @theme {
-  --shadow-neon: 0 0 6px #00f0ff, 0 0 12px #00f0ff, 0 0 24px #00f0ff;
+  --shadow-neon: 0px 0px 10px 0px rgba(0, 201, 255, 1) inset;
+  --color-primary-200: #00c9ff;
 }

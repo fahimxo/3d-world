@@ -73,37 +73,39 @@ const App: React.FC = () => {
         <FilterButton onClick={toggleFilterModal} />
         {filterModalVisible && (
           <Modal>
-            <Input placeholder="anything...." />
             <Combobox
               options={sportTypes}
               value={selectedSport}
               onChange={setSelectedSport}
-              placeholder="choose one"
+              placeholder="select"
+              label="Sport Type"
             />
             <Combobox
               options={sportTypes}
               value={selectedSport}
               onChange={setSelectedSport}
-              placeholder="choose one"
+              placeholder="select"
+              label="Techno Sector"
             />
             <Combobox
               options={sportTypes}
               value={selectedSport}
               onChange={setSelectedSport}
-              placeholder="choose one"
+              placeholder="select"
+              label="Country"
             />
             <Combobox
               options={sportTypes}
               value={selectedSport}
               onChange={setSelectedSport}
-              placeholder="choose one"
+              placeholder="select"
+              label="City"
             />
-            <Combobox
-              options={sportTypes}
-              value={selectedSport}
-              onChange={setSelectedSport}
-              placeholder="choose one"
+            <Input
+              placeholder="Write reimagined name"
+              label="Reimagined Name"
             />
+            <Input placeholder="Write current name" label="Current Name" />
             <Button>confirm</Button>
           </Modal>
         )}
