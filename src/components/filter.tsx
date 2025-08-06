@@ -6,6 +6,7 @@ export const Filter = () => {
       viewBox="0 0 338 682"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className="absolute -z-10 flex items-center justify-center right-0 left-0 top-0 space-y-4"
     >
       <g filter="url(#filter0_i_53_257)">
         <path

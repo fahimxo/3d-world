@@ -8,6 +8,8 @@ import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
+import DetailsModal from "./assets/icons/DetailsModal";
+import { Filter } from "./components/filter";
 
 export type DataType = {
   name: string;
@@ -17,6 +19,9 @@ export type DataType = {
 }[];
 
 const App: React.FC = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedSport, setSelectedSport] = useState<string>("");
+  const [detailsModal, setDetailsModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const toggleFilterModal = useCallback(() => {
@@ -43,7 +48,7 @@ const App: React.FC = () => {
   }, []);
 
   // This function can be passed to the WorldComponent to show the modal
-  const [modalVisible, setModalVisible] = useState(false);
+
   const showCityModal = useCallback((name: string, data: string) => {
     setModalData({ name, data });
     setModalVisible(true);
@@ -62,7 +67,9 @@ const App: React.FC = () => {
     { value: "motorsport", label: "Motorsport" },
   ];
 
-  const [selectedSport, setSelectedSport] = useState<string>("");
+  const handleDetailsModal = () => {
+    setDetailsModal((prev) => !prev);
+  };
 
   return (
     <div className="app-container">
@@ -74,7 +81,8 @@ const App: React.FC = () => {
       <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
         <FilterButton onClick={toggleFilterModal} />
         {filterModalVisible && (
-          <Modal>
+          <Modal className="w-[335px] h-[678px]">
+            <Filter />
             <Combobox
               options={sportTypes}
               value={selectedSport}
@@ -109,6 +117,90 @@ const App: React.FC = () => {
             />
             <Input placeholder="Write current name" label="Current Name" />
             <Button>confirm</Button>
+          </Modal>
+        )}
+        <p
+          className="font-normal text-[26px] leading-[100%] tracking-[0px] text-cyan-300 orbitron-font"
+          onClick={handleDetailsModal}
+        >
+          MODAl
+        </p>
+
+        {detailsModal && (
+          <Modal mode="center" onClose={handleDetailsModal}>
+            <DetailsModal>
+              <div className="space-y-6 text-white">
+                <h3 className="text-cyan-400 font-bold text-lg">
+                  GALACTIC CROWN
+                </h3>
+                <p className="mt-4 text-gray-300 text-sm leading-relaxed">
+                  Born from Earth's last unified monarchic alliance during the
+                  Age of Colleges... Born from Earth's last unified monarchic
+                  alliance during the Age of Colleges... Born from Earth's last
+                  unified monarchic alliance during the Age of Colleges... Born
+                  from Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age oforn from Earth's last unified monarchic
+                  alliance during the Age of Colleges... Born from Earth's last
+                  unified monarchic alliance during the Age of Colleges... Born
+                  from Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges... Born from Earth's last unified
+                  monarchic alliance during the Age of Colleges... Born from
+                  Earth's last unified monarchic alliance during the Age of
+                  Colleges... Born from Earth's last unified monarchic alliance
+                  during the Age of Colleges...
+                </p>
+              </div>
+            </DetailsModal>
           </Modal>
         )}
       </div>

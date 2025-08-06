@@ -228,6 +228,11 @@ h2 a {
   --color-primary-200: #00c9ff;
 }
 
-.orbitron-font {
-  font-family: "Orbitron", sans-serif;
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
