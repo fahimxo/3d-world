@@ -4,10 +4,10 @@ import WorldComponent from "./ts/index";
 import "./app.css";
 import Input from "./components/input";
 import Combobox, { ComboboxOption } from "./components/combobox";
-import { Funnel } from "lucide-react";
 import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
+import { Headers } from "./layouts/header/Header";
 
 export type DataType = {
   name: string;
@@ -68,8 +68,10 @@ const App: React.FC = () => {
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
-
-      <div className=" absolute top-8 left-8 w-full max-w-sm space-y-8 ">
+      <div className="fixed top-0 left-0 w-full z-50">
+        <Headers children="Logo" />
+      </div>
+      <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
         <FilterButton onClick={toggleFilterModal} />
         {filterModalVisible && (
           <Modal>
@@ -110,7 +112,6 @@ const App: React.FC = () => {
           </Modal>
         )}
       </div>
-
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">
@@ -123,7 +124,6 @@ const App: React.FC = () => {
         </div>
         <div>Loading resources...</div>
       </div>
-
       {/* Modal Dialog */}
       {modalVisible && (
         <div id="cityModal" className="modal">
