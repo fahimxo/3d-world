@@ -70,7 +70,7 @@ const App: React.FC = () => {
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
       <div className="fixed top-0 left-0 w-full z-50">
-        <Headers clickMenu={() => console.log("clicked")} />
+        <Headers children="Logo" />
       </div>
       <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
         <FilterButton onClick={toggleFilterModal} />
