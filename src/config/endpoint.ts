@@ -1,5 +1,6 @@
 export const API_ENDPOINTS = {
   WORLD_MAP: {
-    GET_SPORTS_LIST: "/api/WorldMap/GetSportsList/GetSportsList",
+    getSportsList: "/api/WorldMap/GetSportsList/GetSportsList",
+    getClubDetails: "/api/WorldMap/GetClubDetails/GetClubDetails",
   },
 };

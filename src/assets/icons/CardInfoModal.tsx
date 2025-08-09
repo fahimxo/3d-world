@@ -1,18 +1,18 @@
-import React from "react";
-
 const CardInfoModal = ({
-  logoUrl,
-  title,
-  country,
-  state,
-  city,
+  // logoUrl,
+  // title,
+  // country,
+  // state,
+  // city,
+  data,
   className = "",
 }: {
-  logoUrl: string;
-  title: string;
-  country: string;
-  state: string;
-  city: string;
+  // logoUrl: string;
+  // title: string;
+  // country: string;
+  // state: string;
+  // city: string;
+  data: any;
   className?: string;
 }) => {
   return (
@@ -39,16 +39,16 @@ const CardInfoModal = ({
       <div className="relative z-10 flex flex-col items-center text-white px-4 py-8 w-full h-full justify-center">
         <div className="w-[100px] h-[100px] flex items-center justify-center mb-3">
           <img
-            src={logoUrl}
+            src={data?.logoUrl}
             alt="Logo"
             className="w-full h-full object-contain"
           />
         </div>
         <h3 className="text-base font-black tracking-widest text-center">
-          {title}
+          {data?.originalClubName}
         </h3>
         <p className="text-xs text-gray-300 text-center mt-2.5 tracking-widest">
-          {country} | {state} | {city}
+          {data?.countryName} | {data?.city} | {data?.sectorName}
         </p>
       </div>
     </div>

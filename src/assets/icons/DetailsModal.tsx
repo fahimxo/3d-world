@@ -2,32 +2,8 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 
 const DetailsModal: React.FC<{
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
 }> = ({ children, onClose }) => {
-  // const scrollRef = useRef<HTMLDivElement>(null);
-  // const [thumbTop, setThumbTop] = useState(50);
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const scrollEl = scrollRef.current;
-  //     if (scrollEl) {
-  //       const { scrollTop, scrollHeight, clientHeight } = scrollEl;
-  //       const thumbHeight = 69;
-  //       const maxScroll = scrollHeight - clientHeight;
-  //       const maxTop = clientHeight - thumbHeight;
-  //       const newTop = (scrollTop / maxScroll) * maxTop;
-  //       setThumbTop(newTop);
-  //     }
-  //   };
-
-  //   const el = scrollRef.current;
-  //   if (el) {
-  //     el.addEventListener("scroll", handleScroll);
-  //   }
-  //   return () => {
-  //     if (el) el.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
@@ -173,7 +149,7 @@ const DetailsModal: React.FC<{
         {children}
       </div>
       {onClose && (
-        <div className="relative z-20 flex justify-center py-8">
+        <div className="relative z-20 flex justify-center py-8 cursor-pointer">
           <button
             onClick={onClose}
             className="relative flex items-center justify-center"

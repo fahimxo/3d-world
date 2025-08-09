@@ -12,6 +12,8 @@ import Combobox, { ComboboxOption } from "./components/combobox";
 import { Modal } from "./components/modal";
 import Input from "./components/input";
 import { Button } from "./components/button";
+import { API_ENDPOINTS } from "./config/endpoint";
+import { apiPost } from "./config/axios";
 
 export type DataType = {
   name: string;
@@ -21,7 +23,6 @@ export type DataType = {
 }[];
 
 const App: React.FC = () => {
-  const [modalVisible, setModalVisible] = useState(false);
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [detailsModal, setDetailsModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -52,12 +53,12 @@ const App: React.FC = () => {
   // This function can be passed to the WorldComponent to show the modal
 
   const showCityModal = useCallback((name: string, data: string) => {
-    setModalData({ name, data });
-    setModalVisible(true);
+    getClubDetails();
+    setDetailsModal(true);
   }, []);
 
   const hideCityModal = useCallback(() => {
-    setModalVisible(false);
+    setDetailsModal((prev) => !prev);
   }, []);
 
   console.log("modalData", modalData);
@@ -69,9 +70,29 @@ const App: React.FC = () => {
     { value: "motorsport", label: "Motorsport" },
   ];
 
-  const handleDetailsModal = () => {
-    setDetailsModal((prev) => !prev);
+  interface ClubDetailsResponse {
+    code: number;
+    data: {
+      result: any;
+    };
+  }
+  const [detailsData, setDetailsData] = useState(null);
+  const getClubDetails = async () => {
+    const postData = { id: 1 };
+    try {
+      const data = await apiPost<ClubDetailsResponse>(
+        API_ENDPOINTS.WORLD_MAP.getClubDetails,
+        postData
+      );
+
+      if (data.code === 0) {
+        setDetailsData(data?.result);
+      }
+    } catch (error) {
+      console.error("Error fetching sports list", error);
+    }
   };
+  console.log(detailsData, "aaaaaaaaaaaaa");
 
   return (
     <div className="app-container">
@@ -121,24 +142,18 @@ const App: React.FC = () => {
             <Button>confirm</Button>
           </Modal>
         )}
-        <p
-          className="font-normal text-[26px] leading-[100%] tracking-[0px] text-cyan-300 orbitron-font"
-          onClick={handleDetailsModal}
-        >
-          MODAl
-        </p>
-
         {detailsModal && (
           <Modal mode="center">
-            <DetailsModal onClose={handleDetailsModal}>
+            <DetailsModal onClose={hideCityModal}>
               <div className="flex items-stretch gap-6 text-white h-[232px]">
                 <div className="w-[240px] h-full">
                   <CardInfoModal
-                    logoUrl="https://example.com/logo.png"
-                    title="GALACTIC CROWN"
-                    country="Eurovia"
-                    state="Spain"
-                    city="Madrid"
+                    // logoUrl="https://example.com/logo.png"
+                    // title="GALACTIC CROWN"
+                    // country="Eurovia"
+                    // state="Spain"
+                    // city="Madrid"
+                    data={detailsData}
                     className="h-full"
                   />
                 </div>
@@ -150,7 +165,7 @@ const App: React.FC = () => {
                   />
                 </div>
               </div>
-              <ClubKit />
+              <ClubKit data={detailsData} />
             </DetailsModal>
           </Modal>
         )}
@@ -168,7 +183,7 @@ const App: React.FC = () => {
         <div>Loading resources...</div>
       </div>
       {/* Modal Dialog */}
-      {modalVisible && (
+      {/* {modalVisible && (
         <div id="cityModal" className="modal">
           <div className="modal-content">
             <span className="close-button" onClick={hideCityModal}>
@@ -178,7 +193,7 @@ const App: React.FC = () => {
             <p id="cityData">{modalData.data}</p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

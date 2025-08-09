@@ -11,7 +11,7 @@ import Input from "./input";
 import { API_ENDPOINTS } from "../config/endpoint";
 
 const getSportsList = async (): Promise<ComboboxOption[]> => {
-  const response = await api.post(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, {
+  const response = await api.post(API_ENDPOINTS.WORLD_MAP.getSportsList, {
     filter: { searchTerm: "" },
   });
 

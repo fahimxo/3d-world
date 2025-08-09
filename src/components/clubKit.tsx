@@ -1,47 +1,4 @@
-// import React from "react";
-
-// const ClubKit = () => {
-//   return (
-//     <>
-//       <p className="mt-8 text-gray-300 text-sm leading-6 tracking-widest">
-//         d monarchic alliance during the Age of Colleges d monarchic alliance
-//         during the Age of Colleges d monarchic alliance during the Age of
-//         Colleges d monarchic alliance during the Age of Colleges d monarchic
-//         alliance during the Age of Colleges d monarchic alliance during the Age
-//         of Colleges d monarchic alliance during the Age of Colleges d monarchic
-//         alliance during the Age of Colleges d monarchic alliance during the Age
-//         of Colleges d monarchic alliance during the Age of Colleges d monarchic
-//         alliance during the Age of Colleges d monarchic alliance during the Age
-//         of Colleges
-//       </p>
-//       <div className="mt-4 border-t border-white pt-6">
-//         <h3 className="text-white text-lg font-bold mb-4">Club Kit</h3>
-//         <div className="w-full flex items-center justify-center gap-4 h-[192px]">
-//           <div className="flex-1 h-full">
-//             <video
-//               src="https://example.com/video.mp4"
-//               controls
-//               className="w-full h-full rounded-lg border border-purple-500 object-cover"
-//             />
-//           </div>
-//           <p className="text-gray-300 text-sm leading-6 tracking-widest flex-1 h-full">
-//             Lorem ipsum dolor sit amet consectetur, id erau sollicitudin
-//             dignissim sed tincidunt. Viverea adipiscing mauris lectus tincidunt
-//             vitae nunc. Quis tellus diam ac aliquam. Praesent hendrerit accumsan
-//             e orci morbi ipsum ac non. Nisi tellus ac ultricies etiam eget neque
-//             faucibus. Nullam faucibus lectus viverea ut lacinia.
-//           </p>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default ClubKit;
-
-import React from "react";
-
-const ClubKit = () => {
+const ClubKit = ({ data }: { data: any }) => {
   return (
     <>
       <p className="mt-8 text-gray-300 text-sm leading-6 tracking-widest">
@@ -57,7 +14,7 @@ const ClubKit = () => {
         <div className="w-full flex items-stretch gap-4 h-[192px]">
           <div className="flex-1 h-full">
             <video
-              src="https://example.com/video.mp4"
+              src={data?.kitVideoUrl}
               controls
               className="w-full h-full rounded-lg border-none object-cover"
             />
