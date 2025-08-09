@@ -10,6 +10,8 @@ import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
 import DetailsModal from "./assets/icons/DetailsModal";
 import { Filter } from "./components/filter";
+import CardInfoModal from "./assets/icons/CardInfoModal";
+import ClubKit from "./components/clubKit";
 
 export type DataType = {
   name: string;
@@ -75,7 +77,7 @@ const App: React.FC = () => {
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
-      <div className="fixed top-0 left-0 w-full z-50">
+      <div className="fixed top-0 left-0 w-full z-10">
         <Headers children="Logo" />
       </div>
       <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
@@ -127,79 +129,28 @@ const App: React.FC = () => {
         </p>
 
         {detailsModal && (
-          <Modal mode="center" onClose={handleDetailsModal}>
-            <DetailsModal>
-              <div className="space-y-6 text-white">
-                <h3 className="text-cyan-400 font-bold text-lg">
-                  GALACTIC CROWN
-                </h3>
-                <p className="mt-4 text-gray-300 text-sm leading-relaxed">
-                  Born from Earth's last unified monarchic alliance during the
-                  Age of Colleges... Born from Earth's last unified monarchic
-                  alliance during the Age of Colleges... Born from Earth's last
-                  unified monarchic alliance during the Age of Colleges... Born
-                  from Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age oforn from Earth's last unified monarchic
-                  alliance during the Age of Colleges... Born from Earth's last
-                  unified monarchic alliance during the Age of Colleges... Born
-                  from Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges... Born from Earth's last unified
-                  monarchic alliance during the Age of Colleges... Born from
-                  Earth's last unified monarchic alliance during the Age of
-                  Colleges... Born from Earth's last unified monarchic alliance
-                  during the Age of Colleges...
-                </p>
+          <Modal mode="center">
+            <DetailsModal onClose={handleDetailsModal}>
+              <div className="flex items-stretch gap-6 text-white h-[232px]">
+                <div className="w-[240px] h-full">
+                  <CardInfoModal
+                    logoUrl="https://example.com/logo.png"
+                    title="GALACTIC CROWN"
+                    country="Eurovia"
+                    state="Spain"
+                    city="Madrid"
+                    className="h-full"
+                  />
+                </div>
+                <div className="flex-1 h-full">
+                  <video
+                    src="https://example.com/video.mp4"
+                    controls
+                    className="w-full h-full rounded-lg border-none object-cover"
+                  />
+                </div>
               </div>
+              <ClubKit />
             </DetailsModal>
           </Modal>
         )}

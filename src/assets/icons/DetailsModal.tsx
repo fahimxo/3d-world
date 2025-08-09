@@ -1,20 +1,84 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 
-const DetailsModal: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const DetailsModal: React.FC<{
+  children: React.ReactNode;
+  onClose: () => void;
+}> = ({ children, onClose }) => {
+  // const scrollRef = useRef<HTMLDivElement>(null);
+  // const [thumbTop, setThumbTop] = useState(50);
+
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const scrollEl = scrollRef.current;
+  //     if (scrollEl) {
+  //       const { scrollTop, scrollHeight, clientHeight } = scrollEl;
+  //       const thumbHeight = 69;
+  //       const maxScroll = scrollHeight - clientHeight;
+  //       const maxTop = clientHeight - thumbHeight;
+  //       const newTop = (scrollTop / maxScroll) * maxTop;
+  //       setThumbTop(newTop);
+  //     }
+  //   };
+
+  //   const el = scrollRef.current;
+  //   if (el) {
+  //     el.addEventListener("scroll", handleScroll);
+  //   }
+  //   return () => {
+  //     if (el) el.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [thumbTop, setThumbTop] = useState(50);
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const [thumbTop, setThumbTop] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const updateScrollPosition = useCallback((clientY: number) => {
+    const scrollEl = scrollRef.current;
+    const thumbEl = thumbRef.current;
+    if (!scrollEl || !thumbEl) return;
+
+    const { top, height } = scrollEl.getBoundingClientRect();
+    const thumbHeight = 69;
+    const clickPosition = clientY - top - thumbHeight / 2;
+    const maxTop = height - thumbHeight;
+    const newTop = Math.max(0, Math.min(maxTop, clickPosition));
+
+    const scrollHeight = scrollEl.scrollHeight;
+    const maxScroll = scrollHeight - height;
+    const scrollPosition = (newTop / maxTop) * maxScroll;
+
+    setThumbTop(newTop);
+    scrollEl.scrollTo(0, scrollPosition);
+  }, []);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    updateScrollPosition(e.clientY);
+  };
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
+      updateScrollPosition(e.clientY);
+    },
+    [isDragging, updateScrollPosition]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollEl = scrollRef.current;
-      if (scrollEl) {
+      if (scrollEl && !isDragging) {
         const { scrollTop, scrollHeight, clientHeight } = scrollEl;
         const thumbHeight = 69;
         const maxScroll = scrollHeight - clientHeight;
         const maxTop = clientHeight - thumbHeight;
-        const newTop = (scrollTop / maxScroll) * maxTop;
+        const newTop = maxScroll > 0 ? (scrollTop / maxScroll) * maxTop : 0;
         setThumbTop(newTop);
       }
     };
@@ -23,23 +87,30 @@ const DetailsModal: React.FC<{ children: React.ReactNode }> = ({
     if (el) {
       el.addEventListener("scroll", handleScroll);
     }
-
     return () => {
-      if (el) {
-        el.removeEventListener("scroll", handleScroll);
-      }
+      if (el) el.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [isDragging]);
 
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
   return (
-    <div className="relative w-[812px] h-[534px]">
+    <div className="relative w-[812px] h-[534px] flex flex-col">
       <svg
         width="812"
         height="534"
         viewBox="0 0 812 534"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-20"
       >
         <g filter="url(#filter0_i_80_110)">
           <path
@@ -97,16 +168,42 @@ const DetailsModal: React.FC<{ children: React.ReactNode }> = ({
       </svg>
       <div
         ref={scrollRef}
-        className="relative z-10 w-full h-full px-10 py-12 text-white overflow-y-auto pr-10 hide-scrollbar"
+        className="relative z-20 flex-1 px-10 py-8 text-white overflow-y-auto hide-scrollbar"
       >
         {children}
       </div>
+      {onClose && (
+        <div className="relative z-20 flex justify-center py-8">
+          <button
+            onClick={onClose}
+            className="relative flex items-center justify-center"
+            style={{ width: 114, height: 36 }}
+          >
+            <svg
+              width="114"
+              height="36"
+              viewBox="0 0 114 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute inset-0"
+            >
+              <path
+                d="M0 0H107.5L114 7.75385V36H6L0 29.3538V0Z"
+                fill="#00C9FF"
+              />
+            </svg>
+            <span className="text-black font-bold relative z-20">Close</span>
+          </button>
+        </div>
+      )}
       <div
-        className="absolute right-4 top-0 z-20"
+        ref={thumbRef}
+        className="absolute right-4 top-0 z-20 cursor-pointer"
         style={{
           transform: `translateY(${thumbTop}px)`,
-          transition: "transform 0.05s linear",
+          transition: isDragging ? "none" : "transform 0.05s linear",
         }}
+        onMouseDown={handleMouseDown}
       >
         <svg
           width="7"
