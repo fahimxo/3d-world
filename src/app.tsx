@@ -2,16 +2,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import WorldComponent from "./ts/index";
 import "./app.css";
-import Input from "./components/input";
-import Combobox, { ComboboxOption } from "./components/combobox";
-import { Modal } from "./components/modal";
-import { Button } from "./components/button";
-import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
 import DetailsModal from "./assets/icons/DetailsModal";
 import { Filter } from "./components/filter";
 import CardInfoModal from "./assets/icons/CardInfoModal";
 import ClubKit from "./components/clubKit";
+import { FilterButton } from "./components/filterButton";
+import Combobox, { ComboboxOption } from "./components/combobox";
+import { Modal } from "./components/modal";
+import Input from "./components/input";
+import { Button } from "./components/button";
 
 export type DataType = {
   name: string;
