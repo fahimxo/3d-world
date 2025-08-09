@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import api from "../config/axios";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import api from "../config/axios";
+import { usePublicClubs } from "../lib/usePublicClubs";
 import { Button } from "./button";
 import Combobox, { ComboboxOption } from "./combobox";
 import { FilterButton } from "./filterButton";
@@ -10,30 +11,40 @@ import { Modal } from "./modal";
 import Input from "./input";
 import { API_ENDPOINTS } from "../config/endpoint";
 
-const getSportsList = async (): Promise<ComboboxOption[]> => {
-  const response = await api.post(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, {
-    filter: { searchTerm: "" },
-  });
-
-  if (response && response.code === 0 && Array.isArray(response.result)) {
-    return response.result.map((sport: any) => ({
-      value: sport.id.toString(),
-      label: sport.name,
-    }));
+// The getOptionsFor function remains unchanged.
+const getOptionsFor = async (
+  endpoint: string,
+  listName: string
+): Promise<ComboboxOption[]> => {
+  console.log(`[DEBUG] Fetching data for: ${listName} from ${endpoint}`);
+  try {
+    const response = await api.post(endpoint, {
+      filter: { searchTerm: "" },
+    });
+    const responseData = response.data ? response.data : response;
+    if (
+      responseData &&
+      responseData.code === 0 &&
+      Array.isArray(responseData.result)
+    ) {
+      return responseData.result.map((item: any) => ({
+        value: item.id.toString(),
+        label: item.name,
+      }));
+    }
+    console.warn(`[DEBUG] Could not parse a valid result for ${listName}.`);
+    return [];
+  } catch (error: any) {
+    console.error(`[DEBUG] Error fetching ${listName}:`, error.message);
+    return [];
   }
-
-  console.warn(
-    "Sports list response was not in the expected format:",
-    response
-  );
-  return [];
 };
 
+// Schema for form validation (City removed).
 const filterSchema = z.object({
   sportType: z.string().optional(),
   technoSector: z.string().optional(),
   country: z.string().optional(),
-  city: z.string().optional(),
   reimaginedName: z.string().optional(),
   currentName: z.string().optional(),
 });
@@ -43,7 +54,16 @@ type FilterFormValues = z.infer<typeof filterSchema>;
 export const Filters: React.FC = () => {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
-  const [isComboboxLoading, setIsComboboxLoading] = useState(false);
+  const [technoSectorOptions, setTechnoSectorOptions] = useState<
+    ComboboxOption[]
+  >([]);
+  const [countryOptions, setCountryOptions] = useState<ComboboxOption[]>([]);
+
+  const [loadingStates, setLoadingStates] = useState({
+    sports: false,
+    technoSectors: false,
+    countries: false,
+  });
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const {
@@ -56,32 +76,74 @@ export const Filters: React.FC = () => {
       sportType: "",
       technoSector: "",
       country: "",
-      city: "",
       reimaginedName: "",
       currentName: "",
     },
   });
 
   useEffect(() => {
-    if (filterModalVisible && sportOptions.length === 0) {
-      setIsComboboxLoading(true);
-      getSportsList().then((data) => {
-        setSportOptions(data);
-        setIsComboboxLoading(false);
-      });
+    if (filterModalVisible) {
+      if (sportOptions.length === 0) {
+        setLoadingStates((prev) => ({ ...prev, sports: true }));
+        getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
+          (data) => {
+            setSportOptions(data);
+            setLoadingStates((prev) => ({ ...prev, sports: false }));
+          }
+        );
+      }
+      if (technoSectorOptions.length === 0) {
+        setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
+        getOptionsFor(
+          API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
+          "Techno Sectors"
+        ).then((data) => {
+          setTechnoSectorOptions(data);
+          setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
+        });
+      }
+      if (countryOptions.length === 0) {
+        setLoadingStates((prev) => ({ ...prev, countries: true }));
+        getOptionsFor(
+          API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
+          "Countries"
+        ).then((data) => {
+          setCountryOptions(data);
+          setLoadingStates((prev) => ({ ...prev, countries: false }));
+        });
+      }
     }
   }, [filterModalVisible]);
 
-  const onSubmit: SubmitHandler<FilterFormValues> = (data) => {
+  const { fetchClubs, loading: clubsLoading } = usePublicClubs();
+  const onSubmit: SubmitHandler<FilterFormValues> = async (data) => {
     setIsFormSubmitting(true);
-    console.log("Submitting final filter data:", data);
-
-    // Simulating a network request for form submission
-    setTimeout(() => {
-      setIsFormSubmitting(false);
+    const filterPayload: { [key: string]: any } = {};
+    if (data.sportType) {
+      const sportId = parseInt(data.sportType, 10);
+      if (sportId !== 0) filterPayload.sportId = sportId;
+    }
+    if (data.technoSector) {
+      const sectorId = parseInt(data.technoSector, 10);
+      if (sectorId !== 0) filterPayload.sectorId = sectorId;
+    }
+    if (data.country) {
+      const countryId = parseInt(data.country, 10);
+      if (countryId !== 0) filterPayload.countryId = countryId;
+    }
+    if (data.reimaginedName) filterPayload.reimaginedName = data.reimaginedName;
+    if (data.currentName) filterPayload.currentName = data.currentName;
+    try {
+      await fetchClubs(filterPayload);
       setFilterModalVisible(false);
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to submit filters:", error);
+    } finally {
+      setIsFormSubmitting(false);
+    }
   };
+
+  const areAnyComboboxesLoading = Object.values(loadingStates).some(Boolean);
 
   return (
     <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
@@ -90,6 +152,7 @@ export const Filters: React.FC = () => {
       {filterModalVisible && (
         <Modal>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* The rest of the form remains unchanged */}
             <Controller
               name="sportType"
               control={control}
@@ -98,13 +161,57 @@ export const Filters: React.FC = () => {
                   options={sportOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder={isComboboxLoading ? "Loading..." : "Select..."}
+                  placeholder={
+                    loadingStates.sports ? "Loading..." : "Select Sport"
+                  }
                   label="Sport Type"
                   error={errors.sportType?.message}
                 />
               )}
             />
-
+            <Controller
+              name="technoSector"
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={technoSectorOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    loadingStates.technoSectors ? "Loading..." : "Select Sector"
+                  }
+                  label="Techno Sector"
+                  error={errors.technoSector?.message}
+                />
+              )}
+            />
+            <Controller
+              name="country"
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={countryOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    loadingStates.countries ? "Loading..." : "Select Country"
+                  }
+                  label="Country"
+                  error={errors.country?.message}
+                />
+              )}
+            />
+            <Controller
+              name="reimaginedName"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="Write reimagined name"
+                  label="Reimagined Name"
+                />
+              )}
+            />
             <Controller
               name="currentName"
               control={control}
@@ -116,12 +223,15 @@ export const Filters: React.FC = () => {
                 />
               )}
             />
-
             <Button
               type="submit"
-              disabled={isComboboxLoading || isFormSubmitting}
+              disabled={
+                areAnyComboboxesLoading || isFormSubmitting || clubsLoading
+              }
             >
-              {isFormSubmitting ? "Submitting..." : "Apply Filters"}
+              {isFormSubmitting || clubsLoading
+                ? "Submitting..."
+                : "Apply Filters"}
             </Button>
           </form>
         </Modal>

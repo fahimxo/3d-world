@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { usePublicClubs } from "../../lib/usePublicClubs";
 import MenuIcon from "../../assets/icons/MenuIcon";
 import Search from "../../assets/icons/SearchIcon";
 import { SciFiMenuBorder } from "../../assets/icons/SciFiMenuBorder";
@@ -6,6 +7,19 @@ import { HamburgerMenu } from "../../assets/icons/hamburgerMenu";
 
 export const Headers = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const { fetchClubs, loading } = usePublicClubs();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchValue.trim()) {
+      // Search by city or club name
+      fetchClubs({ city: searchValue.trim(), currentName: searchValue.trim() });
+    }
+  };
 
   return (
     <div className="w-full px-[45px]">
@@ -20,6 +34,10 @@ export const Headers = ({ children }: { children: React.ReactNode }) => {
               type="text"
               placeholder="Enter club name or city"
               className="w-full h-full bg-transparent border-none outline-none pl-12 pr-4 text-cyan-300 placeholder-cyan-400/50 font-medium text-sm"
+              value={searchValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
             />
           </div>
         </div>
