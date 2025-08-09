@@ -2,12 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import WorldComponent from "./ts/index";
 import "./app.css";
-import Input from "./components/input";
-import Combobox, { ComboboxOption } from "./components/combobox";
-import { Modal } from "./components/modal";
-import { Button } from "./components/button";
-import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
+import { Filters } from "./components/filters";
 
 export type DataType = {
   name: string;
@@ -55,15 +51,6 @@ const App: React.FC = () => {
 
   console.log("modalData", modalData);
 
-  const sportTypes: ComboboxOption[] = [
-    { value: "football", label: "Football" },
-    { value: "basketball", label: "Basketball" },
-    { value: "esports", label: "eSports" },
-    { value: "motorsport", label: "Motorsport" },
-  ];
-
-  const [selectedSport, setSelectedSport] = useState<string>("");
-
   return (
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
@@ -71,47 +58,7 @@ const App: React.FC = () => {
       <div className="fixed top-0 left-0 w-full z-50">
         <Headers children="Logo" />
       </div>
-      <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
-        <FilterButton onClick={toggleFilterModal} />
-        {filterModalVisible && (
-          <Modal>
-            <Combobox
-              options={sportTypes}
-              value={selectedSport}
-              onChange={setSelectedSport}
-              placeholder="select"
-              label="Sport Type"
-            />
-            <Combobox
-              options={sportTypes}
-              value={selectedSport}
-              onChange={setSelectedSport}
-              placeholder="select"
-              label="Techno Sector"
-            />
-            <Combobox
-              options={sportTypes}
-              value={selectedSport}
-              onChange={setSelectedSport}
-              placeholder="select"
-              label="Country"
-            />
-            <Combobox
-              options={sportTypes}
-              value={selectedSport}
-              onChange={setSelectedSport}
-              placeholder="select"
-              label="City"
-            />
-            <Input
-              placeholder="Write reimagined name"
-              label="Reimagined Name"
-            />
-            <Input placeholder="Write current name" label="Current Name" />
-            <Button>confirm</Button>
-          </Modal>
-        )}
-      </div>
+      <Filters />
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">

@@ -16,6 +16,7 @@ interface ComboboxProps {
   searchPlaceholder?: string;
   label?: string;
   name?: string;
+  error?: string;
 }
 
 const ComboboxMenu = ({
@@ -93,7 +94,9 @@ const ComboboxMenu = ({
             icon={Search}
             value={searchValue}
             name={name}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(event) => {
+              setSearchValue?.(event.target.value);
+            }}
           />
         </div>
         <div className="max-h-60 overflow-auto p-1">
@@ -134,6 +137,7 @@ const Combobox: React.FC<ComboboxProps> = ({
   searchPlaceholder,
   label,
   name,
+  error,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -159,6 +163,7 @@ const Combobox: React.FC<ComboboxProps> = ({
       <div className="relative w-full">
         <div className="p-[2px]" style={futuristicClipPath}>
           <button
+            type="button"
             ref={triggerRef}
             role="combobox"
             aria-expanded={open}
@@ -188,6 +193,9 @@ const Combobox: React.FC<ComboboxProps> = ({
             triggerRef={triggerRef}
             futuristicClipPath={futuristicClipPath}
           />
+        )}
+        {typeof error === "string" && error && (
+          <div className="text-red-400 text-xs mt-1">{error}</div>
         )}
       </div>
     </div>

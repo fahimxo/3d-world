@@ -56,7 +56,9 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@tweakpane/core": "^1.0.6",
+    "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "eslint-webpack-plugin": "^3.1.1",
     "gsap": "^3.7.1",
@@ -67,8 +69,10 @@
     "pietile-eventemitter": "^1.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
-    "three": "^0.143"
+    "three": "^0.143",
+    "zod": "^4.0.15"
   }
 }
