@@ -159,7 +159,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="flex-1 h-full">
                   <video
-                    src="https://example.com/video.mp4"
+                    src={detailsData?.videoUrl}
                     controls
                     className="w-full h-full rounded-lg border-none object-cover"
                   />
