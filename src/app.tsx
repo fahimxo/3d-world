@@ -8,6 +8,8 @@ import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
+import { Locations } from "./assets/icons/Locations";
+import AddClubForm from "./components/AddClubForm";
 
 export type DataType = {
   name: string;
@@ -23,6 +25,8 @@ const App: React.FC = () => {
     setFilterModalVisible((prev) => !prev);
   }, []);
   const [modalData, setModalData] = useState({ name: "", data: "" });
+  const [isLocationsModalOpen, setLocationsModalOpen] = useState(false);
+
   const [clubData, setClubData] = useState<DataType>([
     { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
     { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
@@ -68,11 +72,16 @@ const App: React.FC = () => {
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
+      {/* Moodals modal preview */}
+
       <div className="fixed top-0 left-0 w-full z-50">
         <Headers children="Logo" />
       </div>
-      <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
-        <FilterButton onClick={toggleFilterModal} />
+      <div className="absolute top-30 w-full px-20 z-40">
+        <div className="flex justify-between w-full mb-4">
+          <FilterButton onClick={toggleFilterModal} />
+          <Locations onClick={() => setLocationsModalOpen(true)} />
+        </div>
         {filterModalVisible && (
           <Modal>
             <Combobox
@@ -133,6 +142,16 @@ const App: React.FC = () => {
             </span>
             <h3 className="text-amber-800">{modalData.name}</h3>
             <p id="cityData">{modalData.data}</p>
+          </div>
+        </div>
+      )}
+      {isLocationsModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setLocationsModalOpen(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <AddClubForm onClose={() => setLocationsModalOpen(false)} />
           </div>
         </div>
       )}
