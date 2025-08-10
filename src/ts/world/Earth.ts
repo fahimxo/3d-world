@@ -25,6 +25,7 @@ import {
   Path,
   ExtrudeGeometry,
   MeshStandardMaterial,
+  PerspectiveCamera,
 } from "three";
 
 import html2canvas from "html2canvas";
@@ -194,7 +195,7 @@ export default class earth {
     const div = document.createElement("div");
     // Style the div using Tailwind CSS classes
     div.className =
-      "text-primary-200 text-sm font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none";
+      "text-primary-200 text-xs font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none";
     div.textContent = text;
 
     const label = new CSS2DObject(div);
@@ -472,6 +473,9 @@ export default class earth {
         // --- Create the 3D marker using the code function ---
         const marker3D = this.createCustom3DMarker(color);
 
+        marker3D.name = "city_marker";
+        marker3D.userData = mesh.userData;
+
         // Position the marker with a bit of distance from the surface
         const position = lon2xyz(
           this.options.earth.radius + 0.4,
@@ -556,7 +560,7 @@ export default class earth {
         // );
         label.visible = false;
         // Position the label slightly above the surface and offset to the side
-        const labelPos = lon2xyz(radius + 2, lon, lat); // Adjust radius offset as needed
+        const labelPos = lon2xyz(radius + 1, lon, lat); // Adjust radius offset as needed
         label.position.set(labelPos.x, labelPos.y, labelPos.z);
 
         this.markupPoint.add(label);
@@ -611,8 +615,13 @@ export default class earth {
       { name: "Latina Terra", E: -60, N: -15 },
       { name: "Afrika Nova", E: 20, N: 2 },
       { name: "Eurovia", E: 15, N: 50 },
-      { name: "Rusino", E: 100, N: 45 },
+      { name: "Rusino", E: 86, N: 52 },
       { name: "Oceastria", E: 135, N: -25 },
+      { name: "Balkara", E: 22, N: 43 },
+      { name: "Nordika", E: 13, N: 65 },
+      { name: "Indora", E: 77, N: 23 },
+      { name: "Sinora", E: 138, N: 37 },
+      { name: "Araka", E: 27, N: 26 },
     ];
 
     const fontSize = 40; // Larger font for continents
@@ -887,7 +896,7 @@ export default class earth {
     });
   }
 
-  render() {
+  render(camera: PerspectiveCamera) {
     this.flyLineArcGroup?.userData["flyLineArray"]?.forEach((fly) => {
       // fly.rotation.z += this.options.flyLine.speed; // 调节飞线速度
       if (fly.rotation.z >= fly.flyEndAngle) fly.rotation.z = 0;
@@ -928,5 +937,37 @@ export default class earth {
         }
       });
     }
+
+    const cameraPosition = new Vector3();
+    camera.getWorldPosition(cameraPosition);
+
+    // Combine all labels into one array for easier processing
+    const allLabels = [...this.cityLabels];
+
+    allLabels.forEach((label) => {
+      // This logic only runs for labels that are currently supposed to be visible based on zoom level.
+      if (label.visible) {
+        const labelPosition = new Vector3();
+        // Get the label's absolute world position
+        label.getWorldPosition(labelPosition);
+
+        // For a sphere at the origin, the normal vector is just its normalized position
+        const labelNormal = labelPosition.clone().normalize();
+
+        // Calculate the dot product. This tells us if the label's normal is facing the camera.
+        const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
+
+        // If the dot product is less than a small threshold, the label is on the back side.
+        // We use a small positive number (like 0.1) to hide labels right at the edge of the globe
+        // to prevent them from popping in and out abruptly.
+        if (dotProduct < 0.1) {
+          // Hide the HTML element
+          label.element.style.display = "none";
+        } else {
+          // Show the HTML element
+          label.element.style.display = "block";
+        }
+      }
+    });
   }
 }

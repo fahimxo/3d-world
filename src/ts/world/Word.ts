@@ -40,6 +40,8 @@ export default class World {
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType;
   public labelRenderer: CSS2DRenderer;
+  private tooltipElement: HTMLElement | null;
+  private currentlyHovered: THREE.Object3D | null = null;
 
   // 👉 ADD THESE NEW PROPERTIES
   private detailedTexture: THREE.Texture;
@@ -51,6 +53,10 @@ export default class World {
   // بین این دو فاصله -> کشورها
   private readonly cityThreshold: number = 95;
   // از این فاصله نزدیکتر -> شهرها
+
+  private readonly markerBaseScale: number = 0.6; // مقیاس پایه و عادی مارکر
+  private readonly markerMinScale: number = 0.2; // کوچک‌ترین مقیاسی که مارکر می‌تواند داشته باشد
+  private readonly zoomForMinScale: number = 60; // فاصله‌ای که در آن مارکر به کوچک‌ترین اندازه می‌رسد
 
   constructor(option: IWord) {
     /**
@@ -74,6 +80,14 @@ export default class World {
     this.labelRenderer.domElement.style.top = "0px";
     this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
     this.option.dom.appendChild(this.labelRenderer.domElement);
+
+    this.raycaster = new Raycaster();
+    this.mouse = new Vector2();
+    window.addEventListener("click", this.onPointClick.bind(this));
+
+    this.tooltipElement = document.getElementById("tooltip");
+    // Add the event listener for mouse movement
+    window.addEventListener("mousemove", this.onMarkerHover.bind(this));
 
     this.sizes = new Sizes({ dom: option.dom });
 
@@ -149,6 +163,81 @@ export default class World {
     } else if (!shouldBeZoomedIn && this.isZoomedIn) {
       this.isZoomedIn = false;
       this.earth.earth.material.uniforms.map.value = this.originalTexture;
+    }
+
+    let newScale = this.markerBaseScale;
+
+    // Only apply dynamic scaling if we are in the city view
+    if (showCountries || showCities) {
+      // Calculate the zoom progress (0 to 1) within the city zoom range
+      const range = this.cityThreshold - this.zoomForMinScale;
+      const progress = (this.cityThreshold - distance) / range;
+      const clampedProgress = Math.max(0, Math.min(1, progress)); // Clamp between 0 and 1
+
+      // Interpolate between the base scale and the minimum scale
+      newScale =
+        this.markerBaseScale +
+        (this.markerMinScale - this.markerBaseScale) * clampedProgress;
+    }
+
+    // Apply the new scale to all markers
+    this.earth.markupPoint.children.forEach((child) => {
+      if (child.name === "city_marker") {
+        // Find markers by the name we set in Step 1
+        child.scale.set(newScale, newScale, newScale);
+      }
+    });
+  }
+
+  private onMarkerHover(event: MouseEvent) {
+    if (!this.tooltipElement || !this.earth?.markupPoint) {
+      return;
+    }
+
+    this.mouse.x = (event.clientX / this.sizes.viewport.width) * 2 - 1;
+    this.mouse.y = -(event.clientY / this.sizes.viewport.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(
+      [this.earth.markupPoint],
+      true
+    );
+
+    let hoveredMarkerGroup = null;
+    if (intersects.length > 0) {
+      let intersectedObject = intersects[0].object;
+      while (
+        intersectedObject.parent &&
+        intersectedObject.name !== "city_marker"
+      ) {
+        intersectedObject = intersectedObject.parent;
+      }
+      if (intersectedObject.name === "city_marker") {
+        hoveredMarkerGroup = intersectedObject;
+      }
+    }
+
+    if (hoveredMarkerGroup) {
+      if (this.currentlyHovered !== hoveredMarkerGroup) {
+        this.currentlyHovered = hoveredMarkerGroup;
+        const cityName = this.currentlyHovered.userData.city;
+        this.tooltipElement.textContent = cityName;
+
+        // --- UPDATE THIS ---
+        // Show the tooltip by removing the 'hidden' class
+        this.tooltipElement.classList.remove("hidden");
+      }
+
+      // Position update remains the same
+      this.tooltipElement.style.left = `${event.clientX}px`;
+      this.tooltipElement.style.top = `${event.clientY - 60}px`;
+    } else {
+      if (this.currentlyHovered) {
+        // --- UPDATE THIS ---
+        // Hide the tooltip by adding the 'hidden' class
+        this.tooltipElement.classList.add("hidden");
+        this.currentlyHovered = null;
+      }
     }
   }
 
@@ -298,6 +387,6 @@ export default class World {
     this.renderer.render(this.scene, this.camera); // Renders the 3D scene
     this.labelRenderer.render(this.scene, this.camera);
     this.controls && this.controls.update();
-    this.earth && this.earth.render();
+    this.earth && this.earth.render(this.camera);
   }
 }

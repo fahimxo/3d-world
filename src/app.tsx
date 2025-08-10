@@ -8,6 +8,7 @@ import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
+import { Tooltip } from "./components";
 
 export type DataType = {
   name: string;
@@ -28,7 +29,12 @@ const App: React.FC = () => {
     { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
     { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
     { name: "Madrid", E: -3.7038, N: 40.4168, color: 0xffa500 },
-    { name: "barcelona", E: 2.1734, N: 41.3851, color: 0xffa500 },
+    {
+      name: "barcelona",
+      E: 0.8181,
+      N: 41.9091,
+      color: 0xffa500,
+    },
   ]);
 
   // This effect hides the loading screen after a delay.
@@ -111,6 +117,7 @@ const App: React.FC = () => {
           </Modal>
         )}
       </div>
+      <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">
