@@ -23,6 +23,7 @@ import Earth from "./Earth";
 import Data from "./Data";
 import { lon2xyz } from "../Utils/common";
 import { DataType } from "src/app";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export default class World {
   public basic: Basic;
@@ -38,12 +39,24 @@ export default class World {
   public raycaster: Raycaster; // 👈 Add raycaster property
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType;
+  public labelRenderer: CSS2DRenderer;
+  private tooltipElement: HTMLElement | null;
+  private currentlyHovered: THREE.Object3D | null = null;
 
   // 👉 ADD THESE NEW PROPERTIES
   private detailedTexture: THREE.Texture;
   private originalTexture: THREE.Texture;
   private isZoomedIn = false;
   private readonly zoomThreshold: number = 115;
+
+  private readonly continentThreshold: number = 120;
+  // بین این دو فاصله -> کشورها
+  private readonly cityThreshold: number = 95;
+  // از این فاصله نزدیکتر -> شهرها
+
+  private readonly markerBaseScale: number = 0.6; // مقیاس پایه و عادی مارکر
+  private readonly markerMinScale: number = 0.2; // کوچک‌ترین مقیاسی که مارکر می‌تواند داشته باشد
+  private readonly zoomForMinScale: number = 60; // فاصله‌ای که در آن مارکر به کوچک‌ترین اندازه می‌رسد
 
   constructor(option: IWord) {
     /**
@@ -58,15 +71,38 @@ export default class World {
     this.camera = this.basic.camera;
     this.data = option.data;
 
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(
+      this.renderer.domElement.clientWidth,
+      this.renderer.domElement.clientHeight
+    );
+    this.labelRenderer.domElement.style.position = "absolute";
+    this.labelRenderer.domElement.style.top = "0px";
+    this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
+    this.option.dom.appendChild(this.labelRenderer.domElement);
+
+    this.raycaster = new Raycaster();
+    this.mouse = new Vector2();
+    window.addEventListener("click", this.onPointClick.bind(this));
+
+    this.tooltipElement = document.getElementById("tooltip");
+    // Add the event listener for mouse movement
+    window.addEventListener("mousemove", this.onMarkerHover.bind(this));
+
     this.sizes = new Sizes({ dom: option.dom });
 
     this.sizes.$on("resize", () => {
-      this.renderer.setSize(
-        Number(this.sizes.viewport.width),
-        Number(this.sizes.viewport.height)
-      );
-      this.camera.aspect =
-        Number(this.sizes.viewport.width) / Number(this.sizes.viewport.height);
+      const width = Number(this.sizes.viewport.width);
+      const height = Number(this.sizes.viewport.height);
+
+      // Update WebGL Renderer
+      this.renderer.setSize(width, height);
+
+      // Update CSS2D Renderer
+      this.labelRenderer.setSize(width, height);
+
+      // Update Camera
+      this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
     });
 
@@ -79,6 +115,8 @@ export default class World {
 
       // Add the event listener for zoom changes
       this.controls.addEventListener("change", this.handleZoom.bind(this));
+
+      this.handleZoom();
       // 开始渲染
       this.render();
     });
@@ -92,17 +130,114 @@ export default class World {
   private handleZoom() {
     const distance = this.controls.getDistance();
 
-    // 👉 Check if we need to swap to the DETAILED texture
-    if (distance < this.zoomThreshold && !this.isZoomedIn) {
-      this.isZoomedIn = true;
-      // Correct way to update the texture on a ShaderMaterial
-      this.earth.earth.material.uniforms.map.value = this.detailedTexture;
+    // اطمینان از اینکه تمام لیبل‌ها بارگذاری شده‌اند
+    if (
+      !this.earth ||
+      !this.earth.cityLabels ||
+      !this.earth.continentLabels ||
+      !this.earth.countryLabels
+    ) {
+      return;
     }
-    // 👉 Check if we need to swap back to the ORIGINAL texture
-    else if (distance >= this.zoomThreshold && this.isZoomedIn) {
+
+    // --- منطق اصلی نمایش لیبل‌ها ---
+    const showContinents = distance > this.continentThreshold;
+    const showCountries =
+      distance <= this.continentThreshold && distance > this.cityThreshold;
+    const showCities = distance <= this.cityThreshold;
+
+    this.earth.continentLabels.forEach(
+      (label) => (label.visible = showContinents)
+    );
+    this.earth.countryLabels.forEach(
+      (label) => (label.visible = showCountries)
+    );
+    this.earth.cityLabels.forEach((label) => (label.visible = showCities));
+
+    // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
+    const shouldBeZoomedIn = showCountries || showCities;
+
+    if (shouldBeZoomedIn && !this.isZoomedIn) {
+      this.isZoomedIn = true;
+      this.earth.earth.material.uniforms.map.value = this.detailedTexture;
+    } else if (!shouldBeZoomedIn && this.isZoomedIn) {
       this.isZoomedIn = false;
-      // Correct way to update the texture on a ShaderMaterial
       this.earth.earth.material.uniforms.map.value = this.originalTexture;
+    }
+
+    let newScale = this.markerBaseScale;
+
+    // Only apply dynamic scaling if we are in the city view
+    if (showCountries || showCities) {
+      // Calculate the zoom progress (0 to 1) within the city zoom range
+      const range = this.cityThreshold - this.zoomForMinScale;
+      const progress = (this.cityThreshold - distance) / range;
+      const clampedProgress = Math.max(0, Math.min(1, progress)); // Clamp between 0 and 1
+
+      // Interpolate between the base scale and the minimum scale
+      newScale =
+        this.markerBaseScale +
+        (this.markerMinScale - this.markerBaseScale) * clampedProgress;
+    }
+
+    // Apply the new scale to all markers
+    this.earth.markupPoint.children.forEach((child) => {
+      if (child.name === "city_marker") {
+        // Find markers by the name we set in Step 1
+        child.scale.set(newScale, newScale, newScale);
+      }
+    });
+  }
+
+  private onMarkerHover(event: MouseEvent) {
+    if (!this.tooltipElement || !this.earth?.markupPoint) {
+      return;
+    }
+
+    this.mouse.x = (event.clientX / this.sizes.viewport.width) * 2 - 1;
+    this.mouse.y = -(event.clientY / this.sizes.viewport.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(
+      [this.earth.markupPoint],
+      true
+    );
+
+    let hoveredMarkerGroup = null;
+    if (intersects.length > 0) {
+      let intersectedObject = intersects[0].object;
+      while (
+        intersectedObject.parent &&
+        intersectedObject.name !== "city_marker"
+      ) {
+        intersectedObject = intersectedObject.parent;
+      }
+      if (intersectedObject.name === "city_marker") {
+        hoveredMarkerGroup = intersectedObject;
+      }
+    }
+
+    if (hoveredMarkerGroup) {
+      if (this.currentlyHovered !== hoveredMarkerGroup) {
+        this.currentlyHovered = hoveredMarkerGroup;
+        const cityName = this.currentlyHovered.userData.city;
+        this.tooltipElement.textContent = cityName;
+
+        // --- UPDATE THIS ---
+        // Show the tooltip by removing the 'hidden' class
+        this.tooltipElement.classList.remove("hidden");
+      }
+
+      // Position update remains the same
+      this.tooltipElement.style.left = `${event.clientX}px`;
+      this.tooltipElement.style.top = `${event.clientY - 60}px`;
+    } else {
+      if (this.currentlyHovered) {
+        // --- UPDATE THIS ---
+        // Hide the tooltip by adding the 'hidden' class
+        this.tooltipElement.classList.add("hidden");
+        this.currentlyHovered = null;
+      }
     }
   }
 
@@ -249,8 +384,9 @@ export default class World {
    */
   public render() {
     requestAnimationFrame(this.render.bind(this));
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.camera); // Renders the 3D scene
+    this.labelRenderer.render(this.scene, this.camera);
     this.controls && this.controls.update();
-    this.earth && this.earth.render();
+    this.earth && this.earth.render(this.camera);
   }
 }
