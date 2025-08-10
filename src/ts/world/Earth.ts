@@ -113,7 +113,7 @@ export default class earth {
   public isRotation: boolean;
   public flyLineArcGroup: Group;
   public clickablePoints: THREE.Mesh[] = [];
-  public data: DataType;
+  public data: DataType[];
   public cityLabels: CSS2DObject[] = [];
   public continentLabels: Sprite[] = [];
   public countryLabels: Sprite[] = [];
@@ -180,7 +180,7 @@ export default class earth {
       this.createStars(); // 添加星星
       this.createEarthGlow(); // 创建地球辉光
       this.createEarthAperture(); // 创建地球的大气层
-      await this.createMarkupPointsAndLabels(); // 创建柱状点位
+      await this.createMarkupPointsAndLabels(this.data); // 创建柱状点位
       await this.createSpriteLabel(); // 创建标签
       this.createCountryLabels();
       // this.createAnimateCircle(); // 创建环绕卫星
@@ -443,16 +443,33 @@ export default class earth {
     return markerGroup;
   }
 
-  async createMarkupPointsAndLabels() {
+  public clearMarkers() {
+    // Remove all children from the markupPoint group
+    while (this.markupPoint.children.length > 0) {
+      this.markupPoint.remove(this.markupPoint.children[0]);
+    }
+    // Clear the helper arrays
+    this.clickablePoints = [];
+    this.cityLabels = [];
+    this.countryLabels = [];
+    this.continentLabels = [];
+  }
+
+  async createMarkupPointsAndLabels(data: DataType[]) {
+    this.data = data;
+    console.log("this.data", this.data);
+
+    this.clearMarkers();
+
     await Promise.all(
-      this.data.map(async (item) => {
+      data?.map(async (item) => {
         const radius = this.options.earth.radius;
-        const lon = item.E; //经度
-        const lat = item.N; //纬度
-        const color = item.color;
+        const lon = item.longitude; //经度
+        const lat = item.latitude; //纬度
+        const color = 0xffa500;
 
         const pointMaterial = new MeshBasicMaterial({
-          color: item.color,
+          color: color,
           map: this.options.textures.label,
           transparent: true, //使用背景透明的png贴图，注意开启透明计算
           depthWrite: false, //禁止写入深度缓冲区数据
@@ -465,7 +482,7 @@ export default class earth {
           material: pointMaterial,
         }); //光柱底座矩形平面
 
-        mesh.userData = { type: "MarkupPoint", city: item.name, data: item };
+        mesh.userData = { type: "MarkupPoint", city: item.city, data: item };
 
         this.markupPoint.add(mesh);
         this.clickablePoints.push(mesh); // Add to our special array
@@ -477,11 +494,7 @@ export default class earth {
         marker3D.userData = mesh.userData;
 
         // Position the marker with a bit of distance from the surface
-        const position = lon2xyz(
-          this.options.earth.radius + 0.4,
-          item.E,
-          item.N
-        ); // The '+ 2' controls distance
+        const position = lon2xyz(this.options.earth.radius + 0.4, lon, lat); // The '+ 2' controls distance
         marker3D.position.set(position.x, position.y, position.z);
 
         // Scale it down to an appropriate size
@@ -551,7 +564,7 @@ export default class earth {
         const fontSize = 12; // رزولوشن بالا برای کیفیت
         const scalingFactor = 0.05; // کوچک کردن برای اندازه مناسب در صحنه
 
-        const label = this.createHTMLLabel(item.name);
+        const label = this.createHTMLLabel(item.city);
         // const label = this.createTextSprite(
         //   item.name,
         //   fontSize,

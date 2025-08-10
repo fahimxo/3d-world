@@ -20,10 +20,10 @@ import { Resources } from "./Resources";
 
 // earth
 import Earth from "./Earth";
-import Data from "./Data";
 import { lon2xyz } from "../Utils/common";
 import { DataType } from "src/app";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import gsap from "gsap";
 
 export default class World {
   public basic: Basic;
@@ -38,7 +38,8 @@ export default class World {
   public earth: Earth;
   public raycaster: Raycaster; // 👈 Add raycaster property
   public mouse: Vector2; // 👈 Add mouse vector property
-  public data: DataType;
+  public data: DataType[];
+  private cachedData: DataType[] | null = null;
   public labelRenderer: CSS2DRenderer;
   private tooltipElement: HTMLElement | null;
   private currentlyHovered: THREE.Object3D | null = null;
@@ -116,6 +117,13 @@ export default class World {
       // Add the event listener for zoom changes
       this.controls.addEventListener("change", this.handleZoom.bind(this));
 
+      if (this.cachedData) {
+        // If so, use the cached data to create the markers immediately.
+        await this.earth.createMarkupPointsAndLabels(this.cachedData);
+        // Clear the cache so it's not used again.
+        this.cachedData = null;
+      }
+
       this.handleZoom();
       // 开始渲染
       this.render();
@@ -125,6 +133,25 @@ export default class World {
     this.raycaster = new Raycaster();
     this.mouse = new Vector2();
     window.addEventListener("click", this.onPointClick.bind(this)); // Use 'window' for global clicks
+  }
+
+  // --- ADD THIS NEW METHOD TO CLEAR MARKERS ---
+  public clearMarkers() {
+    if (this.earth) {
+      this.earth.clearMarkers(); // We will add this method to the Earth class
+    }
+  }
+
+  // --- ADD THIS NEW METHOD TO UPDATE DATA ---
+  public async updateData(newData: DataType[]) {
+    console.log("newData", newData, this.earth);
+
+    if (this.earth) {
+      // Re-create the markup points with the new data
+      await this.earth.createMarkupPointsAndLabels(newData);
+    } else {
+      this.cachedData = newData;
+    }
   }
 
   private handleZoom() {

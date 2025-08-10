@@ -29,8 +29,9 @@ export function usePublicClubs() {
         API_ENDPOINTS.WORLD_MAP.GET_PUBLIC_CLUB,
         payload
       );
-      if (response.data && response.data.code === 0) {
-        setData(response.data.result || []);
+
+      if (response?.code === 0) {
+        setData(response?.result || []);
       } else {
         setData([]);
         setError("No data found");

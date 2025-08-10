@@ -51,7 +51,15 @@ const filterSchema = z.object({
 
 type FilterFormValues = z.infer<typeof filterSchema>;
 
-export const Filters: React.FC = () => {
+interface FiltersProps {
+  onFilterSubmit: (payload: object) => void;
+  loading: boolean;
+}
+
+export const Filters: React.FC<FiltersProps> = ({
+  onFilterSubmit,
+  loading,
+}) => {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
@@ -82,40 +90,37 @@ export const Filters: React.FC = () => {
   });
 
   useEffect(() => {
-    if (filterModalVisible) {
-      if (sportOptions.length === 0) {
-        setLoadingStates((prev) => ({ ...prev, sports: true }));
-        getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
-          (data) => {
-            setSportOptions(data);
-            setLoadingStates((prev) => ({ ...prev, sports: false }));
-          }
-        );
-      }
-      if (technoSectorOptions.length === 0) {
-        setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
-        getOptionsFor(
-          API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
-          "Techno Sectors"
-        ).then((data) => {
-          setTechnoSectorOptions(data);
-          setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
-        });
-      }
-      if (countryOptions.length === 0) {
-        setLoadingStates((prev) => ({ ...prev, countries: true }));
-        getOptionsFor(
-          API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
-          "Countries"
-        ).then((data) => {
-          setCountryOptions(data);
-          setLoadingStates((prev) => ({ ...prev, countries: false }));
-        });
-      }
+    if (sportOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, sports: true }));
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
+        (data) => {
+          setSportOptions(data);
+          setLoadingStates((prev) => ({ ...prev, sports: false }));
+        }
+      );
     }
-  }, [filterModalVisible]);
+    if (technoSectorOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
+      getOptionsFor(
+        API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
+        "Techno Sectors"
+      ).then((data) => {
+        setTechnoSectorOptions(data);
+        setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
+      });
+    }
+    if (countryOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, countries: true }));
+      getOptionsFor(
+        API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
+        "Countries"
+      ).then((data) => {
+        setCountryOptions(data);
+        setLoadingStates((prev) => ({ ...prev, countries: false }));
+      });
+    }
+  }, []);
 
-  const { fetchClubs, loading: clubsLoading } = usePublicClubs();
   const onSubmit: SubmitHandler<FilterFormValues> = async (data) => {
     setIsFormSubmitting(true);
     const filterPayload: { [key: string]: any } = {};
@@ -134,7 +139,7 @@ export const Filters: React.FC = () => {
     if (data.reimaginedName) filterPayload.reimaginedName = data.reimaginedName;
     if (data.currentName) filterPayload.currentName = data.currentName;
     try {
-      await fetchClubs(filterPayload);
+      await onFilterSubmit(filterPayload);
       setFilterModalVisible(false);
     } catch (error) {
       console.error("Failed to submit filters:", error);
@@ -225,13 +230,9 @@ export const Filters: React.FC = () => {
             />
             <Button
               type="submit"
-              disabled={
-                areAnyComboboxesLoading || isFormSubmitting || clubsLoading
-              }
+              disabled={areAnyComboboxesLoading || isFormSubmitting || loading}
             >
-              {isFormSubmitting || clubsLoading
-                ? "Submitting..."
-                : "Apply Filters"}
+              {isFormSubmitting || loading ? "Submitting..." : "Apply Filters"}
             </Button>
           </form>
         </Modal>

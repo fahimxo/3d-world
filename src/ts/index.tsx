@@ -1,54 +1,77 @@
-import React, { useRef, useEffect } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import World from "./world/Word"; // Corrected import from 'Word' to 'World'
 import { DataType } from "src/app";
 
 // Define the props for the component
 interface WorldComponentProps {
   onCityClick: (name: string, data: string) => void;
-  data: DataType;
+  data: DataType[];
 }
 
-const WorldComponent: React.FC<WorldComponentProps> = ({
-  onCityClick,
-  data,
-}) => {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const worldInstance = useRef<World | null>(null);
+export interface WorldHandle {
+  rotateToCoordinates: (lat: number, lon: number) => void;
+}
 
-  useEffect(() => {
-    const currentMount = mountRef.current;
-    if (!currentMount) {
-      return;
-    }
+const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
+  ({ onCityClick, data }, ref) => {
+    const mountRef = useRef<HTMLDivElement>(null);
+    const worldInstance = useRef<World | null>(null);
 
-    // Only create a new World instance if one doesn't already exist.
-    if (!worldInstance.current) {
-      worldInstance.current = new World({
-        dom: currentMount,
-        // Pass the callback function to your World class
-        // You will need to update your IWord interface and World constructor to accept this
-        onPointClick: (data) => onCityClick(data.name, JSON.stringify(data)),
-        data: data,
-      });
-    }
+    useImperativeHandle(ref, () => ({
+      // This makes the rotateToCoordinates function available on the ref
+      rotateToCoordinates(lat, lon) {
+        worldInstance.current?.rotateToCoordinates(lat, lon);
+      },
+    }));
 
-    // The cleanup function will be called when the component is unmounted.
-    return () => {
-      // To prevent memory leaks, you should add a 'destroy' method to your World class
-      // that cleans up event listeners, geometries, materials, etc.
-      // worldInstance.current?.destroy();
-      if (currentMount) {
-        while (currentMount.firstChild) {
-          currentMount.removeChild(currentMount.firstChild);
-        }
+    useEffect(() => {
+      const currentMount = mountRef.current;
+      if (!currentMount) {
+        return;
       }
-      worldInstance.current = null;
-    };
-  }, [onCityClick]);
 
-  // This div is the container where your Three.js canvas will be placed.
-  // It will be styled to be in the background.
-  return <div id="earth-canvas" ref={mountRef} />;
-};
+      // Only create a new World instance if one doesn't already exist.
+      if (!worldInstance.current) {
+        worldInstance.current = new World({
+          dom: currentMount,
+          // Pass the callback function to your World class
+          // You will need to update your IWord interface and World constructor to accept this
+          onPointClick: (data) => onCityClick(data.city, JSON.stringify(data)),
+          data: [],
+        });
+      }
+
+      // The cleanup function will be called when the component is unmounted.
+      return () => {
+        // To prevent memory leaks, you should add a 'destroy' method to your World class
+        // that cleans up event listeners, geometries, materials, etc.
+        // worldInstance.current?.destroy();
+        if (currentMount) {
+          while (currentMount.firstChild) {
+            currentMount.removeChild(currentMount.firstChild);
+          }
+        }
+        worldInstance.current = null;
+      };
+    }, [onCityClick]);
+
+    useEffect(() => {
+      console.log("data in useEffect", data);
+
+      // When the 'data' prop changes and is not empty, update the world
+      if (worldInstance.current && data && data.length > 0) {
+        worldInstance.current.updateData(data);
+      }
+    }, [data]); // This effect runs whenever the 'data' prop changes
+    // This div is the container where your Three.js canvas will be placed.
+    // It will be styled to be in the background.
+    return <div id="earth-canvas" ref={mountRef} />;
+  }
+);
 
 export default WorldComponent;
