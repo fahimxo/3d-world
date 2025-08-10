@@ -5,4 +5,8 @@ export const API_ENDPOINTS = {
     GET_COUNTRIES_LIST: "/api/WorldMap/GetCountriesList/GetCountriesList",
     GET_PUBLIC_CLUB: "/api/WorldMap/GetPublicClubs/GetPublicClubs",
   },
+  USER: {
+    LOGIN: "/api/User/Login",
+    LOGOUT: "/api/User/Logout",
+  },
 };
