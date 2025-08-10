@@ -23,6 +23,7 @@ import Earth from "./Earth";
 import Data from "./Data";
 import { lon2xyz } from "../Utils/common";
 import { DataType } from "src/app";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export default class World {
   public basic: Basic;
@@ -38,12 +39,18 @@ export default class World {
   public raycaster: Raycaster; // 👈 Add raycaster property
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType;
+  public labelRenderer: CSS2DRenderer;
 
   // 👉 ADD THESE NEW PROPERTIES
   private detailedTexture: THREE.Texture;
   private originalTexture: THREE.Texture;
   private isZoomedIn = false;
   private readonly zoomThreshold: number = 115;
+
+  private readonly continentThreshold: number = 120;
+  // بین این دو فاصله -> کشورها
+  private readonly cityThreshold: number = 95;
+  // از این فاصله نزدیکتر -> شهرها
 
   constructor(option: IWord) {
     /**
@@ -58,15 +65,30 @@ export default class World {
     this.camera = this.basic.camera;
     this.data = option.data;
 
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(
+      this.renderer.domElement.clientWidth,
+      this.renderer.domElement.clientHeight
+    );
+    this.labelRenderer.domElement.style.position = "absolute";
+    this.labelRenderer.domElement.style.top = "0px";
+    this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
+    this.option.dom.appendChild(this.labelRenderer.domElement);
+
     this.sizes = new Sizes({ dom: option.dom });
 
     this.sizes.$on("resize", () => {
-      this.renderer.setSize(
-        Number(this.sizes.viewport.width),
-        Number(this.sizes.viewport.height)
-      );
-      this.camera.aspect =
-        Number(this.sizes.viewport.width) / Number(this.sizes.viewport.height);
+      const width = Number(this.sizes.viewport.width);
+      const height = Number(this.sizes.viewport.height);
+
+      // Update WebGL Renderer
+      this.renderer.setSize(width, height);
+
+      // Update CSS2D Renderer
+      this.labelRenderer.setSize(width, height);
+
+      // Update Camera
+      this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
     });
 
@@ -94,23 +116,39 @@ export default class World {
   private handleZoom() {
     const distance = this.controls.getDistance();
 
-    // Check if we have an earth object with city labels yet
-    if (!this.earth || !this.earth.cityLabels) {
+    // اطمینان از اینکه تمام لیبل‌ها بارگذاری شده‌اند
+    if (
+      !this.earth ||
+      !this.earth.cityLabels ||
+      !this.earth.continentLabels ||
+      !this.earth.countryLabels
+    ) {
       return;
     }
 
-    if (distance < this.zoomThreshold && !this.isZoomedIn) {
+    // --- منطق اصلی نمایش لیبل‌ها ---
+    const showContinents = distance > this.continentThreshold;
+    const showCountries =
+      distance <= this.continentThreshold && distance > this.cityThreshold;
+    const showCities = distance <= this.cityThreshold;
+
+    this.earth.continentLabels.forEach(
+      (label) => (label.visible = showContinents)
+    );
+    this.earth.countryLabels.forEach(
+      (label) => (label.visible = showCountries)
+    );
+    this.earth.cityLabels.forEach((label) => (label.visible = showCities));
+
+    // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
+    const shouldBeZoomedIn = showCountries || showCities;
+
+    if (shouldBeZoomedIn && !this.isZoomedIn) {
       this.isZoomedIn = true;
-      // Swap to detailed texture
       this.earth.earth.material.uniforms.map.value = this.detailedTexture;
-      // 👇 SHOW LABELS
-      this.earth.cityLabels.forEach((label) => (label.visible = true));
-    } else if (distance >= this.zoomThreshold && this.isZoomedIn) {
+    } else if (!shouldBeZoomedIn && this.isZoomedIn) {
       this.isZoomedIn = false;
-      // Swap back to original texture
       this.earth.earth.material.uniforms.map.value = this.originalTexture;
-      // 👇 HIDE LABELS
-      this.earth.cityLabels.forEach((label) => (label.visible = false));
     }
   }
 
@@ -257,7 +295,8 @@ export default class World {
    */
   public render() {
     requestAnimationFrame(this.render.bind(this));
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.camera); // Renders the 3D scene
+    this.labelRenderer.render(this.scene, this.camera);
     this.controls && this.controls.update();
     this.earth && this.earth.render();
   }

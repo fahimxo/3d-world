@@ -4,10 +4,10 @@ import WorldComponent from "./ts/index";
 import "./app.css";
 import Input from "./components/input";
 import Combobox, { ComboboxOption } from "./components/combobox";
-import { Funnel } from "lucide-react";
 import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
+import { Headers } from "./layouts/header/Header";
 
 export type DataType = {
   name: string;
@@ -28,23 +28,7 @@ const App: React.FC = () => {
     { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
     { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
     { name: "Madrid", E: -3.7038, N: 40.4168, color: 0xffa500 },
-    { name: "Rome", E: 12.4964, N: 41.9028, color: 0xffa500 },
-    { name: "Lisbon", E: -9.1393, N: 38.7223, color: 0xffa500 },
-    { name: "Dublin", E: -6.2603, N: 53.3498, color: 0xffa500 },
-    { name: "Amsterdam", E: 4.8952, N: 52.3702, color: 0xffa500 },
-    { name: "Prague", E: 14.4378, N: 50.0755, color: 0xffa500 },
-    { name: "Vienna", E: 16.3738, N: 48.2082, color: 0xffa500 },
-    { name: "Warsaw", E: 21.0122, N: 52.2297, color: 0xffa500 },
-    { name: "Budapest", E: 19.0402, N: 47.4979, color: 0xffa500 },
-    { name: "Athens", E: 23.7275, N: 37.9838, color: 0xffa500 },
-    { name: "Istanbul", E: 28.9784, N: 41.0082, color: 0xffa500 },
-    { name: "Moscow", E: 37.6173, N: 55.7558, color: 0xffa500 },
-    { name: "Kiev", E: 30.5234, N: 50.4501, color: 0xffa500 },
-    { name: "Cairo", E: 31.2357, N: 30.0444, color: 0xffa500 },
-    { name: "Algiers", E: 3.0588, N: 36.7762, color: 0xffa500 },
-    { name: "Tunis", E: 10.1815, N: 36.8065, color: 0xffa500 },
-    { name: "Tripoli", E: 13.1913, N: 32.8872, color: 0xffa500 },
-    { name: "Casablanca", E: -7.5898, N: 33.5731, color: 0xffa500 },
+    { name: "barcelona", E: 2.1734, N: 41.3851, color: 0xffa500 },
   ]);
 
   // This effect hides the loading screen after a delay.
@@ -83,8 +67,10 @@ const App: React.FC = () => {
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent onCityClick={showCityModal} data={clubData} />
-
-      <div className=" absolute top-8 left-8 w-full max-w-sm space-y-8 ">
+      <div className="fixed top-0 left-0 w-full z-50">
+        <Headers children="Logo" />
+      </div>
+      <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
         <FilterButton onClick={toggleFilterModal} />
         {filterModalVisible && (
           <Modal>
@@ -125,7 +111,6 @@ const App: React.FC = () => {
           </Modal>
         )}
       </div>
-
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">
@@ -138,7 +123,6 @@ const App: React.FC = () => {
         </div>
         <div>Loading resources...</div>
       </div>
-
       {/* Modal Dialog */}
       {modalVisible && (
         <div id="cityModal" className="modal">
