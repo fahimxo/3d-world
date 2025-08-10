@@ -12,34 +12,51 @@ export const SciFiMenuBorder: React.FC<SciFiMenuBorderProps> = ({
   return (
     <div className={`relative inline-block ${className || ""}`}>
       <svg
-        width="142"
-        height="125"
-        viewBox="0 0 142 125"
+        width="144"
+        height="50"
+        viewBox="0 0 144 50"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="block pointer-events-none"
       >
-        <g filter="url(#filter0_i_80_820)">
+        <g filter="url(#filter0_i_288_3679)">
           <path
-            d="M141 1.25598H135.5L132.167 5.59987H118.5L116.5 2.70395H107L105 5.59987H60.3485H3.5L0.5 9.46111V55.4057L3.5 57.6662V75.615L0.5 78.1791V124.333H77.904L81.5 121.769H90.5L93.8636 124.333H137L141 118.692V42.7944V36.1278V27.802V23.0798V1.25598Z"
+            d="M141 1H135.52L132.198 2.69412H118.58L116.587 1.56471H107.121L105.128 2.69412H60.6355H5L1 5.98113V22.1184L3.98932 23V30L1 31V49H78.1286L81.7117 48H90.6797L94.0314 49H137.014L141 44.9245V17.2V14.6V11.3529V9.51128V1Z"
             fill="#010826"
           />
         </g>
         <path
-          d="M141 1.25598H135.5L132.167 5.59987H118.5L116.5 2.70395H107L105 5.59987H60.3485H3.5L0.5 9.46111V55.4057L3.5 57.6662V75.615L0.5 78.1791V124.333H77.904L81.5 121.769H90.5L93.8636 124.333H137L141 118.692V42.7944V36.1278V27.802V23.0798V1.25598Z"
+          d="M141 1H135.52L132.198 2.69412H118.58L116.587 1.56471H107.121L105.128 2.69412H60.6355H5L1 5.98113V22.1184L3.98932 23V30L1 31V49H78.1286L81.7117 48H90.6797L94.0314 49H137.014L141 44.9245V17.2V14.6V11.3529V9.51128V1Z"
+          stroke="#00C9FF"
+        />
+        <line
+          x1="143.3"
+          y1="1"
+          x2="143.3"
+          y2="47"
+          stroke="#00C9FF"
+          stroke-width="0.6"
+        />
+        <path
+          d="M94 49L90.5 46H81.5L78 49H94Z"
+          fill="#00C9FF"
+          stroke="#00C9FF"
+        />
+        <path
+          d="M1 34L4 32.3333V20.6667L1 19V34Z"
+          fill="#00C9FF"
           stroke="#00C9FF"
         />
         <defs>
           <filter
-            id="filter0_i_80_820"
-            x="0"
-            y="0.755981"
-            width="141.5"
-            height="124.077"
+            id="filter0_i_288_3679"
+            x="0.5"
+            y="0.5"
+            width="141"
+            height="49"
             filterUnits="userSpaceOnUse"
-            colorInterpolationFilters="sRGB"
+            color-interpolation-filters="sRGB"
           >
-            <feFlood floodOpacity="0" result="BackgroundImageFix" />
+            <feFlood flood-opacity="0" result="BackgroundImageFix" />
             <feBlend
               mode="normal"
               in="SourceGraphic"
@@ -62,7 +79,7 @@ export const SciFiMenuBorder: React.FC<SciFiMenuBorderProps> = ({
             <feBlend
               mode="normal"
               in2="shape"
-              result="effect1_innerShadow_80_820"
+              result="effect1_innerShadow_288_3679"
             />
           </filter>
         </defs>
