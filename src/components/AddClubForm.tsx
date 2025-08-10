@@ -53,6 +53,19 @@ const AddClubForm = ({ onClose }) => {
       <div onClick={(e) => e.stopPropagation()}>
         <LocationsModal>
           <div className="p-8 space-y-6 text-white h-full overflow-y-auto">
+            <div className="flex justify-center items-center pt-6 border-b border-cyan-400/20">
+              
+              <div className="flex gap-20">
+                <Button onClick={onClose}>Close</Button>
+                <Button>Add</Button>
+              </div>
+            </div>
+
+
+
+
+
+
             <Accordion title="Club Info">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 {/* ستون چپ */}
