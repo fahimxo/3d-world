@@ -19,9 +19,6 @@ const ClubKit = ({ data }: { data: any }) => {
             <p className="text-gray-300 text-sm leading-6 tracking-widest h-full overflow-hidden">
               {data?.lore}
             </p>
-            <div className="absolute bottom-0 left-0 right-0 h-6 flex items-end justify-center">
-              <span className="text-[#A201E2] text-lg">...</span>
-            </div>
           </div>
         </div>
       </div>
