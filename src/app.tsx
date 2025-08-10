@@ -8,6 +8,7 @@ import { Modal } from "./components/modal";
 import { Button } from "./components/button";
 import { FilterButton } from "./components/filterButton";
 import { Headers } from "./layouts/header/Header";
+import { Tooltip } from "./components";
 
 export type DataType = {
   name: string;
@@ -24,10 +25,16 @@ const App: React.FC = () => {
   }, []);
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [clubData, setClubData] = useState<DataType>([
-    { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
     { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
-    { name: "Tokyo", E: 139.6503, N: 35.6762, color: 0xffa500 },
-    // Add more cities here
+    { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
+    { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
+    { name: "Madrid", E: -3.7038, N: 40.4168, color: 0xffa500 },
+    {
+      name: "barcelona",
+      E: 0.8181,
+      N: 41.9091,
+      color: 0xffa500,
+    },
   ]);
 
   // This effect hides the loading screen after a delay.
@@ -52,8 +59,6 @@ const App: React.FC = () => {
   const hideCityModal = useCallback(() => {
     setModalVisible(false);
   }, []);
-
-  console.log("modalData", modalData);
 
   const sportTypes: ComboboxOption[] = [
     { value: "football", label: "Football" },
@@ -112,6 +117,7 @@ const App: React.FC = () => {
           </Modal>
         )}
       </div>
+      <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">

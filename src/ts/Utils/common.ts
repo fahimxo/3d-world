@@ -76,8 +76,8 @@ export const createLightPillar = (options: {
   punctuation: punctuation;
   color: number;
 }) => {
-  const height = options.radius * 0.3;
-  const geometry = new PlaneBufferGeometry(options.radius * 0.05, height);
+  const height = options.radius * 0.1;
+  const geometry = new PlaneBufferGeometry(options.radius * 0.02, height);
   geometry.rotateX(Math.PI / 2);
   geometry.translate(0, 0, height / 2);
   const material = new MeshBasicMaterial({
@@ -102,6 +102,52 @@ export const createLightPillar = (options: {
   const meshNormal = new Vector3(0, 0, 1);
   group.quaternion.setFromUnitVectors(meshNormal, coordVec3);
   return group;
+};
+
+export const createMarker = (options: {
+  radius: number;
+  lon: number;
+  lat: number;
+  textures: Record<string, Texture>;
+  color: number;
+}) => {
+  // 1. Define the marker's size. Adjust these values to fit your scene.
+  const markerHeight = options.radius * 0.1;
+  // Use the aspect ratio of your image to prevent distortion. (width / height)
+  // Your marker image is roughly 3:4, so width is 0.75 * height.
+  const markerWidth = markerHeight * 0.75;
+
+  // 2. Create the plane geometry for the marker.
+  const geometry = new PlaneBufferGeometry(markerWidth, markerHeight);
+
+  // 3. Create the material.
+  // IMPORTANT: For the 'color' property to work as expected,
+  // the source texture (options.textures.marker) should be WHITE.
+  // If you use your red texture, this color will tint it.
+  const material = new MeshBasicMaterial({
+    map: options.textures.marker, // Use your new marker texture
+    color: options.color,
+    transparent: true,
+    depthWrite: false, // Useful for avoiding rendering artifacts with transparent objects
+    side: DoubleSide,
+  });
+
+  // 4. Create the marker Mesh.
+  const mesh = new Mesh(geometry, material);
+
+  // 5. Convert latitude and longitude to 3D coordinates on the sphere.
+  const position = lon2xyz(options.radius, options.lon, options.lat);
+  mesh.position.set(position.x, position.y, position.z);
+
+  // 6. Orient the marker to stand up from the sphere's surface.
+  // The 'up' vector for a plane geometry is the Y-axis.
+  const up = new Vector3(0, 1, 0);
+  // The 'target' vector is the normal of the sphere at the marker's position.
+  const target = new Vector3(position.x, position.y, position.z).normalize();
+  // Calculate the rotation needed to align 'up' with 'target'.
+  mesh.quaternion.setFromUnitVectors(up, target);
+
+  return mesh;
 };
 
 // 光柱底座矩形平面

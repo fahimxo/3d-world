@@ -18,15 +18,25 @@ import {
   Texture,
   TextureLoader,
   Vector3,
+  CanvasTexture,
+  ConeGeometry,
+  SphereGeometry,
+  Shape,
+  Path,
+  ExtrudeGeometry,
+  MeshStandardMaterial,
+  PerspectiveCamera,
 } from "three";
 
 import html2canvas from "html2canvas";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 import earthVertex from "../../shaders/earth/vertex.vs";
 import earthFragment from "../../shaders/earth/fragment.fs";
 import {
   createAnimateLine,
   createLightPillar,
+  createMarker,
   createPointMesh,
   createWaveMesh,
   getCirclePoints,
@@ -35,6 +45,10 @@ import {
 import gsap from "gsap";
 import { flyArc } from "../Utils/arc";
 import { DataType } from "src/app";
+import {
+  CSS2DRenderer,
+  CSS2DObject,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export type punctuation = {
   circleColor: number;
@@ -100,6 +114,9 @@ export default class earth {
   public flyLineArcGroup: Group;
   public clickablePoints: THREE.Mesh[] = [];
   public data: DataType;
+  public cityLabels: CSS2DObject[] = [];
+  public continentLabels: Sprite[] = [];
+  public countryLabels: Sprite[] = [];
 
   constructor(options: options) {
     this.options = options;
@@ -163,14 +180,26 @@ export default class earth {
       this.createStars(); // 添加星星
       this.createEarthGlow(); // 创建地球辉光
       this.createEarthAperture(); // 创建地球的大气层
-      await this.createMarkupPoint(); // 创建柱状点位
-      // await this.createSpriteLabel(); // 创建标签
+      await this.createMarkupPointsAndLabels(); // 创建柱状点位
+      await this.createSpriteLabel(); // 创建标签
+      this.createCountryLabels();
       // this.createAnimateCircle(); // 创建环绕卫星
       // this.createFlyLine(); // 创建飞线
 
       this.show();
       resolve();
     });
+  }
+
+  private createHTMLLabel(text: string): CSS2DObject {
+    const div = document.createElement("div");
+    // Style the div using Tailwind CSS classes
+    div.className =
+      "text-primary-200 text-xs font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none";
+    div.textContent = text;
+
+    const label = new CSS2DObject(div);
+    return label;
   }
 
   createEarth() {
@@ -363,18 +392,64 @@ export default class earth {
   //   });
   // }
 
-  async createMarkupPoint() {
-    // const cities = [
-    //   { name: "Kyiv", E: 30.5234, N: 50.4501, color: 0xffa500 }, // Longitude, Latitude
-    //   { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
-    //   // Add more cities here
-    // ];
+  createCustom3DMarker(color) {
+    const markerGroup = new Group();
 
+    // --- 1. Define the 2D shape of the marker ---
+    const markerShape = new Shape();
+    const width = 1.2; // Base width of the marker
+    const height = 2; // Height from the bottom tip to the top of the circle
+    const radius = width / 2;
+
+    // Start at the bottom tip
+    markerShape.moveTo(0, 0);
+    // Draw the top arc
+    markerShape.absarc(0, height - radius, radius, Math.PI, 0, true);
+    // Close the shape by drawing a line back to the tip
+    markerShape.lineTo(0, 0);
+
+    // --- 2. Define the hole in the middle ---
+    const holeRadius = radius * 0.77; // Adjust size of the hole
+    const holePath = new Path();
+    // Create a circular path for the hole
+    holePath.absarc(0, height - radius, holeRadius, 0, Math.PI * 2, false);
+    // Add the hole to the shape's definition
+    markerShape.holes.push(holePath);
+
+    // --- 3. Extrude the 2D shape to make it 3D ---
+    const extrudeSettings = {
+      steps: 1,
+      depth: 0.75, // This controls the thickness of the marker
+      bevelEnabled: true, // Beveling creates the nice rounded edges
+      bevelThickness: 0.2,
+      bevelSize: 0.2,
+      bevelSegments: 5,
+    };
+
+    const geometry = new ExtrudeGeometry(markerShape, extrudeSettings);
+
+    // --- 4. Create the material and mesh ---
+    // Using MeshStandardMaterial will allow the marker to react to lights in your scene
+    const material = new MeshBasicMaterial({
+      color: new Color(color),
+    });
+
+    const mesh = new Mesh(geometry, material);
+    markerGroup.add(mesh);
+
+    // The shape is drawn on the XY plane, so we rotate it to stand up
+    markerGroup.rotateX(Math.PI / 2);
+
+    return markerGroup;
+  }
+
+  async createMarkupPointsAndLabels() {
     await Promise.all(
       this.data.map(async (item) => {
         const radius = this.options.earth.radius;
         const lon = item.E; //经度
         const lat = item.N; //纬度
+        const color = item.color;
 
         const pointMaterial = new MeshBasicMaterial({
           color: item.color,
@@ -395,25 +470,101 @@ export default class earth {
         this.markupPoint.add(mesh);
         this.clickablePoints.push(mesh); // Add to our special array
 
-        const LightPillar = createLightPillar({
-          radius: this.options.earth.radius,
-          lon,
-          lat,
-          color: item.color,
-          index: 0,
-          textures: this.options.textures,
-          punctuation: this.options.punctuation,
-        }); //光柱
-        this.markupPoint.add(LightPillar);
-        const WaveMesh = createWaveMesh({
-          radius,
-          lon,
-          lat,
-          textures: this.options.textures,
-          color: item.color,
-        }); //波动光圈
-        this.markupPoint.add(WaveMesh);
-        this.waveMeshArr.push(WaveMesh);
+        // --- Create the 3D marker using the code function ---
+        const marker3D = this.createCustom3DMarker(color);
+
+        marker3D.name = "city_marker";
+        marker3D.userData = mesh.userData;
+
+        // Position the marker with a bit of distance from the surface
+        const position = lon2xyz(
+          this.options.earth.radius + 0.4,
+          item.E,
+          item.N
+        ); // The '+ 2' controls distance
+        marker3D.position.set(position.x, position.y, position.z);
+
+        // Scale it down to an appropriate size
+        // const scaleFactor = 0.5;
+        // marker3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        const surfaceNormal = new Vector3(
+          position.x,
+          position.y,
+          position.z
+        ).normalize();
+        const markerUp = new Vector3(0, 1, 0);
+        marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
+
+        // const angleInDegrees = 10; // مارکر را ۴۵ درجه به جلو خم کن
+        // const angleInRadians = angleInDegrees * (Math.PI / 180);
+        // marker3D.rotateX(angleInRadians);
+        // برای خم کردن به بغل می‌توانید از marker.rotateZ() استفاده کنید
+        marker3D.rotateZ(70 * (Math.PI / 180));
+
+        marker3D.rotateY(90 * (Math.PI / 180));
+        // --- پایان اعمال زاویه ---
+
+        // ۳. مقیاس مارکر را تنظیم کنید
+        marker3D.scale.set(0.7, 0.7, 0.7);
+
+        // Orient it to point away from the Earth's center
+        // marker3D.lookAt(0, 0, 0); // Points towards the center
+        // marker3D.rotateX(Math.PI); // Flips it 180 degrees to point outwards
+
+        this.markupPoint.add(marker3D);
+
+        // const textureLoader = new TextureLoader();
+        // const markerTexture = textureLoader.load(
+        //   "/static/images/earth/map-marker.webp"
+        // );
+
+        // const marker = createMarker({
+        //   radius: radius,
+        //   lon: lon, // Longitude for Hidden Hills, CA
+        //   lat: lat, // Latitude for Hidden Hills, CA
+        //   textures: { marker: markerTexture }, // Make sure this texture is white
+        //   color: color, // Now you can set any color you want
+        // });
+
+        // const LightPillar = createLightPillar({
+        //   radius: this.options.earth.radius,
+        //   lon,
+        //   lat,
+        //   color: item.color,
+        //   index: 0,
+        //   textures: this.options.textures,
+        //   punctuation: this.options.punctuation,
+        // }); //光柱
+        // this.markupPoint.add(marker);
+        // const WaveMesh = createWaveMesh({
+        //   radius,
+        //   lon,
+        //   lat,
+        //   textures: this.options.textures,
+        //   color: item.color,
+        // }); //波动光圈
+        // this.markupPoint.add(WaveMesh);
+        // this.waveMeshArr.push(WaveMesh);
+
+        // const label = this.createCityLabel(item.name);
+        const fontSize = 12; // رزولوشن بالا برای کیفیت
+        const scalingFactor = 0.05; // کوچک کردن برای اندازه مناسب در صحنه
+
+        const label = this.createHTMLLabel(item.name);
+        // const label = this.createTextSprite(
+        //   item.name,
+        //   fontSize,
+        //   "#fff",
+        //   scalingFactor
+        // );
+        label.visible = false;
+        // Position the label slightly above the surface and offset to the side
+        const labelPos = lon2xyz(radius + 1, lon, lat); // Adjust radius offset as needed
+        label.position.set(labelPos.x, labelPos.y, labelPos.z);
+
+        this.markupPoint.add(label);
+        this.cityLabels.push(label);
 
         this.earthGroup.add(this.markupPoint);
       })
@@ -422,7 +573,7 @@ export default class earth {
 
   // async createSpriteLabel() {
   //   await Promise.all(
-  //     this.options.data.map(async (item) => {
+  //     this.data.map(async (item) => {
   //       let cityArry = [];
   //       cityArry.push(item.startArray);
   //       cityArry = cityArry.concat(...item.endArray);
@@ -457,6 +608,167 @@ export default class earth {
   //     })
   //   );
   // }
+
+  public createSpriteLabel() {
+    const continents = [
+      { name: "Amerika Prime", E: -100, N: 45 },
+      { name: "Latina Terra", E: -60, N: -15 },
+      { name: "Afrika Nova", E: 20, N: 2 },
+      { name: "Eurovia", E: 15, N: 50 },
+      { name: "Rusino", E: 86, N: 52 },
+      { name: "Oceastria", E: 135, N: -25 },
+      { name: "Balkara", E: 22, N: 43 },
+      { name: "Nordika", E: 13, N: 65 },
+      { name: "Indora", E: 77, N: 23 },
+      { name: "Sinora", E: 138, N: 37 },
+      { name: "Araka", E: 27, N: 26 },
+    ];
+
+    const fontSize = 40; // Larger font for continents
+    const color = "#FFFFFF"; // White color for continents
+    const scalingFactor = 0.06;
+
+    continents.forEach((continent) => {
+      // Use the reusable helper function
+      const sprite = this.createTextSprite(
+        continent.name,
+        fontSize,
+        color,
+        scalingFactor
+      );
+
+      // Position the label further out from the globe
+      const pos = lon2xyz(
+        this.options.earth.radius + 4,
+        continent.E,
+        continent.N
+      );
+      sprite.position.set(pos.x, pos.y, pos.z);
+
+      // Make continent labels always visible
+      sprite.visible = false;
+
+      this.earthGroup.add(sprite);
+      this.continentLabels.push(sprite);
+    });
+  }
+
+  public createCountryLabels() {
+    const countries = [
+      { name: "United States", E: -100, N: 39 },
+      { name: "Canada", E: -95, N: 56 },
+      { name: "Brazil", E: -55, N: -10 },
+      { name: "Germany", E: 10, N: 51 },
+      { name: "Spain", E: -4, N: 40 },
+      { name: "United Kingdom", E: -2, N: 54 },
+      { name: "Russia", E: 90, N: 60 },
+      { name: "China", E: 104, N: 35 },
+      { name: "India", E: 78, N: 20 },
+      { name: "Japan", E: 138, N: 36 },
+      { name: "Egypt", E: 30, N: 27 },
+      { name: "South Africa", E: 24, N: -29 },
+    ];
+
+    // استایل فونت برای کشورها (کمی بزرگتر از شهرها)
+    const fontSize = 17;
+    const color = "#FFFFFF";
+    // const fontSize = 192;
+    const scalingFactor = 0.05; // ضریب مقیاس مشابه
+    countries.forEach((country) => {
+      const sprite = this.createTextSprite(
+        country.name,
+        fontSize,
+        color,
+        scalingFactor
+      );
+      const pos = lon2xyz(this.options.earth.radius + 3, country.E, country.N);
+      sprite.position.set(pos.x, pos.y, pos.z);
+      sprite.visible = false; // در ابتدا مخفی باشد
+      this.earthGroup.add(sprite);
+
+      // اضافه کردن به آرایه مخصوص کشورها
+      this.countryLabels.push(sprite);
+    });
+  }
+
+  private createTextSprite(
+    text: string,
+    fontSize: number,
+    color: string,
+    scalingFactor: number
+  ): Sprite {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const fontFamily = "Arial";
+
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+    const metrics = context.measureText(text);
+    canvas.width = metrics.width;
+    canvas.height = fontSize * 1.2;
+
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+    context.fillStyle = color;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new CanvasTexture(canvas);
+    const material = new SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+    });
+
+    const sprite = new Sprite(material);
+
+    // تغییر یافته: استفاده از scalingFactor ورودی
+    const spriteWidth = canvas.width * scalingFactor;
+    const spriteHeight = canvas.height * scalingFactor;
+    sprite.scale.set(spriteWidth, spriteHeight, 1);
+
+    return sprite;
+  }
+
+  private createCityLabel(text: string): Sprite {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const fontSize = 10;
+    const fontFamily = "Orbitron";
+
+    // To get a crisp texture, we'll set the font on the context BEFORE measuring the text
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+
+    // Measure text to dynamically size the canvas
+    const metrics = context.measureText(text);
+    canvas.width = metrics.width;
+    canvas.height = fontSize * 1.2; // Add some padding
+
+    // Re-apply the font as context is reset when canvas dimensions change
+    context.font = `bolder ${fontSize}px ${fontFamily}`;
+    context.fillStyle = "#FFC900"; // A nice golden yellow color
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    const texture = new CanvasTexture(canvas);
+    const material = new SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false, // Don't block other objects behind it
+    });
+
+    const sprite = new Sprite(material);
+
+    // Scale the sprite to an appropriate size in the scene
+    const spriteWidth = canvas.width * 0.15;
+    const spriteHeight = canvas.height * 0.15;
+    sprite.scale.set(spriteWidth, spriteHeight, 1);
+
+    // Initially hide the label
+    sprite.visible = false;
+
+    return sprite;
+  }
 
   createAnimateCircle() {
     // 创建 圆环 点
@@ -584,7 +896,7 @@ export default class earth {
     });
   }
 
-  render() {
+  render(camera: PerspectiveCamera) {
     this.flyLineArcGroup?.userData["flyLineArray"]?.forEach((fly) => {
       // fly.rotation.z += this.options.flyLine.speed; // 调节飞线速度
       if (fly.rotation.z >= fly.flyEndAngle) fly.rotation.z = 0;
@@ -625,5 +937,37 @@ export default class earth {
         }
       });
     }
+
+    const cameraPosition = new Vector3();
+    camera.getWorldPosition(cameraPosition);
+
+    // Combine all labels into one array for easier processing
+    const allLabels = [...this.cityLabels];
+
+    allLabels.forEach((label) => {
+      // This logic only runs for labels that are currently supposed to be visible based on zoom level.
+      if (label.visible) {
+        const labelPosition = new Vector3();
+        // Get the label's absolute world position
+        label.getWorldPosition(labelPosition);
+
+        // For a sphere at the origin, the normal vector is just its normalized position
+        const labelNormal = labelPosition.clone().normalize();
+
+        // Calculate the dot product. This tells us if the label's normal is facing the camera.
+        const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
+
+        // If the dot product is less than a small threshold, the label is on the back side.
+        // We use a small positive number (like 0.1) to hide labels right at the edge of the globe
+        // to prevent them from popping in and out abruptly.
+        if (dotProduct < 0.1) {
+          // Hide the HTML element
+          label.element.style.display = "none";
+        } else {
+          // Show the HTML element
+          label.element.style.display = "block";
+        }
+      }
+    });
   }
 }
