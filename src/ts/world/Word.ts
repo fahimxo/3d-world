@@ -234,11 +234,11 @@ export default class World {
       let intersectedObject = intersects[0].object;
       while (
         intersectedObject.parent &&
-        intersectedObject.name !== "city_marker"
+        intersectedObject.name !== "light_pillar"
       ) {
         intersectedObject = intersectedObject.parent;
       }
-      if (intersectedObject.name === "city_marker") {
+      if (intersectedObject.name === "light_pillar") {
         hoveredMarkerGroup = intersectedObject;
       }
     }

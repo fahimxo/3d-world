@@ -487,44 +487,47 @@ export default class earth {
         this.clickablePoints.push(mesh); // Add to our special array
 
         // --- Create the 3D marker using the code function ---
-        const marker3D = this.createCustom3DMarker(color);
+        // const marker3D = this.createCustom3DMarker(color);
 
-        marker3D.name = "city_marker";
-        marker3D.userData = mesh.userData;
+        // marker3D.name = "city_marker";
+        // marker3D.userData = mesh.userData;
 
         // Position the marker with a bit of distance from the surface
-        const position = lon2xyz(this.options.earth.radius + 0.4, lon, lat); // The '+ 2' controls distance
-        marker3D.position.set(position.x, position.y, position.z);
+        // const position = lon2xyz(
+        //   this.options.earth.radius + 0.4,
+        //   lon, lat
+        // ); // The '+ 2' controls distance
+        // marker3D.position.set(position.x, position.y, position.z);
 
         // Scale it down to an appropriate size
         // const scaleFactor = 0.5;
         // marker3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        const surfaceNormal = new Vector3(
-          position.x,
-          position.y,
-          position.z
-        ).normalize();
-        const markerUp = new Vector3(0, 1, 0);
-        marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
+        // const surfaceNormal = new Vector3(
+        //   position.x,
+        //   position.y,
+        //   position.z
+        // ).normalize();
+        // const markerUp = new Vector3(0, 1, 0);
+        // marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
 
         // const angleInDegrees = 10; // مارکر را ۴۵ درجه به جلو خم کن
         // const angleInRadians = angleInDegrees * (Math.PI / 180);
         // marker3D.rotateX(angleInRadians);
         // برای خم کردن به بغل می‌توانید از marker.rotateZ() استفاده کنید
-        marker3D.rotateZ(70 * (Math.PI / 180));
+        // marker3D.rotateZ(70 * (Math.PI / 180));
 
-        marker3D.rotateY(90 * (Math.PI / 180));
+        // marker3D.rotateY(90 * (Math.PI / 180));
         // --- پایان اعمال زاویه ---
 
         // ۳. مقیاس مارکر را تنظیم کنید
-        marker3D.scale.set(0.7, 0.7, 0.7);
+        // marker3D.scale.set(0.7, 0.7, 0.7);
 
         // Orient it to point away from the Earth's center
         // marker3D.lookAt(0, 0, 0); // Points towards the center
         // marker3D.rotateX(Math.PI); // Flips it 180 degrees to point outwards
 
-        this.markupPoint.add(marker3D);
+        // this.markupPoint.add(marker3D);
 
         // const textureLoader = new TextureLoader();
         // const markerTexture = textureLoader.load(
@@ -539,16 +542,17 @@ export default class earth {
         //   color: color, // Now you can set any color you want
         // });
 
-        // const LightPillar = createLightPillar({
-        //   radius: this.options.earth.radius,
-        //   lon,
-        //   lat,
-        //   color: item.color,
-        //   index: 0,
-        //   textures: this.options.textures,
-        //   punctuation: this.options.punctuation,
-        // }); //光柱
-        // this.markupPoint.add(marker);
+        const LightPillar = createLightPillar({
+          radius: this.options.earth.radius,
+          lon,
+          lat,
+          color: item.color,
+          index: 0,
+          textures: this.options.textures,
+          punctuation: this.options.punctuation,
+          data: item,
+        }); //光柱
+        this.markupPoint.add(LightPillar);
         // const WaveMesh = createWaveMesh({
         //   radius,
         //   lon,
