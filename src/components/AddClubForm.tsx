@@ -23,6 +23,8 @@ const AddClubForm = ({ onClose }) => {
     tecnoSector: "",
     currentName: "",
     clubAnthem: "",
+    description:"",
+    clubKitVideo:"",
     clubLogo: null,
     lockClub: false,
     hideClub: true,
@@ -78,34 +80,28 @@ const AddClubForm = ({ onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className=" inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 "
       onClick={onClose}
     >
       <div onClick={(e) => e.stopPropagation()}>
         <LocationsModal>
           {/* inner Scroll */}
-          <div className=" space-y-6 text-white h-full overflow-y-auto ">
+          <div className=" space-y-6 text-white h-full  ">
             <div className="flex justify-center items-center  border-b border-cyan-400/20">
 
               <div className="flex gap-20 mb-5">
-
                 <button
                   // onClick={}
                   className="relative flex items-center justify-center cursor-pointer"
-                  
                 >
                   <svg width="202" height="46" viewBox="0 0 202 46" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M195.094 1H1V39.5618L8.48031 45H201V8.41573L195.094 1Z" fill="#00FFA6" stroke="#00FFA6" />
                     <path d="M47.104 28V19.866C47.104 19.5113 47.1927 19.1893 47.37 18.9C47.5473 18.6013 47.7807 18.3633 48.07 18.186C48.3687 18.0087 48.6953 17.92 49.05 17.92H55.224C55.5787 17.92 55.9053 18.0087 56.204 18.186C56.5027 18.3633 56.7407 18.6013 56.918 18.9C57.0953 19.1893 57.184 19.5113 57.184 19.866V28H55.322V24.612H48.952V28H47.104ZM48.952 22.764H55.322V19.95C55.322 19.9033 55.3033 19.866 55.266 19.838C55.2287 19.8007 55.1867 19.782 55.14 19.782H49.12C49.0733 19.782 49.0313 19.8007 48.994 19.838C48.966 19.866 48.952 19.9033 48.952 19.95V22.764ZM60.2491 28C59.8851 28 59.5585 27.9113 59.2691 27.734C58.9798 27.5567 58.7465 27.3233 58.5691 27.034C58.4011 26.7447 58.3171 26.4227 58.3171 26.068V21.812C58.3171 21.4573 58.4011 21.1353 58.5691 20.846C58.7465 20.5567 58.9798 20.3233 59.2691 20.146C59.5585 19.9687 59.8851 19.88 60.2491 19.88H64.7431V17.22H66.5771V28H60.2491ZM60.3331 26.166H64.5751C64.6218 26.166 64.6591 26.152 64.6871 26.124C64.7245 26.0867 64.7431 26.0447 64.7431 25.998V21.882C64.7431 21.8353 64.7245 21.798 64.6871 21.77C64.6591 21.7327 64.6218 21.714 64.5751 21.714H60.3331C60.2865 21.714 60.2445 21.7327 60.2071 21.77C60.1791 21.798 60.1651 21.8353 60.1651 21.882V25.998C60.1651 26.0447 60.1791 26.0867 60.2071 26.124C60.2445 26.152 60.2865 26.166 60.3331 26.166ZM69.587 28C69.223 28 68.8963 27.9113 68.607 27.734C68.3177 27.5567 68.0843 27.3233 67.907 27.034C67.739 26.7447 67.655 26.4227 67.655 26.068V21.812C67.655 21.4573 67.739 21.1353 67.907 20.846C68.0843 20.5567 68.3177 20.3233 68.607 20.146C68.8963 19.9687 69.223 19.88 69.587 19.88H74.081V17.22H75.915V28H69.587ZM69.671 26.166H73.913C73.9597 26.166 73.997 26.152 74.025 26.124C74.0623 26.0867 74.081 26.0447 74.081 25.998V21.882C74.081 21.8353 74.0623 21.798 74.025 21.77C73.997 21.7327 73.9597 21.714 73.913 21.714H69.671C69.6243 21.714 69.5823 21.7327 69.545 21.77C69.517 21.798 69.503 21.8353 69.503 21.882V25.998C69.503 26.0447 69.517 26.0867 69.545 26.124C69.5823 26.152 69.6243 26.166 69.671 26.166ZM81.7342 28V17.92H83.7642L89.9522 25.284V17.92H91.8142V28H89.7842L83.5822 20.622V28H81.7342ZM95.1489 28C94.7943 28 94.4723 27.9113 94.1829 27.734C93.8936 27.5567 93.6603 27.3233 93.4829 27.034C93.3056 26.7447 93.2169 26.4227 93.2169 26.068V21.812C93.2169 21.4573 93.3056 21.1353 93.4829 20.846C93.6603 20.5567 93.8936 20.3233 94.1829 20.146C94.4723 19.9687 94.7943 19.88 95.1489 19.88H99.5309C99.8856 19.88 100.208 19.9687 100.497 20.146C100.796 20.3233 101.029 20.5567 101.197 20.846C101.374 21.1353 101.463 21.4573 101.463 21.812V24.864H95.0509V25.998C95.0509 26.0447 95.0649 26.0867 95.0929 26.124C95.1303 26.152 95.1723 26.166 95.2189 26.166H101.463V28H95.1489ZM95.0509 23.212H99.6289V21.882C99.6289 21.8353 99.6103 21.798 99.5729 21.77C99.5449 21.7327 99.5076 21.714 99.4609 21.714H95.2189C95.1723 21.714 95.1303 21.7327 95.0929 21.77C95.0649 21.798 95.0509 21.8353 95.0509 21.882V23.212ZM105.345 28L102.153 19.88H104.099L106.073 24.668L108.145 19.88H110.049L112.261 24.696L114.095 19.88H116.041L112.989 28H111.561L109.111 22.582L106.773 28H105.345ZM123.493 28C123.138 28 122.811 27.9113 122.513 27.734C122.223 27.5567 121.99 27.3233 121.813 27.034C121.635 26.7353 121.547 26.4087 121.547 26.054V19.866C121.547 19.5113 121.635 19.1893 121.813 18.9C121.99 18.6013 122.223 18.3633 122.513 18.186C122.811 18.0087 123.138 17.92 123.493 17.92H131.599V19.782H123.885C123.735 19.782 123.614 19.824 123.521 19.908C123.437 19.992 123.395 20.1133 123.395 20.272V25.648C123.395 25.7973 123.437 25.9187 123.521 26.012C123.614 26.096 123.735 26.138 123.885 26.138H131.599V28H123.493ZM134.934 28C134.58 28 134.258 27.9113 133.968 27.734C133.679 27.5567 133.446 27.3233 133.268 27.034C133.091 26.7447 133.002 26.4227 133.002 26.068V17.206H134.85V25.998C134.85 26.0447 134.864 26.0867 134.892 26.124C134.93 26.152 134.972 26.166 135.018 26.166H136.572V28H134.934ZM139.624 28C139.27 28 138.943 27.9113 138.644 27.734C138.355 27.5567 138.122 27.3233 137.944 27.034C137.776 26.7447 137.692 26.4227 137.692 26.068V19.88H139.526V25.998C139.526 26.0447 139.54 26.0867 139.568 26.124C139.606 26.152 139.648 26.166 139.694 26.166H143.936C143.983 26.166 144.02 26.152 144.048 26.124C144.086 26.0867 144.104 26.0447 144.104 25.998V19.88H145.938V26.068C145.938 26.4227 145.85 26.7447 145.672 27.034C145.504 27.3233 145.276 27.5567 144.986 27.734C144.697 27.9113 144.37 28 144.006 28H139.624ZM147.126 28V17.22H148.96V19.88H153.44C153.795 19.88 154.117 19.9687 154.406 20.146C154.705 20.3233 154.938 20.5567 155.106 20.846C155.283 21.1353 155.372 21.4573 155.372 21.812V26.068C155.372 26.4227 155.283 26.7447 155.106 27.034C154.938 27.3233 154.705 27.5567 154.406 27.734C154.117 27.9113 153.795 28 153.44 28H147.126ZM149.128 26.166H153.37C153.417 26.166 153.454 26.152 153.482 26.124C153.519 26.0867 153.538 26.0447 153.538 25.998V21.882C153.538 21.8353 153.519 21.798 153.482 21.77C153.454 21.7327 153.417 21.714 153.37 21.714H149.128C149.081 21.714 149.039 21.7327 149.002 21.77C148.974 21.798 148.96 21.8353 148.96 21.882V25.998C148.96 26.0447 148.974 26.0867 149.002 26.124C149.039 26.152 149.081 26.166 149.128 26.166Z" fill="#011231" />
                   </svg>
                 </button>
-
-
-
                 <button
                   // onClick={}
                   className="relative flex items-center justify-center cursor-pointer"
-            
                 >
                   <svg width="202" height="46" viewBox="0 0 202 46" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M195.094 1H1V39.5618L8.48031 45H201V8.41573L195.094 1Z" fill="#00FFA6" fill-opacity="0.1" stroke="#00FFA6" />
@@ -125,6 +121,7 @@ const AddClubForm = ({ onClose }) => {
                     value={formData.coordinates}
                     onChange={handleInputChange}
                     placeholder="Example: 50.510281, 4.719585"
+                    addClub="true"
                   />
                 </div>
 
@@ -135,6 +132,7 @@ const AddClubForm = ({ onClose }) => {
                   placeholder="Select Country"
                   value={formData.country}
                   onChange={(value) => handleComboboxChange("country", value)}
+                  addClub="true"
                 />
                 <Combobox
                   label="City"
@@ -143,6 +141,7 @@ const AddClubForm = ({ onClose }) => {
                   placeholder="Select City"
                   value={formData.city}
                   onChange={(value) => handleComboboxChange("city", value)}
+                  addClub="true"
                 />
                 <Combobox
                   label="Tecno Sector"
@@ -153,6 +152,7 @@ const AddClubForm = ({ onClose }) => {
                   onChange={(value) =>
                     handleComboboxChange("tecnoSector", value)
                   }
+                  addClub="true"
                 />
                 <Combobox
                   label="Sport Type"
@@ -163,6 +163,7 @@ const AddClubForm = ({ onClose }) => {
                   onChange={(value) =>
                     handleComboboxChange("sportType", value)
                   }
+                  addClub="true"
                 />
                 <Input
                   label="Reimagined Name"
@@ -170,6 +171,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.reimaginedName}
                   onChange={handleInputChange}
                   placeholder="Example: Galactic Crown"
+                  addClub="true"
                 />
                 <Input
                   label="Current Name"
@@ -177,6 +179,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.currentName}
                   onChange={handleInputChange}
                   placeholder="Example: Real Madrid"
+                  addClub="true"
                 />
                 <Input
                   label="Club anthem"
@@ -184,6 +187,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.clubAnthem}
                   onChange={handleInputChange}
                   placeholder="Enter youtube link"
+                  addClub="true"
                 />
 
                 {/* ستون راست */}
@@ -196,6 +200,7 @@ const AddClubForm = ({ onClose }) => {
                     onChange={handleInputChange}
                     placeholder="Enter youtube link"
                     area="true"
+                    addClub="true"
                   />
                 </div>
                 <FileUpload
@@ -209,7 +214,30 @@ const AddClubForm = ({ onClose }) => {
 
             <div className="space-y-4">
               <Accordion title="Club kit">
-                <p className="text-cyan-200/80">Kit form elements go here...</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                  {/* ستون چپ */}
+
+                  <Input
+                    label="Video"
+                    name="clubKitVideo"
+                    value={formData.clubKitVideo}
+                    onChange={handleInputChange}
+                    placeholder="Example:url.com"
+                    addClub="true"
+                  />
+
+                  <div className="col-span-2">
+                   <Input
+                    label="Description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="Enter youtube link"
+                    area="true"
+                    addClub="true"
+                  />
+                  </div>
+                </div>
               </Accordion>
               <Accordion title="Club stadium">
                 <p className="text-cyan-200/80">
@@ -287,6 +315,7 @@ const AddClubForm = ({ onClose }) => {
             </div>
           </div>
 
+
           {/* scroll */}
           <div
             ref={thumbRef}
@@ -308,7 +337,6 @@ const AddClubForm = ({ onClose }) => {
             </svg>
           </div>
           {/* scroll */}
-
 
 
 
