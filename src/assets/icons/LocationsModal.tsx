@@ -79,7 +79,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
           </radialGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 p-8 overflow-y-auto mt-80">{children}</div>
+      <div className="absolute inset-0 p-8 overflow-y-auto ">{children}</div>
     </div>
   );
 };

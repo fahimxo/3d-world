@@ -5,10 +5,11 @@ import { cn } from "../lib/utils";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: LucideIcon;
   label?: string;
+  area?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, icon: Icon, label, name, ...props }, ref) => {
+  ({ className, type, icon: Icon, area, label, name, ...props }, ref) => {
     // Style for the angled corners using clip-path
     const futuristicClipPath = {
       clipPath:
@@ -43,8 +44,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               name={name}
               id={name}
               className={cn(
-                "flex h-12 w-full bg-transparent shadow-[var(--shadow-neon)] border-1 border-primary-200 px-3 py-2 text-base  text-cyan-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-cyan-400/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-                Icon ? "pl-10" : "",
+                "flex w-full bg-transparent shadow-[var(--shadow-neon)] border-1 border-primary-200 px-3 py-2 text-base  text-cyan-200 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-cyan-400/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                Icon ? "pl-10" : "", area ? "h-24" : "h-12",
                 className
               )}
               ref={ref}
