@@ -2,6 +2,7 @@ import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Input from "./input";
+import { cn } from "../lib/utils";
 
 export interface ComboboxOption {
   value: string;
@@ -17,6 +18,8 @@ interface ComboboxProps {
   label?: string;
   name?: string;
   error?: string;
+  addClub?: string;
+  addCc?: string;
 }
 
 const ComboboxMenu = ({
@@ -138,6 +141,7 @@ const Combobox: React.FC<ComboboxProps> = ({
   label,
   name,
   error,
+  addClub,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -155,7 +159,10 @@ const Combobox: React.FC<ComboboxProps> = ({
       {label && (
         <label
           htmlFor={name}
-          className="text-sm font-bold text-cyan-300/80 block tracking-wider mb-1"
+          className={cn(
+            "text-sm   block tracking-wider mb-1",
+            addClub ? "text-[#00FFA6]" : "text-cyan-300/80 font-bold"
+          )}
         >
           {label}
         </label>
@@ -168,13 +175,22 @@ const Combobox: React.FC<ComboboxProps> = ({
             role="combobox"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-            className="relative flex h-12 w-full shadow-[var(--shadow-neon)] items-center justify-between bg-[#0A192F] px-3 py-2 text-base text-cyan-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className={cn(
+              "relative flex h-12 w-full  items-center justify-between  px-3 py-2 text-base text-[#49675D] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              addClub
+                ? "bg-[#001b11] border-2 border-[#415C52] "
+                : "shadow-[var(--shadow-neon)] bg-[#0A192F]d"
+            )}
             style={futuristicClipPath}
           >
             {selectedOption ? (
               <span className="truncate">{selectedOption.label}</span>
             ) : (
-              <span className="text-cyan-400/50">{placeholder}</span>
+              <span
+                className={cn(addClub ? "text-[#49675D]" : "text-cyan-400/50")}
+              >
+                {placeholder}
+              </span>
             )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </button>

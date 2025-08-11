@@ -24,6 +24,8 @@ const AddClubForm = ({ onClose }) => {
     tecnoSector: "",
     currentName: "",
     clubAnthem: "",
+    description: "",
+    clubKitVideo: "",
     clubLogo: null,
     lockClub: false,
     hideClub: true,
@@ -78,13 +80,13 @@ const AddClubForm = ({ onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className=" inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 "
       onClick={onClose}
     >
       <div onClick={(e) => e.stopPropagation()}>
         <LocationsModal>
           {/* inner Scroll */}
-          <div className=" space-y-6 text-white h-full overflow-y-auto ">
+          <div className=" space-y-6 text-white h-full  ">
             <div className="flex justify-center items-center  border-b border-cyan-400/20">
               <div className="flex gap-20 mb-5">
                 <button
@@ -148,6 +150,7 @@ const AddClubForm = ({ onClose }) => {
                     value={formData.coordinates}
                     onChange={handleInputChange}
                     placeholder="Example: 50.510281, 4.719585"
+                    addClub="true"
                   />
                 </div>
 
@@ -158,6 +161,7 @@ const AddClubForm = ({ onClose }) => {
                   placeholder="Select Country"
                   value={formData.country}
                   onChange={(value) => handleComboboxChange("country", value)}
+                  addClub="true"
                 />
                 <Combobox
                   label="City"
@@ -166,6 +170,7 @@ const AddClubForm = ({ onClose }) => {
                   placeholder="Select City"
                   value={formData.city}
                   onChange={(value) => handleComboboxChange("city", value)}
+                  addClub="true"
                 />
                 <Combobox
                   label="Tecno Sector"
@@ -176,6 +181,7 @@ const AddClubForm = ({ onClose }) => {
                   onChange={(value) =>
                     handleComboboxChange("tecnoSector", value)
                   }
+                  addClub="true"
                 />
                 <Combobox
                   label="Sport Type"
@@ -191,6 +197,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.reimaginedName}
                   onChange={handleInputChange}
                   placeholder="Example: Galactic Crown"
+                  addClub="true"
                 />
                 <Input
                   label="Current Name"
@@ -198,6 +205,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.currentName}
                   onChange={handleInputChange}
                   placeholder="Example: Real Madrid"
+                  addClub="true"
                 />
                 <Input
                   label="Club anthem"
@@ -205,6 +213,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.clubAnthem}
                   onChange={handleInputChange}
                   placeholder="Enter youtube link"
+                  addClub="true"
                 />
 
                 {/* ستون راست */}
@@ -217,6 +226,7 @@ const AddClubForm = ({ onClose }) => {
                     onChange={handleInputChange}
                     placeholder="Enter youtube link"
                     area="true"
+                    addClub="true"
                   />
                 </div>
                 <FileUpload
@@ -229,7 +239,30 @@ const AddClubForm = ({ onClose }) => {
 
             <div className="space-y-4">
               <Accordion title="Club kit">
-                <p className="text-cyan-200/80">Kit form elements go here...</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                  {/* ستون چپ */}
+
+                  <Input
+                    label="Video"
+                    name="clubKitVideo"
+                    value={formData.clubKitVideo}
+                    onChange={handleInputChange}
+                    placeholder="Example:url.com"
+                    addClub="true"
+                  />
+
+                  <div className="col-span-2">
+                    <Input
+                      label="Description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                      placeholder="Enter youtube link"
+                      area="true"
+                      addClub="true"
+                    />
+                  </div>
+                </div>
               </Accordion>
               <Accordion title="Club stadium">
                 <p className="text-cyan-200/80">

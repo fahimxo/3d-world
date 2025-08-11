@@ -9,7 +9,7 @@ interface FileUploadProps {
 
 const UploadIcon = () => (
   <svg
-    className="w-8 h-8 text-cyan-300/50 mb-2"
+    className="w-8 h-8 text-[#415C52]"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
@@ -49,11 +49,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className="w-full space-y-3">
-      <label className="text-sm font-bold text-cyan-300/80 block tracking-wider mb-1">
+      <label className="text-sm  text-[#00FFA6] block tracking-wider mb-1">
         {label}
       </label>
       <div
-        className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-cyan-400/50 rounded-lg cursor-pointer hover:bg-cyan-500/10 transition-colors"
+        className="relative flex flex-col items-center justify-center w-full h-23 
+        border-2 border-dashed border-[#415C52] rounded-lg 
+        cursor-pointer hover:bg-cyan-500/10 transition-colors"
         onClick={handleClick}
       >
         <input
@@ -65,7 +67,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           accept="image/*"
         />
         <UploadIcon />
-        <p className="text-sm text-cyan-300/60">
+        <p className="text-xs text-[#415C52]">
           {fileName || "Upload club logo"}
         </p>
       </div>
