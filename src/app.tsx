@@ -80,6 +80,8 @@ const App: React.FC = () => {
   useEffect(() => {
     // اگر بارگذاری اولیه تمام شده باشد و نتیجه فیلتر دقیقا یک باشگاه باشد
     if (!isInitialLoad && clubData && worldRef.current) {
+      console.log("clubData[0]", clubData[5]);
+
       const targetClub = clubData[0];
       worldRef.current.rotateToCoordinates(
         targetClub.latitude,
@@ -118,8 +120,6 @@ const App: React.FC = () => {
   const hideCityModal = useCallback(() => {
     setModalVisible(false);
   }, []);
-
-  console.log("clubData", clubData);
 
   return (
     <div className="app-container">

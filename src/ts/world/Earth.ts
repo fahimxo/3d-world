@@ -455,9 +455,8 @@ export default class earth {
     this.continentLabels = [];
   }
 
-  async createMarkupPointsAndLabels(data: DataType[]) {
-    this.data = data;
-    console.log("this.data", this.data);
+  async createMarkupPointsAndLabels(data: DataType[] = []) {
+    this.data = data ?? [];
 
     this.clearMarkers();
 
