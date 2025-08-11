@@ -226,6 +226,15 @@ h2 a {
 @theme {
   --shadow-neon: 0px 0px 10px 0px rgba(0, 201, 255, 1) inset;
   --color-primary-200: #00c9ff;
+  --color-secondary-700: #010826;
+}
+
+.orbitron-font {
+  font-family: "Orbitron", sans-serif;
+}
+
+.orbitron-font {
+  font-family: "Orbitron", sans-serif;
 }
 
 .orbitron-font {
