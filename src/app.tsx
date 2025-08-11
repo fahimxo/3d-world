@@ -15,7 +15,7 @@ export type DataType = {
   E: number;
   N: number;
   color: number;
-}[];
+};
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -24,7 +24,7 @@ const App: React.FC = () => {
     setFilterModalVisible((prev) => !prev);
   }, []);
   const [modalData, setModalData] = useState({ name: "", data: "" });
-  const [clubData, setClubData] = useState<DataType>([
+  const [clubData, setClubData] = useState<DataType[]>([
     { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
     { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
     { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
