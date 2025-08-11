@@ -61,8 +61,6 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
     }, [onCityClick]);
 
     useEffect(() => {
-      console.log("data in useEffect", data);
-
       // When the 'data' prop changes and is not empty, update the world
       if (worldInstance.current && data && data.length > 0) {
         worldInstance.current.updateData(data);

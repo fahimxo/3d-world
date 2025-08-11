@@ -8,6 +8,7 @@ import {
   Vector2,
   Vector3,
   Quaternion,
+  Euler,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
@@ -144,8 +145,6 @@ export default class World {
 
   // --- ADD THIS NEW METHOD TO UPDATE DATA ---
   public async updateData(newData: DataType[]) {
-    console.log("newData", newData, this.earth);
-
     if (this.earth) {
       // Re-create the markup points with the new data
       await this.earth.createMarkupPointsAndLabels(newData);
@@ -269,36 +268,64 @@ export default class World {
   }
 
   public rotateToCoordinates(lat: number, lon: number) {
-    // 1. Convert Lat/Lon to a 3D vector on the globe's surface
-    const targetPosition = lon2xyz(this.earth.options.earth.radius, lon, lat);
-    const targetVector = new Vector3(
-      targetPosition.x,
-      targetPosition.y,
-      targetPosition.z
-    ).normalize();
+    // 1. Get the camera's current horizontal angle (azimuth).
+    // We want the camera to stay at this horizontal angle and the globe to rotate towards it.
+    const currentCameraAzimuth = this.controls.getAzimuthalAngle();
 
-    // 2. Define the "camera-facing" direction (typically the positive Z-axis)
-    const cameraFacingVector = new Vector3(0, 0, 1);
+    // 2. Define the target state for the animation
+    const targetState = {
+      // Corrected Logic: The globe's target is the longitude's angle MINUS the camera's angle.
+      globeY: lon * (Math.PI / 180) - currentCameraAzimuth,
 
-    // 3. Calculate the target rotation (Quaternion)
-    // This quaternion represents the rotation needed to make the targetVector face the camera.
-    const targetQuaternion = new Quaternion();
-    targetQuaternion.setFromUnitVectors(targetVector, cameraFacingVector);
+      // Vertical tilt and zoom calculations remain the same.
+      camPolar: Math.PI / 2 - lat * (Math.PI / 180),
+      camDistance: 80,
+    };
 
-    // 4. Animate the Earth group's rotation using GSAP
-    gsap.to(this.earth.earthGroup.quaternion, {
-      x: targetQuaternion.x,
-      y: targetQuaternion.y,
-      z: targetQuaternion.z,
-      w: targetQuaternion.w,
-      duration: 2.5, // Animation duration in seconds
+    // 3. Create a proxy object with the current values to animate from.
+    const animationProxy = {
+      globeY: this.earth.earthGroup.rotation.y,
+      camPolar: this.controls.getPolarAngle(),
+      camDistance: this.controls.getDistance(),
+    };
+
+    // 4. Handle the shortest rotation path for the globe.
+    // This ensures the globe always spins in the shortest direction.
+    const rotationDifference = targetState.globeY - animationProxy.globeY;
+    const shortestAngle =
+      ((rotationDifference + Math.PI) % (2 * Math.PI)) - Math.PI;
+    const finalTargetY = animationProxy.globeY + shortestAngle;
+
+    // 5. Use GSAP to animate from the current state to the target state.
+    gsap.to(animationProxy, {
+      globeY: finalTargetY,
+      camPolar: targetState.camPolar,
+      camDistance: targetState.camDistance,
+      duration: 2.5,
       ease: "power3.inOut",
+
       onStart: () => {
-        // Disable controls during animation to prevent user interference
         this.controls.enabled = false;
       },
+
+      // onUpdate is called on every frame of the animation
+      onUpdate: () => {
+        // Apply the animated horizontal rotation to the globe
+        this.earth.earthGroup.rotation.y = animationProxy.globeY;
+
+        // Apply the animated vertical tilt and zoom to the camera.
+        // The camera's horizontal angle (azimuth) remains UNCHANGED.
+        this.camera.position.setFromSphericalCoords(
+          animationProxy.camDistance,
+          animationProxy.camPolar,
+          currentCameraAzimuth
+        );
+
+        // We must call controls.update() to apply the camera changes.
+        this.controls.update();
+      },
+
       onComplete: () => {
-        // Re-enable controls when the animation finishes
         this.controls.enabled = true;
       },
     });
@@ -329,8 +356,6 @@ export default class World {
 
       // Access the data you stored earlier!
       const { city, data } = clickedObject.userData;
-
-      console.log(`You clicked on ${city}!`, data);
 
       // 👉 Here you can trigger your React state update
       // For example, by calling a callback function passed in the constructor
