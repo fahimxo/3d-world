@@ -22,9 +22,10 @@ import { Resources } from "./Resources";
 // earth
 import Earth from "./Earth";
 import { lon2xyz } from "../Utils/common";
-import { DataType } from "src/app";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import gsap from "gsap";
+import { ComboboxOption } from "src/components";
+import { DataType } from "src/lib/usePublicClubs";
 
 export default class World {
   public basic: Basic;
@@ -40,7 +41,11 @@ export default class World {
   public raycaster: Raycaster; // 👈 Add raycaster property
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType[];
-  private cachedData: DataType[] | null = null;
+  public cityList: ComboboxOption[];
+  private cachedData: {
+    clubList: DataType[];
+    cityList: ComboboxOption[];
+  } | null = null;
   public labelRenderer: CSS2DRenderer;
   private tooltipElement: HTMLElement | null;
   private currentlyHovered: THREE.Object3D | null = null;
@@ -72,6 +77,7 @@ export default class World {
     this.controls = this.basic.controls;
     this.camera = this.basic.camera;
     this.data = option.data;
+    this.cityList = option.cityList;
 
     this.labelRenderer = new CSS2DRenderer();
     this.labelRenderer.setSize(
@@ -120,7 +126,10 @@ export default class World {
 
       if (this.cachedData) {
         // If so, use the cached data to create the markers immediately.
-        await this.earth.createMarkupPointsAndLabels(this.cachedData);
+        await this.earth.createMarkupPointsAndLabels(
+          this.cachedData?.clubList,
+          this.cachedData?.cityList
+        );
         // Clear the cache so it's not used again.
         this.cachedData = null;
       }
@@ -144,10 +153,16 @@ export default class World {
   }
 
   // --- ADD THIS NEW METHOD TO UPDATE DATA ---
-  public async updateData(newData: DataType[]) {
+  public async updateData(newData: {
+    clubList: DataType[];
+    cityList: ComboboxOption[];
+  }) {
     if (this.earth) {
       // Re-create the markup points with the new data
-      await this.earth.createMarkupPointsAndLabels(newData);
+      await this.earth.createMarkupPointsAndLabels(
+        newData?.clubList,
+        newData?.cityList
+      );
     } else {
       this.cachedData = newData;
     }
@@ -216,51 +231,65 @@ export default class World {
   }
 
   private onMarkerHover(event: MouseEvent) {
-    if (!this.tooltipElement || !this.earth?.markupPoint) {
-      return;
-    }
+    if (!this.tooltipElement || !this.earth) return;
 
-    this.mouse.x = (event.clientX / this.sizes.viewport.width) * 2 - 1;
-    this.mouse.y = -(event.clientY / this.sizes.viewport.height) * 2 + 1;
+    const width = Number(this.sizes.viewport.width);
+    const height = Number(this.sizes.viewport.height);
+
+    this.mouse.x = (event.clientX / width) * 2 - 1;
+    this.mouse.y = -(event.clientY / height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(
-      [this.earth.markupPoint],
-      true
-    );
 
-    let hoveredMarkerGroup = null;
+    // ریشه‌هایی که برای ری‌کست چک می‌کنیم: اولویت با clubGroup، بعداً fallback به markupPoint
+    const roots: THREE.Object3D[] = [];
+    if ((this.earth as any).clubGroup)
+      roots.push((this.earth as any).clubGroup);
+    if (this.earth.markupPoint) roots.push(this.earth.markupPoint);
+
+    const intersects = this.raycaster.intersectObjects(roots, true);
+
+    let hit: THREE.Object3D | null = null;
     if (intersects.length > 0) {
-      let intersectedObject = intersects[0].object;
+      let obj = intersects[0].object as THREE.Object3D;
+
+      // تا ریشه‌ی ستون باشگاه بالا می‌رویم
       while (
-        intersectedObject.parent &&
-        intersectedObject.name !== "light_pillar"
+        obj &&
+        obj.parent &&
+        !(
+          obj.userData?.type === "Club" ||
+          obj.name === "club_pillar" ||
+          obj.name === "light_pillar"
+        )
       ) {
-        intersectedObject = intersectedObject.parent;
+        obj = obj.parent;
       }
-      if (intersectedObject.name === "light_pillar") {
-        hoveredMarkerGroup = intersectedObject;
+
+      if (
+        obj.userData?.type === "Club" ||
+        obj.name === "club_pillar" ||
+        obj.name === "light_pillar"
+      ) {
+        hit = obj;
       }
     }
 
-    if (hoveredMarkerGroup) {
-      if (this.currentlyHovered !== hoveredMarkerGroup) {
-        this.currentlyHovered = hoveredMarkerGroup;
-        const cityName = this.currentlyHovered.userData.city;
-        this.tooltipElement.textContent = cityName;
+    if (hit) {
+      if (this.currentlyHovered !== hit) {
+        this.currentlyHovered = hit;
 
-        // --- UPDATE THIS ---
-        // Show the tooltip by removing the 'hidden' class
+        // نام باشگاه/شهر
+        const labelText =
+          hit.userData?.clubName || hit.userData?.city || "Club";
+        this.tooltipElement.textContent = labelText;
+
         this.tooltipElement.classList.remove("hidden");
       }
-
-      // Position update remains the same
       this.tooltipElement.style.left = `${event.clientX}px`;
       this.tooltipElement.style.top = `${event.clientY - 60}px`;
     } else {
       if (this.currentlyHovered) {
-        // --- UPDATE THIS ---
-        // Hide the tooltip by adding the 'hidden' class
         this.tooltipElement.classList.add("hidden");
         this.currentlyHovered = null;
       }
@@ -268,63 +297,59 @@ export default class World {
   }
 
   public rotateToCoordinates(lat: number, lon: number) {
-    // 1. Get the camera's current horizontal angle (azimuth).
-    // We want the camera to stay at this horizontal angle and the globe to rotate towards it.
-    const currentCameraAzimuth = this.controls.getAzimuthalAngle();
+    if (!this.earth) return;
 
-    // 2. Define the target state for the animation
-    const targetState = {
-      // Corrected Logic: The globe's target is the longitude's angle MINUS the camera's angle.
-      globeY: lon * (Math.PI / 180) - currentCameraAzimuth,
+    // حتماً محور چرخش OrbitControls روی مرکز زمین باشد
+    // (اگر pan فعال بوده، target ممکن است جابجا شده باشد)
+    this.controls.target.set(0, 0, 0);
 
-      // Vertical tilt and zoom calculations remain the same.
-      camPolar: Math.PI / 2 - lat * (Math.PI / 180),
-      camDistance: 80,
+    // آزیماس فعلی دوربین (theta در Spherical سه‌جی‌اس، از محور +Z و حول +Y)
+    const camAz = this.controls.getAzimuthalAngle();
+
+    // 1) بردار جهت نقطه روی کره را در دستگاه محلی زمین بسازید
+    // حتماً ترتیب آرگومان‌ها دقیقاً مثل جایی که مارکرها ساخته می‌شوند باشد
+    // (بسته به امضای lon2xyz در پروژه‌ی شما)
+    const localDir = lon2xyz(1, lon, lat).normalize(); // radius=1 کافی‌ست (فقط جهت مهم است)
+
+    // 2) به دستگاه جهانی (با درنظر گرفتن چرخش فعلی earthGroup) ببریم
+    const worldDir = localDir
+      .clone()
+      .applyQuaternion(this.earth.earthGroup.quaternion);
+
+    // 3) آزیماس و پولارِ همین نقطه را حساب کنیم
+    const thetaPoint = Math.atan2(worldDir.x, worldDir.z); // آزیماس حول محور Y
+    const yClamped = Math.max(-1, Math.min(1, worldDir.y));
+    const phiPoint = Math.acos(yClamped); // پولار از +Y
+
+    // 4) به اندازه‌ای کره را حول Y بچرخانیم که آزیماس نقطه = آزیماس دوربین شود
+    const currentY = this.earth.earthGroup.rotation.y;
+    let deltaYaw = camAz - thetaPoint;
+
+    // نرمال‌سازی به کوتاه‌ترین مسیر [-PI, PI]
+    deltaYaw = ((deltaYaw + Math.PI) % (2 * Math.PI)) - Math.PI;
+    const targetY = currentY + deltaYaw;
+
+    // 5) انیمیشن
+    const state = {
+      y: currentY,
+      phi: this.controls.getPolarAngle(),
+      d: this.controls.getDistance(),
     };
 
-    // 3. Create a proxy object with the current values to animate from.
-    const animationProxy = {
-      globeY: this.earth.earthGroup.rotation.y,
-      camPolar: this.controls.getPolarAngle(),
-      camDistance: this.controls.getDistance(),
-    };
+    this.controls.enabled = false;
 
-    // 4. Handle the shortest rotation path for the globe.
-    // This ensures the globe always spins in the shortest direction.
-    const rotationDifference = targetState.globeY - animationProxy.globeY;
-    const shortestAngle =
-      ((rotationDifference + Math.PI) % (2 * Math.PI)) - Math.PI;
-    const finalTargetY = animationProxy.globeY + shortestAngle;
-
-    // 5. Use GSAP to animate from the current state to the target state.
-    gsap.to(animationProxy, {
-      globeY: finalTargetY,
-      camPolar: targetState.camPolar,
-      camDistance: targetState.camDistance,
-      duration: 2.5,
+    gsap.to(state, {
+      y: targetY,
+      phi: phiPoint, // دوربین را به عرض جغرافیایی نقطه می‌بریم
+      d: 80, // فاصله دلخواه
+      duration: 2.0,
       ease: "power3.inOut",
-
-      onStart: () => {
-        this.controls.enabled = false;
-      },
-
-      // onUpdate is called on every frame of the animation
       onUpdate: () => {
-        // Apply the animated horizontal rotation to the globe
-        this.earth.earthGroup.rotation.y = animationProxy.globeY;
-
-        // Apply the animated vertical tilt and zoom to the camera.
-        // The camera's horizontal angle (azimuth) remains UNCHANGED.
-        this.camera.position.setFromSphericalCoords(
-          animationProxy.camDistance,
-          animationProxy.camPolar,
-          currentCameraAzimuth
-        );
-
-        // We must call controls.update() to apply the camera changes.
+        this.earth.earthGroup.rotation.y = state.y;
+        // آزیماس دوربین را ثابت نگه می‌داریم، فقط φ و فاصله را انیمیت می‌کنیم
+        this.camera.position.setFromSphericalCoords(state.d, state.phi, camAz);
         this.controls.update();
       },
-
       onComplete: () => {
         this.controls.enabled = true;
       },
@@ -392,6 +417,7 @@ export default class World {
     this.earth = new Earth({
       // data: Data,
       data: this.data,
+      cityList: this.cityList,
       dom: this.option.dom,
       textures: this.resources.textures,
       earth: {
