@@ -123,7 +123,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-     <AddClubForm/>
+    <AddClubForm />
     // <div className="app-container">
     //   {/* The component that will render your Three.js world in the background */}
     //   <WorldComponent

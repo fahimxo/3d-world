@@ -10,6 +10,7 @@ import {
   Vector3,
 } from "three";
 import { punctuation } from "../world/Earth";
+import { DataType } from "src/app";
 
 /**
  * 经纬度坐标转球面坐标
@@ -75,6 +76,7 @@ export const createLightPillar = (options: {
   textures: Record<string, Texture>;
   punctuation: punctuation;
   color: number;
+  data: DataType;
 }) => {
   const height = options.radius * 0.1;
   const geometry = new PlaneBufferGeometry(options.radius * 0.02, height);
@@ -92,6 +94,8 @@ export const createLightPillar = (options: {
   // 两个光柱交叉叠加
   group.add(mesh, mesh.clone().rotateZ(Math.PI / 2)); //几何体绕x轴旋转了，所以mesh旋转轴变为z
   // 经纬度转球面坐标
+  group.name = "light_pillar"; // Assign a unique name
+  group.userData = { city: options.data.name, data: options.data };
   const SphereCoord = lon2xyz(options.radius, options.lon, options.lat); //SphereCoord球面坐标
   group.position.set(SphereCoord.x, SphereCoord.y, SphereCoord.z); //设置mesh位置
   const coordVec3 = new Vector3(
@@ -161,7 +165,7 @@ export const createPointMesh = (options: {
   const mesh = new Mesh(geometry, options.material);
   // 经纬度转球面坐标
   const coord = lon2xyz(options.radius * 1.001, options.lon, options.lat);
-  const size = options.radius * 0.05; // 矩形平面Mesh的尺寸
+  const size = options.radius * 0.03; // 矩形平面Mesh的尺寸
   mesh.scale.set(size, size, size); // 设置mesh大小
 
   // 设置mesh位置
