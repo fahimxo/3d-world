@@ -9,4 +9,9 @@ export const API_ENDPOINTS = {
     LOGIN: "/api/User/Login",
     LOGOUT: "/api/User/Logout",
   },
+
+  ADMIN: {
+    GET_CLUBS_LIST: "/api/User/GetClubsList/GetClubsList",
+    
+  },
 };

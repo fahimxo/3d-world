@@ -6,7 +6,6 @@ import { Headers } from "./layouts/header/Header";
 import { Filters } from "./components/filters";
 import { Tooltip } from "./components";
 import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
-import { Locations } from "./assets/icons/Locations";
 import AddClubForm from "./components/AddClubForm";
 
 export type DataType = {
@@ -124,53 +123,54 @@ const App: React.FC = () => {
   console.log("clubData", clubData);
 
   return (
-    <div className="app-container">
-      {/* The component that will render your Three.js world in the background */}
-      <WorldComponent
-        onCityClick={showCityModal}
-        data={clubData}
-        ref={worldRef}
-      />
-      <div className="fixed top-0 left-0 w-full z-50">
-        <Headers children="Logo" />
-      </div>
-      <Filters onFilterSubmit={handleFilterSubmit} loading={clubsLoading} />
-      <Tooltip />
-      {/* Loading Indicator (can remain outside the main container) */}
-      <div id="loading">
-        <div className="sk-chase">
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-        </div>
-        <div>Loading resources...</div>
-      </div>
-      {/* Modal Dialog */}
-      {modalVisible && (
-        <div id="cityModal" className="modal">
-          <div className="modal-content">
-            <span className="close-button" onClick={hideCityModal}>
-              &times;
-            </span>
-            <h3 className="text-amber-800">{modalData.name}</h3>
-            <p id="cityData">{modalData.data}</p>
-          </div>
-        </div>
-      )}
-      {isLocationsModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-          onClick={() => setLocationsModalOpen(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <AddClubForm onClose={() => setLocationsModalOpen(false)} />
-          </div>
-        </div>
-      )}
-    </div>
+     <AddClubForm/>
+    // <div className="app-container">
+    //   {/* The component that will render your Three.js world in the background */}
+    //   <WorldComponent
+    //     onCityClick={showCityModal}
+    //     data={clubData}
+    //     ref={worldRef}
+    //   />
+    //   <div className="fixed top-0 left-0 w-full z-50">
+    //     <Headers children="Logo" />
+    //   </div>
+    //   <Filters onFilterSubmit={handleFilterSubmit} loading={clubsLoading} />
+    //   <Tooltip />
+    //   {/* Loading Indicator (can remain outside the main container) */}
+    //   <div id="loading">
+    //     <div className="sk-chase">
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //     </div>
+    //     <div>Loading resources...</div>
+    //   </div>
+    //   {/* Modal Dialog */}
+    //   {modalVisible && (
+    //     <div id="cityModal" className="modal">
+    //       <div className="modal-content">
+    //         <span className="close-button" onClick={hideCityModal}>
+    //           &times;
+    //         </span>
+    //         <h3 className="text-amber-800">{modalData.name}</h3>
+    //         <p id="cityData">{modalData.data}</p>
+    //       </div>
+    //     </div>
+    //   )}
+    //   {isLocationsModalOpen && (
+    //     <div
+    //       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+    //       onClick={() => setLocationsModalOpen(false)}
+    //     >
+    //       <div onClick={(e) => e.stopPropagation()}>
+    //         <AddClubForm onClose={() => setLocationsModalOpen(false)} />
+    //       </div>
+    //     </div>
+    //   )}
+    // </div>
   );
 };
 

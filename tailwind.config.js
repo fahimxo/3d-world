@@ -9,6 +9,8 @@ export default {
         neon: "0 0 8px #0ff, 0 0 16px #0ff, 0 0 24px #0ff", // cyan glow
         "neon-pink": "0 0 8px #f0f, 0 0 16px #f0f, 0 0 24px #f0f",
       },
+
+      
     },
   },
   plugins: [],

@@ -6,6 +6,8 @@ import Combobox from "./combobox";
 import { Checkbox } from "./Checkbox";
 import { FileUpload } from "./FileUpload";
 import Input from "./input";
+import ClubCard from "./ClubCard";
+import ClubList from "./ClubList";
 
 const countryOptions = [
   { value: "usa", label: "United States" },
@@ -14,7 +16,7 @@ const countryOptions = [
 ];
 
 const AddClubForm = ({ onClose }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] =       useState({
     coordinates: "",
     city: "",
     reimaginedName: "",
@@ -115,6 +117,10 @@ const AddClubForm = ({ onClose }) => {
 
               </div>
             </div>
+
+<ClubList/>
+
+            
             <Accordion title="Club Info">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
                 {/* ستون چپ */}
