@@ -32,17 +32,17 @@ const textures = fileSuffix.map((item) => {
 
 textures.push({
   name: "earth",
-  url: filePath + "Eurovia.png",
+  url: filePath + "3DGlobe-TS.png",
 });
 
 // ✨ ADD YOUR NEW DETAILED MAP HERE
 textures.push({
   name: "earthDetailed", // Give it a new, unique name
-  url: filePath + "Neon-World-.png", // Use the correct file name
+  url: filePath + "3DGlobe-C.png", // Use the correct file name
 });
 
 const resources: IResources = {
-  textures,
+  textures, 
 };
 
 export { resources };

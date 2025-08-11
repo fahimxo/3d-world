@@ -3,22 +3,20 @@
  * 场景、相机、渲染器、控制器
  */
 
-import * as THREE from 'three';
-import {
-  OrbitControls
-} from "three/examples/jsm/controls/OrbitControls";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export class Basic {
   public scene: THREE.Scene;
   public camera: THREE.PerspectiveCamera;
-  public renderer: THREE.WebGLRenderer
+  public renderer: THREE.WebGLRenderer;
   public controls: OrbitControls;
   public dom: HTMLElement;
 
   constructor(dom: HTMLElement) {
-    this.dom = dom
-    this.initScenes()
-    this.setControls()
+    this.dom = dom;
+    this.initScenes();
+    this.setControls();
   }
 
   /**
@@ -33,8 +31,7 @@ export class Basic {
       1,
       100000
     );
-    this.camera.position.set(0, 30, -250)
-
+    this.camera.position.set(0, 30, -250);
 
     this.renderer = new THREE.WebGLRenderer({
       alpha: true, // 透明
@@ -51,8 +48,8 @@ export class Basic {
   setControls() {
     // 鼠标控制      相机，渲染dom
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    
-    this.controls.autoRotateSpeed = 3
+
+    this.controls.autoRotateSpeed = 3;
     // 使动画循环使用时阻尼或自转 意思是否有惯性
     this.controls.enableDamping = true;
     // 动态阻尼系数 就是鼠标拖拽旋转灵敏度
@@ -60,7 +57,7 @@ export class Basic {
     // 是否可以缩放
     this.controls.enableZoom = true;
     // 设置相机距离原点的最远距离
-    this.controls.minDistance = 100;
+    this.controls.minDistance = 65;
     // 设置相机距离原点的最远距离
     this.controls.maxDistance = 300;
     // 是否开启右键拖拽
