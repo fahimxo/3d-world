@@ -44,11 +44,12 @@ import {
 } from "../Utils/common";
 import gsap from "gsap";
 import { flyArc } from "../Utils/arc";
-import { DataType } from "src/app";
 import {
   CSS2DRenderer,
   CSS2DObject,
 } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { ComboboxOption } from "src/components";
+import { DataType } from "src/lib/usePublicClubs";
 
 export type punctuation = {
   circleColor: number;
@@ -58,8 +59,16 @@ export type punctuation = {
   };
 };
 
+export interface CityData {
+  city: string;
+  latitude: number;
+  longitude: number;
+  // ... هر فیلد دیگه‌ای که بعداً لازم داری
+}
+
 type options = {
-  data: DataType;
+  data: DataType[];
+  cityList: ComboboxOption[];
   dom: HTMLElement;
   textures: Record<string, Texture>; // 贴图
   earth: {
@@ -114,13 +123,18 @@ export default class earth {
   public flyLineArcGroup: Group;
   public clickablePoints: THREE.Mesh[] = [];
   public data: DataType[];
+  public cityList: ComboboxOption[];
   public cityLabels: CSS2DObject[] = [];
   public continentLabels: Sprite[] = [];
   public countryLabels: Sprite[] = [];
 
+  public cityGroup: THREE.Group;
+  public clubGroup: THREE.Group;
+
   constructor(options: options) {
     this.options = options;
     this.data = options.data;
+    this.cityList = options.cityList;
 
     this.group = new Group();
     this.group.name = "group";
@@ -133,6 +147,15 @@ export default class earth {
     this.markupPoint = new Group();
     this.markupPoint.name = "markupPoint";
     this.waveMeshArr = [];
+
+    this.cityGroup = new Group();
+    this.cityGroup.name = "city_group";
+
+    this.clubGroup = new Group();
+    this.clubGroup.name = "club_group";
+
+    this.earthGroup.add(this.cityGroup);
+    this.earthGroup.add(this.clubGroup);
 
     // 卫星和标签
     this.circleLineList = [];
@@ -180,7 +203,7 @@ export default class earth {
       this.createStars(); // 添加星星
       this.createEarthGlow(); // 创建地球辉光
       this.createEarthAperture(); // 创建地球的大气层
-      await this.createMarkupPointsAndLabels(this.data); // 创建柱状点位
+      await this.createMarkupPointsAndLabels(this.data, this.cityList); // 创建柱状点位
       await this.createSpriteLabel(); // 创建标签
       this.createCountryLabels();
       // this.createAnimateCircle(); // 创建环绕卫星
@@ -455,137 +478,253 @@ export default class earth {
     this.continentLabels = [];
   }
 
-  async createMarkupPointsAndLabels(data: DataType[] = []) {
-    this.data = data ?? [];
-
-    this.clearMarkers();
+  // 1) ساخت Light Pillar برای باشگاه‌ها
+  public async createClubPillars(clubs: DataType[] = []) {
+    const radius = this.options.earth.radius;
 
     await Promise.all(
-      data?.map(async (item) => {
-        const radius = this.options.earth.radius;
-        const lon = item.longitude; //经度
-        const lat = item.latitude; //纬度
+      clubs.map(async (item) => {
+        const lon = item.longitude;
+        const lat = item.latitude;
         const color = 0xffa500;
 
-        const pointMaterial = new MeshBasicMaterial({
-          color: color,
-          map: this.options.textures.label,
-          transparent: true, //使用背景透明的png贴图，注意开启透明计算
-          depthWrite: false, //禁止写入深度缓冲区数据
-        });
-
-        const mesh = createPointMesh({
+        // خود ستون نور
+        const pillar = createLightPillar({
           radius,
           lon,
           lat,
-          material: pointMaterial,
-        }); //光柱底座矩形平面
-
-        mesh.userData = { type: "MarkupPoint", city: item.city, data: item };
-
-        this.markupPoint.add(mesh);
-        this.clickablePoints.push(mesh); // Add to our special array
-
-        // --- Create the 3D marker using the code function ---
-        // const marker3D = this.createCustom3DMarker(color);
-
-        // marker3D.name = "city_marker";
-        // marker3D.userData = mesh.userData;
-
-        // Position the marker with a bit of distance from the surface
-        // const position = lon2xyz(
-        //   this.options.earth.radius + 0.4,
-        //   item.E,
-        //   item.N
-        // ); // The '+ 2' controls distance
-        // marker3D.position.set(position.x, position.y, position.z);
-
-        // Scale it down to an appropriate size
-        // const scaleFactor = 0.5;
-        // marker3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-        // const surfaceNormal = new Vector3(
-        //   position.x,
-        //   position.y,
-        //   position.z
-        // ).normalize();
-        // const markerUp = new Vector3(0, 1, 0);
-        // marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
-
-        // const angleInDegrees = 10; // مارکر را ۴۵ درجه به جلو خم کن
-        // const angleInRadians = angleInDegrees * (Math.PI / 180);
-        // marker3D.rotateX(angleInRadians);
-        // برای خم کردن به بغل می‌توانید از marker.rotateZ() استفاده کنید
-        // marker3D.rotateZ(70 * (Math.PI / 180));
-
-        // marker3D.rotateY(90 * (Math.PI / 180));
-        // --- پایان اعمال زاویه ---
-
-        // ۳. مقیاس مارکر را تنظیم کنید
-        // marker3D.scale.set(0.7, 0.7, 0.7);
-
-        // Orient it to point away from the Earth's center
-        // marker3D.lookAt(0, 0, 0); // Points towards the center
-        // marker3D.rotateX(Math.PI); // Flips it 180 degrees to point outwards
-
-        // this.markupPoint.add(marker3D);
-
-        // const textureLoader = new TextureLoader();
-        // const markerTexture = textureLoader.load(
-        //   "/static/images/earth/map-marker.webp"
-        // );
-
-        // const marker = createMarker({
-        //   radius: radius,
-        //   lon: lon, // Longitude for Hidden Hills, CA
-        //   lat: lat, // Latitude for Hidden Hills, CA
-        //   textures: { marker: markerTexture }, // Make sure this texture is white
-        //   color: color, // Now you can set any color you want
-        // });
-
-        const LightPillar = createLightPillar({
-          radius: this.options.earth.radius,
-          lon,
-          lat,
-          color: item.color,
+          color,
           index: 0,
           textures: this.options.textures,
           punctuation: this.options.punctuation,
           data: item,
-        }); //光柱
-        this.markupPoint.add(LightPillar);
-        // const WaveMesh = createWaveMesh({
-        //   radius,
-        //   lon,
-        //   lat,
-        //   textures: this.options.textures,
-        //   color: item.color,
-        // }); //波动光圈
-        // this.markupPoint.add(WaveMesh);
-        // this.waveMeshArr.push(WaveMesh);
+        });
+        pillar.name = "club_pillar";
+        pillar.userData = { type: "Club", city: item.city, data: item };
 
-        // const label = this.createCityLabel(item.name);
-        const fontSize = 12; // رزولوشن بالا برای کیفیت
-        const scalingFactor = 0.05; // کوچک کردن برای اندازه مناسب در صحنه
+        this.clubGroup.add(pillar);
 
-        const label = this.createHTMLLabel(item.city);
-        // const label = this.createTextSprite(
-        //   item.name,
-        //   fontSize,
-        //   "#fff",
-        //   scalingFactor
-        // );
-        label.visible = false;
-        // Position the label slightly above the surface and offset to the side
-        const labelPos = lon2xyz(radius + 1, lon, lat); // Adjust radius offset as needed
-        label.position.set(labelPos.x, labelPos.y, labelPos.z);
-
-        this.markupPoint.add(label);
-        this.cityLabels.push(label);
-
-        this.earthGroup.add(this.markupPoint);
+        // برای Raycast: یک مش کوچک نامرئی روی محل ستون می‌گذاریم
+        const pick = new Mesh(
+          new SphereGeometry(0.8, 10, 10),
+          new MeshBasicMaterial({ visible: false })
+        );
+        const pickPos = lon2xyz(radius + 0.2, lon, lat);
+        pick.position.set(pickPos.x, pickPos.y, pickPos.z);
+        pick.userData = pillar.userData; // همان دیتا
+        pick.name = "club_pick"; // صرفاً جهت دیباگ
+        this.clubGroup.add(pick);
+        this.clickablePoints.push(pick);
       })
     );
+  }
+
+  // 2) ساخت Point Mesh برای شهرها
+  public async createCityPoints(cities: CityData[] = []) {
+    const radius = this.options.earth.radius;
+
+    await Promise.all(
+      cities.map(async (item) => {
+        const lon = item.longitude;
+        const lat = item.latitude;
+        const color = 0xffa500;
+
+        const pointMaterial = new MeshBasicMaterial({
+          color,
+          map: this.options.textures.label,
+          transparent: true,
+          depthWrite: false,
+        });
+
+        const cityPoint = createPointMesh({
+          radius,
+          lon,
+          lat,
+          material: pointMaterial,
+        });
+
+        cityPoint.name = "city_point";
+        cityPoint.userData = { type: "City", city: item.city, data: item };
+
+        this.cityGroup.add(cityPoint);
+        this.clickablePoints.push(cityPoint);
+
+        // لیبل HTML (اختیاری)
+        const label = this.createHTMLLabel(item.city);
+        label.visible = false;
+
+        const labelPos = lon2xyz(radius + 1, lon, lat);
+        label.position.set(labelPos.x, labelPos.y, labelPos.z);
+
+        this.cityGroup.add(label);
+        this.cityLabels.push(label);
+      })
+    );
+  }
+
+  async createMarkupPointsAndLabels(
+    data: DataType[] = [],
+    cityList: ComboboxOption[] = []
+  ) {
+    this.data = data ?? [];
+
+    this.clearMarkers();
+
+    await this.createClubPillars(data);
+
+    const cities = [
+      {
+        city: "London",
+        longitude: -0.1276,
+        latitude: 51.5074,
+        color: 0xffa500,
+      },
+      { city: "Paris", longitude: 2.3522, latitude: 48.8566, color: 0xffa500 },
+      { city: "Berlin", longitude: 13.405, latitude: 52.52, color: 0xffa500 },
+
+      {
+        city: "barcelona",
+        longitude: 0.8181,
+        latitude: 41.9091,
+        color: 0xffa500,
+      },
+      {
+        city: "Rome",
+        longitude: 12.5716,
+        latitude: 42.823,
+        color: 0xffa500,
+      },
+    ];
+
+    // وقتی دیتای شهر اضافه شد، کافی‌ست این خط را هم صدا بزنید:
+    await this.createCityPoints(cities);
+
+    // await Promise.all(
+    //   data?.map(async (item) => {
+    //     const radius = this.options.earth.radius;
+    //     const lon = item.longitude; //经度
+    //     const lat = item.latitude; //纬度
+    //     const color = 0xffa500;
+
+    //     const pointMaterial = new MeshBasicMaterial({
+    //       color: color,
+    //       map: this.options.textures.label,
+    //       transparent: true, //使用背景透明的png贴图，注意开启透明计算
+    //       depthWrite: false, //禁止写入深度缓冲区数据
+    //     });
+
+    //     const mesh = createPointMesh({
+    //       radius,
+    //       lon,
+    //       lat,
+    //       material: pointMaterial,
+    //     }); //光柱底座矩形平面
+
+    //     mesh.userData = { type: "MarkupPoint", city: item.city, data: item };
+
+    //     this.markupPoint.add(mesh);
+    //     this.clickablePoints.push(mesh); // Add to our special array
+
+    //     // --- Create the 3D marker using the code function ---
+    //     // const marker3D = this.createCustom3DMarker(color);
+
+    //     // marker3D.name = "city_marker";
+    //     // marker3D.userData = mesh.userData;
+
+    //     // Position the marker with a bit of distance from the surface
+    //     // const position = lon2xyz(
+    //     //   this.options.earth.radius + 0.4,
+    //     //   item.E,
+    //   item.N
+    //     // ); // The '+ 2' controls distance
+    //     // marker3D.position.set(position.x, position.y, position.z);
+
+    //     // Scale it down to an appropriate size
+    //     // const scaleFactor = 0.5;
+    //     // marker3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+    //     // const surfaceNormal = new Vector3(
+    //     //   position.x,
+    //     //   position.y,
+    //     //   position.z
+    //     // ).normalize();
+    //     // const markerUp = new Vector3(0, 1, 0);
+    //     // marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
+
+    //     // const angleInDegrees = 10; // مارکر را ۴۵ درجه به جلو خم کن
+    //     // const angleInRadians = angleInDegrees * (Math.PI / 180);
+    //     // marker3D.rotateX(angleInRadians);
+    //     // برای خم کردن به بغل می‌توانید از marker.rotateZ() استفاده کنید
+    //     // marker3D.rotateZ(70 * (Math.PI / 180));
+
+    //     // marker3D.rotateY(90 * (Math.PI / 180));
+    //     // --- پایان اعمال زاویه ---
+
+    //     // ۳. مقیاس مارکر را تنظیم کنید
+    //     // marker3D.scale.set(0.7, 0.7, 0.7);
+
+    //     // Orient it to point away from the Earth's center
+    //     // marker3D.lookAt(0, 0, 0); // Points towards the center
+    //     // marker3D.rotateX(Math.PI); // Flips it 180 degrees to point outwards
+
+    //     // this.markupPoint.add(marker3D);
+
+    //     // const textureLoader = new TextureLoader();
+    //     // const markerTexture = textureLoader.load(
+    //     //   "/static/images/earth/map-marker.webp"
+    //     // );
+
+    //     // const marker = createMarker({
+    //     //   radius: radius,
+    //     //   lon: lon, // Longitude for Hidden Hills, CA
+    //     //   lat: lat, // Latitude for Hidden Hills, CA
+    //     //   textures: { marker: markerTexture }, // Make sure this texture is white
+    //     //   color: color, // Now you can set any color you want
+    //     // });
+
+    //     const LightPillar = createLightPillar({
+    //       radius: this.options.earth.radius,
+    //       lon,
+    //       lat,
+    //       color: color,
+    //       index: 0,
+    //       textures: this.options.textures,
+    //       punctuation: this.options.punctuation,
+    //       data: item,
+    //     }); //光柱
+    //     this.markupPoint.add(LightPillar);
+    //     // const WaveMesh = createWaveMesh({
+    //     //   radius,
+    //     //   lon,
+    //     //   lat,
+    //     //   textures: this.options.textures,
+    //     //   color: item.color,
+    //     // }); //波动光圈
+    //     // this.markupPoint.add(WaveMesh);
+    //     // this.waveMeshArr.push(WaveMesh);
+
+    //     // const label = this.createCityLabel(item.name);
+    //     const fontSize = 12; // رزولوشن بالا برای کیفیت
+    //     const scalingFactor = 0.05; // کوچک کردن برای اندازه مناسب در صحنه
+
+    //     const label = this.createHTMLLabel(item.city);
+    //     // const label = this.createTextSprite(
+    //     //   item.name,
+    //     //   fontSize,
+    //     //   "#fff",
+    //     //   scalingFactor
+    //     // );
+    //     label.visible = false;
+    //     // Position the label slightly above the surface and offset to the side
+    //     const labelPos = lon2xyz(radius + 1, lon, lat); // Adjust radius offset as needed
+    //     label.position.set(labelPos.x, labelPos.y, labelPos.z);
+
+    //     this.markupPoint.add(label);
+    //     this.cityLabels.push(label);
+
+    //     this.earthGroup.add(this.markupPoint);
+    //   })
+    // );
   }
 
   // async createSpriteLabel() {

@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
     GET_SPORTS_LIST: "/api/WorldMap/GetSportsList/GetSportsList",
     GET_TECHNO_SECTORS_LIST: "/api/WorldMap/GetSectorsList/GetSectorsList",
     GET_COUNTRIES_LIST: "/api/WorldMap/GetCountriesList/GetCountriesList",
+    GET_CITIES_LIST: "/api/WorldMap/GetCitiesList/GetCitiesList",
     GET_PUBLIC_CLUB: "/api/WorldMap/GetPublicClubs/GetPublicClubs",
   },
   USER: {
