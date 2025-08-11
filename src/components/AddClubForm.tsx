@@ -90,7 +90,7 @@ const AddClubForm = ({ onClose }) => {
               <div className="flex gap-20 mb-5">
 
                 <button
-                  onClick={onClose}
+                  // onClick={}
                   className="relative flex items-center justify-center cursor-pointer"
                   
                 >
@@ -103,7 +103,7 @@ const AddClubForm = ({ onClose }) => {
 
 
                 <button
-                  onClick={onClose}
+                  // onClick={}
                   className="relative flex items-center justify-center cursor-pointer"
             
                 >
