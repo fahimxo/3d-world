@@ -484,7 +484,7 @@ export default class earth {
       clubs.map(async (item) => {
         const lon = item.longitude;
         const lat = item.latitude;
-        const color = item?.isActive ? 0xffa500 : 0x010826;
+        const color = item?.isActive ? 0xffa500 : 0x525354;
 
         // خود ستون نور
         const pillar = createLightPillar({
