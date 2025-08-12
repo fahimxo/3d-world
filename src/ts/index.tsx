@@ -43,7 +43,11 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           dom: currentMount,
           // Pass the callback function to your World class
           // You will need to update your IWord interface and World constructor to accept this
-          onPointClick: (data) => onCityClick(data.city, JSON.stringify(data)),
+          onPointClick: (data) => {
+            if (data?.isActive === true) {
+              onCityClick(data.city, JSON.stringify(data));
+            }
+          },
           data: [],
           cityList: [],
         });
