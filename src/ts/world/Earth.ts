@@ -204,7 +204,7 @@ export default class earth {
       this.createEarthGlow(); // 创建地球辉光
       this.createEarthAperture(); // 创建地球的大气层
       await this.createMarkupPointsAndLabels(this.data, this.cityList); // 创建柱状点位
-      await this.createSpriteLabel(); // 创建标签
+      this.createSpriteLabel(); // 创建标签
       this.createCountryLabels();
       // this.createAnimateCircle(); // 创建环绕卫星
       // this.createFlyLine(); // 创建飞线
@@ -474,8 +474,6 @@ export default class earth {
     // Clear the helper arrays
     this.clickablePoints = [];
     this.cityLabels = [];
-    this.countryLabels = [];
-    this.continentLabels = [];
   }
 
   // 1) ساخت Light Pillar برای باشگاه‌ها
