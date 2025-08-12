@@ -52,6 +52,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isLocationsModalOpen , setLocationsModalOpen] = useState(true);
   // const [clubData, setClubData] = useState<DataType[]>([]);
   const worldRef = useRef<WorldHandle>(null);
 

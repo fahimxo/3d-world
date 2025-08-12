@@ -133,6 +133,7 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.country}
                   onChange={(value) => handleComboboxChange("country", value)}
                   addClub="true"
+                  salt={true} 
                 />
                 <Combobox
                   label="City"
@@ -142,6 +143,8 @@ const AddClubForm = ({ onClose }) => {
                   value={formData.city}
                   onChange={(value) => handleComboboxChange("city", value)}
                   addClub="true"
+                  salt={true} 
+
                 />
                 <Combobox
                   label="Tecno Sector"

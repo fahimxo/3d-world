@@ -18,7 +18,7 @@ interface ComboboxProps {
   label?: string;
   name?: string;
   addClub?: string;
-  
+  salt?: boolean;
   error?: string;
 }
 
@@ -33,6 +33,7 @@ const ComboboxMenu = ({
   name,
   triggerRef,
   futuristicClipPath,
+  salt,
 }) => {
   const [position, setPosition] = useState({});
   const menuRef = useRef<HTMLDivElement>(null);
@@ -112,8 +113,10 @@ const ComboboxMenu = ({
                   setOpen(false);
                   setSearchValue("");
                 }}
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none hover:bg-cyan-400/20"
-              >
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
+                  salt ? "hover:bg-red-400/20" : "hover:bg-cyan-400/20" // Changed background based on salt
+                )}>
                 <span className="truncate flex-1">{option.label}</span>
                 {option.value === value && (
                   <Check className="ml-auto h-4 w-4" />
@@ -121,7 +124,7 @@ const ComboboxMenu = ({
               </div>
             ))
           ) : (
-            <p className="text-center text-sm text-cyan-400/60 py-2">
+            <p className={cn("text-center text-sm ",salt?"text-[#415C52] py-2":"text-cyan-400/60 py-2")}>
               No results found.
             </p>
           )}
@@ -141,6 +144,7 @@ const Combobox: React.FC<ComboboxProps> = ({
   label,
   name,
   addClub,
+   salt,
   error,
 }) => {
   const [open, setOpen] = useState(false);
@@ -178,7 +182,7 @@ const Combobox: React.FC<ComboboxProps> = ({
 
             className={cn(
               "relative flex h-12 w-full  items-center justify-between  px-3 py-2 text-base text-[#49675D] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-              addClub ? "bg-[#001b11] border-2 border-[#415C52] "  : "shadow-[var(--shadow-neon)] bg-[#0A192F]d"
+              addClub ? "bg-[#001b11] border-2 border-[#415C52] " : "shadow-[var(--shadow-neon)] bg-[#0A192F]d"
             )}
             style={futuristicClipPath}
           >
@@ -203,6 +207,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             name={name}
             triggerRef={triggerRef}
             futuristicClipPath={futuristicClipPath}
+            salt={salt} 
           />
         )}
         {typeof error === "string" && error && (
