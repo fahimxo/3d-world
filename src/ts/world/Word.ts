@@ -276,10 +276,19 @@ export default class World {
       if (this.currentlyHovered !== hit) {
         this.currentlyHovered = hit;
 
-        // نام باشگاه/شهر
-        const labelText =
-          hit.userData?.clubName || hit.userData?.city || "Club";
-        this.tooltipElement.textContent = labelText;
+        // اگر باشگاه قفل باشه، عکس نشون بده
+        if (hit.userData?.data?.isActive === false) {
+          this.tooltipElement.innerHTML = `
+          <div class="flex flex-col gap-1 items-center justify-center">
+          <img src="/static/images/lock-club.png" alt="Locked" class="w-10 h-10 object-cover rounded-full" />
+          <span>Locked</span>
+          </div>
+          `;
+        } else {
+          const labelText =
+            hit.userData?.clubName || hit.userData?.city || "Club";
+          this.tooltipElement.textContent = labelText;
+        }
 
         this.tooltipElement.classList.remove("hidden");
       }
