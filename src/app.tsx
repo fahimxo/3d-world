@@ -3,13 +3,9 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import WorldComponent, { WorldHandle } from "./ts/index";
 import "./app.css";
 import { Headers } from "./layouts/header/Header";
-import DetailsModal from "./assets/icons/DetailsModal";
-import CardInfoModal from "./assets/icons/CardInfoModal";
-import ClubKit from "./components/clubKit";
-import { Modal } from "./components/modal";
 import { Filters } from "./components/filters";
-import { Tooltip } from "./components";
-import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
+import { Tooltip, ClubDetailsModal } from "./components";
+import { PublicClubFilter, usePublicClubs, PublicClubResult } from "./lib/usePublicClubs";
 
 export type DataType = {
   id: number;
@@ -53,8 +49,9 @@ export type DataType = {
 const App: React.FC = () => {
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [detailsModal, setDetailsModal] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [modalData, setModalData] = useState({ name: "", data: "" });
+  const [selectedClubData, setSelectedClubData] = useState<PublicClubResult | undefined>();
+  const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const worldRef = useRef<WorldHandle>(null);
 
@@ -115,12 +112,23 @@ const App: React.FC = () => {
   // This function can be passed to the WorldComponent to show the modal
 
   const showCityModal = useCallback((name: string, data: string) => {
-    setModalData({ name, data });
-    setDetailsModal(true);
+    try {
+      const clubData = JSON.parse(data);
+      console.log("Clicked club data:", clubData);
+      if (clubData && clubData.id) {
+        setModalData({ name, data });
+        setSelectedClubData(clubData);
+        setDetailsModal(true);
+      }
+    } catch (error) {
+      console.error("Error parsing club data:", error);
+    }
   }, []);
 
   const hideCityModal = useCallback(() => {
-    setDetailsModal((prev) => !prev);
+    setDetailsModal(false);
+    setSelectedClubData(undefined);
+    setModalData({ name: "", data: "" });
   }, []);
 
   console.log("clubData", clubData);
@@ -130,7 +138,7 @@ const App: React.FC = () => {
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent
         onCityClick={showCityModal}
-        data={clubData}
+        data={clubData as DataType[]}
         ref={worldRef}
       />
       <div className="fixed top-0 left-0 w-full z-50">
@@ -138,33 +146,11 @@ const App: React.FC = () => {
       </div>
       <Filters onFilterSubmit={handleFilterSubmit} loading={clubsLoading} />
       <Tooltip />
-      {detailsModal && (
-        <Modal mode="center">
-          <DetailsModal onClose={hideCityModal}>
-            <div className="flex items-stretch gap-6 text-white h-[232px]">
-              <div className="w-[240px] h-full">
-                <CardInfoModal
-                  // logoUrl="https://example.com/logo.png"
-                  // title="GALACTIC CROWN"
-                  // country="Eurovia"
-                  // state="Spain"
-                  // city="Madrid"
-                  data={modalData}
-                  className="h-full"
-                />
-              </div>
-              <div className="flex-1 h-full">
-                <video
-                  // src={modalData?.videoUrl}
-                  controls
-                  className="w-full h-full rounded-lg border-none object-cover"
-                />
-              </div>
-            </div>
-            <ClubKit data={modalData} />
-          </DetailsModal>
-        </Modal>
-      )}
+      <ClubDetailsModal
+        isOpen={detailsModal}
+        onClose={hideCityModal}
+        clubData={selectedClubData}
+      />
       {/* Loading Indicator (can remain outside the main container) */}
       <div id="loading">
         <div className="sk-chase">

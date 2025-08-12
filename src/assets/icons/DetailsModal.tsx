@@ -8,6 +8,7 @@ const DetailsModal: React.FC<{
   const thumbRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [showScrollbar, setShowScrollbar] = useState(false);
 
   const updateScrollPosition = useCallback((clientY: number) => {
     const scrollEl = scrollRef.current;
@@ -56,12 +57,15 @@ const DetailsModal: React.FC<{
         const maxTop = clientHeight - thumbHeight;
         const newTop = maxScroll > 0 ? (scrollTop / maxScroll) * maxTop : 0;
         setThumbTop(newTop);
+        setShowScrollbar(maxScroll > 0);
       }
     };
 
     const el = scrollRef.current;
     if (el) {
       el.addEventListener("scroll", handleScroll);
+      const { scrollHeight, clientHeight } = el;
+      setShowScrollbar(scrollHeight > clientHeight);
     }
     return () => {
       if (el) el.removeEventListener("scroll", handleScroll);
@@ -172,25 +176,31 @@ const DetailsModal: React.FC<{
           </button>
         </div>
       )}
-      <div
-        ref={thumbRef}
-        className="absolute right-4 top-0 z-20 cursor-pointer"
-        style={{
-          transform: `translateY(${thumbTop}px)`,
-          transition: isDragging ? "none" : "transform 0.05s linear",
-        }}
-        onMouseDown={handleMouseDown}
-      >
-        <svg
-          width="7"
-          height="69"
-          viewBox="0 0 7 69"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      {showScrollbar && (
+        <div className="absolute right-4 top-0 bottom-0 z-10 w-2 rounded-full backdrop-blur-sm transition-opacity duration-300" style={{ backgroundColor: '#42005E'}} />
+      )}
+      {showScrollbar && (
+        <div
+          ref={thumbRef}
+          className="absolute right-4 top-0 z-20 cursor-pointer hover:scale-105 transition-all duration-200"
+          style={{
+            transform: `translateY(${thumbTop}px)`,
+            transition: isDragging ? "none" : "transform 0.1s ease-out",
+          }}
+          onMouseDown={handleMouseDown}
         >
-          <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#C42FFF" />
-        </svg>
-      </div>
+          <svg
+            width="7"
+            height="69"
+            viewBox="0 0 7 69"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="drop-shadow-lg"
+          >
+            <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#C42FFF" />
+          </svg>
+        </div>
+      )}
     </div>
   );
 };
