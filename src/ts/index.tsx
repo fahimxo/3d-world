@@ -5,12 +5,14 @@ import React, {
   forwardRef,
 } from "react";
 import World from "./world/Word"; // Corrected import from 'Word' to 'World'
-import { DataType } from "src/app";
+import { ComboboxOption } from "src/components";
+import { DataType } from "src/lib/usePublicClubs";
 
 // Define the props for the component
 interface WorldComponentProps {
   onCityClick: (name: string, data: string) => void;
   data: DataType[];
+  cityList: ComboboxOption[];
 }
 
 export interface WorldHandle {
@@ -18,7 +20,7 @@ export interface WorldHandle {
 }
 
 const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
-  ({ onCityClick, data }, ref) => {
+  ({ onCityClick, data, cityList }, ref) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const worldInstance = useRef<World | null>(null);
 
@@ -43,6 +45,7 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           // You will need to update your IWord interface and World constructor to accept this
           onPointClick: (data) => onCityClick(data.city, JSON.stringify(data)),
           data: [],
+          cityList: [],
         });
       }
 
@@ -61,11 +64,9 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
     }, [onCityClick]);
 
     useEffect(() => {
-      console.log("data in useEffect", data);
-
       // When the 'data' prop changes and is not empty, update the world
       if (worldInstance.current && data && data.length > 0) {
-        worldInstance.current.updateData(data);
+        worldInstance.current.updateData({ clubList: data, cityList });
       }
     }, [data]); // This effect runs whenever the 'data' prop changes
     // This div is the container where your Three.js canvas will be placed.

@@ -1,7 +1,9 @@
-import { DataType } from "src/app";
+import { ComboboxOption } from "src/components";
+import { DataType } from "src/lib/usePublicClubs";
 
 export interface IWord {
   dom: HTMLElement;
   onPointClick?: (data: any) => void;
-  data: DataType;
+  data: DataType[];
+  cityList: ComboboxOption[];
 }

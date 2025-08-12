@@ -8,6 +8,8 @@ import {
   Vector2,
   Vector3,
   Quaternion,
+  Euler,
+  MathUtils,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
@@ -21,9 +23,10 @@ import { Resources } from "./Resources";
 // earth
 import Earth from "./Earth";
 import { lon2xyz } from "../Utils/common";
-import { DataType } from "src/app";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import gsap from "gsap";
+import { ComboboxOption } from "src/components";
+import { DataType } from "src/lib/usePublicClubs";
 
 export default class World {
   public basic: Basic;
@@ -39,7 +42,11 @@ export default class World {
   public raycaster: Raycaster; // 👈 Add raycaster property
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType[];
-  private cachedData: DataType[] | null = null;
+  public cityList: ComboboxOption[];
+  private cachedData: {
+    clubList: DataType[];
+    cityList: ComboboxOption[];
+  } | null = null;
   public labelRenderer: CSS2DRenderer;
   private tooltipElement: HTMLElement | null;
   private currentlyHovered: THREE.Object3D | null = null;
@@ -71,6 +78,7 @@ export default class World {
     this.controls = this.basic.controls;
     this.camera = this.basic.camera;
     this.data = option.data;
+    this.cityList = option.cityList;
 
     this.labelRenderer = new CSS2DRenderer();
     this.labelRenderer.setSize(
@@ -81,10 +89,6 @@ export default class World {
     this.labelRenderer.domElement.style.top = "0px";
     this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
     this.option.dom.appendChild(this.labelRenderer.domElement);
-
-    this.raycaster = new Raycaster();
-    this.mouse = new Vector2();
-    window.addEventListener("click", this.onPointClick.bind(this));
 
     this.tooltipElement = document.getElementById("tooltip");
     // Add the event listener for mouse movement
@@ -119,7 +123,10 @@ export default class World {
 
       if (this.cachedData) {
         // If so, use the cached data to create the markers immediately.
-        await this.earth.createMarkupPointsAndLabels(this.cachedData);
+        await this.earth.createMarkupPointsAndLabels(
+          this.cachedData?.clubList,
+          this.cachedData?.cityList
+        );
         // Clear the cache so it's not used again.
         this.cachedData = null;
       }
@@ -143,12 +150,16 @@ export default class World {
   }
 
   // --- ADD THIS NEW METHOD TO UPDATE DATA ---
-  public async updateData(newData: DataType[]) {
-    console.log("newData", newData, this.earth);
-
+  public async updateData(newData: {
+    clubList: DataType[];
+    cityList: ComboboxOption[];
+  }) {
     if (this.earth) {
       // Re-create the markup points with the new data
-      await this.earth.createMarkupPointsAndLabels(newData);
+      await this.earth.createMarkupPointsAndLabels(
+        newData?.clubList,
+        newData?.cityList
+      );
     } else {
       this.cachedData = newData;
     }
@@ -217,51 +228,65 @@ export default class World {
   }
 
   private onMarkerHover(event: MouseEvent) {
-    if (!this.tooltipElement || !this.earth?.markupPoint) {
-      return;
-    }
+    if (!this.tooltipElement || !this.earth) return;
 
-    this.mouse.x = (event.clientX / this.sizes.viewport.width) * 2 - 1;
-    this.mouse.y = -(event.clientY / this.sizes.viewport.height) * 2 + 1;
+    const width = Number(this.sizes.viewport.width);
+    const height = Number(this.sizes.viewport.height);
+
+    this.mouse.x = (event.clientX / width) * 2 - 1;
+    this.mouse.y = -(event.clientY / height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(
-      [this.earth.markupPoint],
-      true
-    );
 
-    let hoveredMarkerGroup = null;
+    // ریشه‌هایی که برای ری‌کست چک می‌کنیم: اولویت با clubGroup، بعداً fallback به markupPoint
+    const roots: THREE.Object3D[] = [];
+    if ((this.earth as any).clubGroup)
+      roots.push((this.earth as any).clubGroup);
+    if (this.earth.markupPoint) roots.push(this.earth.markupPoint);
+
+    const intersects = this.raycaster.intersectObjects(roots, true);
+
+    let hit: THREE.Object3D | null = null;
     if (intersects.length > 0) {
-      let intersectedObject = intersects[0].object;
+      let obj = intersects[0].object as THREE.Object3D;
+
+      // تا ریشه‌ی ستون باشگاه بالا می‌رویم
       while (
-        intersectedObject.parent &&
-        intersectedObject.name !== "city_marker"
+        obj &&
+        obj.parent &&
+        !(
+          obj.userData?.type === "Club" ||
+          obj.name === "club_pillar" ||
+          obj.name === "light_pillar"
+        )
       ) {
-        intersectedObject = intersectedObject.parent;
+        obj = obj.parent;
       }
-      if (intersectedObject.name === "city_marker") {
-        hoveredMarkerGroup = intersectedObject;
+
+      if (
+        obj.userData?.type === "Club" ||
+        obj.name === "club_pillar" ||
+        obj.name === "light_pillar"
+      ) {
+        hit = obj;
       }
     }
 
-    if (hoveredMarkerGroup) {
-      if (this.currentlyHovered !== hoveredMarkerGroup) {
-        this.currentlyHovered = hoveredMarkerGroup;
-        const cityName = this.currentlyHovered.userData.city;
-        this.tooltipElement.textContent = cityName;
+    if (hit) {
+      if (this.currentlyHovered !== hit) {
+        this.currentlyHovered = hit;
 
-        // --- UPDATE THIS ---
-        // Show the tooltip by removing the 'hidden' class
+        // نام باشگاه/شهر
+        const labelText =
+          hit.userData?.clubName || hit.userData?.city || "Club";
+        this.tooltipElement.textContent = labelText;
+
         this.tooltipElement.classList.remove("hidden");
       }
-
-      // Position update remains the same
       this.tooltipElement.style.left = `${event.clientX}px`;
       this.tooltipElement.style.top = `${event.clientY - 60}px`;
     } else {
       if (this.currentlyHovered) {
-        // --- UPDATE THIS ---
-        // Hide the tooltip by adding the 'hidden' class
         this.tooltipElement.classList.add("hidden");
         this.currentlyHovered = null;
       }
@@ -269,37 +294,67 @@ export default class World {
   }
 
   public rotateToCoordinates(lat: number, lon: number) {
-    // 1. Convert Lat/Lon to a 3D vector on the globe's surface
-    const targetPosition = lon2xyz(this.earth.options.earth.radius, lon, lat);
-    const targetVector = new Vector3(
-      targetPosition.x,
-      targetPosition.y,
-      targetPosition.z
-    ).normalize();
+    if (!this.earth) return;
 
-    // 2. Define the "camera-facing" direction (typically the positive Z-axis)
-    const cameraFacingVector = new Vector3(0, 0, 1);
+    // حتماً محور چرخش OrbitControls روی مرکز زمین باشد
+    // (اگر pan فعال بوده، target ممکن است جابجا شده باشد)
+    this.controls.target.set(0, 0, 0);
 
-    // 3. Calculate the target rotation (Quaternion)
-    // This quaternion represents the rotation needed to make the targetVector face the camera.
-    const targetQuaternion = new Quaternion();
-    targetQuaternion.setFromUnitVectors(targetVector, cameraFacingVector);
+    // آزیماس فعلی دوربین (theta در Spherical سه‌جی‌اس، از محور +Z و حول +Y)
+    const camAz = this.controls.getAzimuthalAngle();
 
-    // 4. Animate the Earth group's rotation using GSAP
-    gsap.to(this.earth.earthGroup.quaternion, {
-      x: targetQuaternion.x,
-      y: targetQuaternion.y,
-      z: targetQuaternion.z,
-      w: targetQuaternion.w,
-      duration: 2.5, // Animation duration in seconds
+    // 1) بردار جهت نقطه روی کره را در دستگاه محلی زمین بسازید
+    // حتماً ترتیب آرگومان‌ها دقیقاً مثل جایی که مارکرها ساخته می‌شوند باشد
+    // (بسته به امضای lon2xyz در پروژه‌ی شما)
+    const localDir = lon2xyz(1, lon, lat).normalize(); // radius=1 کافی‌ست (فقط جهت مهم است)
+
+    // 2) به دستگاه جهانی (با درنظر گرفتن چرخش فعلی earthGroup) ببریم
+    const worldDir = localDir
+      .clone()
+      .applyQuaternion(this.earth.earthGroup.quaternion);
+
+    // 3) آزیماس و پولارِ همین نقطه را حساب کنیم
+    const thetaPoint = Math.atan2(worldDir.x, worldDir.z); // آزیماس حول محور Y
+    const yClamped = Math.max(-1, Math.min(1, worldDir.y));
+    const phiPoint = Math.acos(yClamped); // پولار از +Y
+
+    const pitchTilt = MathUtils.degToRad(4); // - یعنی کمی از بالا نگاه کند (مایل‌تر شود)
+
+    // 4) به اندازه‌ای کره را حول Y بچرخانیم که آزیماس نقطه = آزیماس دوربین شود
+    const currentY = this.earth.earthGroup.rotation.y;
+    let deltaYaw = camAz - thetaPoint;
+
+    // نرمال‌سازی به کوتاه‌ترین مسیر [-PI, PI]
+    deltaYaw = ((deltaYaw + Math.PI) % (2 * Math.PI)) - Math.PI;
+    const targetY = currentY + deltaYaw;
+
+    const clampPhi = (phi: number) =>
+      Math.min(Math.max(phi, 0.2), Math.PI - 0.2);
+
+    // 5) انیمیشن
+    const state = {
+      y: currentY,
+      phi: this.controls.getPolarAngle(),
+      d: this.controls.getDistance(),
+    };
+
+    this.controls.enabled = false;
+
+    gsap.to(state, {
+      y: targetY,
+      phi: clampPhi(phiPoint + pitchTilt), // دوربین را به عرض جغرافیایی نقطه می‌بریم
+      d: 80, // فاصله دلخواه
+      duration: 2.0,
       ease: "power3.inOut",
-      onStart: () => {
-        // Disable controls during animation to prevent user interference
-        this.controls.enabled = false;
+      onUpdate: () => {
+        this.earth.earthGroup.rotation.y = state.y;
+        // آزیماس دوربین را ثابت نگه می‌داریم، فقط φ و فاصله را انیمیت می‌کنیم
+        this.camera.position.setFromSphericalCoords(state.d, state.phi, camAz);
+        this.controls.update();
       },
       onComplete: () => {
-        // Re-enable controls when the animation finishes
         this.controls.enabled = true;
+        this.handleZoom();
       },
     });
   }
@@ -329,8 +384,6 @@ export default class World {
 
       // Access the data you stored earlier!
       const { city, data } = clickedObject.userData;
-
-      console.log(`You clicked on ${city}!`, data);
 
       // 👉 Here you can trigger your React state update
       // For example, by calling a callback function passed in the constructor
@@ -367,6 +420,7 @@ export default class World {
     this.earth = new Earth({
       // data: Data,
       data: this.data,
+      cityList: this.cityList,
       dom: this.option.dom,
       textures: this.resources.textures,
       earth: {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { usePublicClubs } from "../../lib/usePublicClubs";
 import MenuIcon from "../../assets/icons/MenuIcon";
 import Search from "../../assets/icons/SearchIcon";
 import { SciFiMenuBorder } from "../../assets/icons/SciFiMenuBorder";
@@ -7,13 +6,19 @@ import { HamburgerMenu } from "../../assets/icons/hamburgerMenu";
 import LoginForm from "../../components/LoginForm";
 import api from "../../config/axios";
 import { API_ENDPOINTS } from "../../config/endpoint";
+import { PublicClubFilter } from "src/lib/usePublicClubs";
 
-export const Headers = ({ children }: { children: React.ReactNode }) => {
+type HeaderProps = {
+  children: React.ReactNode;
+  fetchClubs: (payload: PublicClubFilter) => void;
+  loading: boolean;
+};
+
+export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { fetchClubs, loading } = usePublicClubs();
 
   useEffect(() => {
     const token = localStorage.getItem("token");

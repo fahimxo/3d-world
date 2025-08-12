@@ -4,8 +4,12 @@ import WorldComponent, { WorldHandle } from "./ts/index";
 import "./app.css";
 import { Headers } from "./layouts/header/Header";
 import { Filters } from "./components/filters";
-import { Tooltip, ClubDetailsModal } from "./components";
-import { PublicClubFilter, usePublicClubs, PublicClubResult } from "./lib/usePublicClubs";
+import { Tooltip, ComboboxOption, ClubDetailsModal } from "./components";
+import {
+  PublicClubFilter,
+  usePublicClubs,
+  PublicClubResult,
+} from "./lib/usePublicClubs";
 
 export type DataType = {
   id: number;
@@ -50,9 +54,13 @@ const App: React.FC = () => {
   const [selectedSport, setSelectedSport] = useState<string>("");
   const [detailsModal, setDetailsModal] = useState(false);
   const [modalData, setModalData] = useState({ name: "", data: "" });
-  const [selectedClubData, setSelectedClubData] = useState<PublicClubResult | undefined>();
+  const [selectedClubData, setSelectedClubData] = useState<
+    PublicClubResult | undefined
+  >();
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
+
   const worldRef = useRef<WorldHandle>(null);
 
   const {
@@ -60,18 +68,6 @@ const App: React.FC = () => {
     loading: clubsLoading,
     fetchClubs,
   } = usePublicClubs();
-  // [
-  //   { name: "London", E: -0.1276, N: 51.5074, color: 0xffa500 },
-  //   { name: "Paris", E: 2.3522, N: 48.8566, color: 0xffa500 },
-  //   { name: "Berlin", E: 13.405, N: 52.52, color: 0xffa500 },
-  //   { name: "Madrid", E: -3.7038, N: 40.4168, color: 0xffa500 },
-  //   {
-  //     name: "barcelona",
-  //     E: 0.8181,
-  //     N: 41.9091,
-  //     color: 0xffa500,
-  //   },
-  // ]
 
   useEffect(() => {
     // هوک fetchClubs را بدون هیچ فیلتری فراخوانی می‌کنیم تا همه باشگاه‌ها را بگیرد
@@ -80,7 +76,12 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // اگر بارگذاری اولیه تمام شده باشد و نتیجه فیلتر دقیقا یک باشگاه باشد
-    if (!isInitialLoad && clubData && worldRef.current) {
+    if (
+      !isInitialLoad &&
+      clubData &&
+      clubData?.length > 0 &&
+      worldRef.current
+    ) {
       const targetClub = clubData[0];
       worldRef.current.rotateToCoordinates(
         targetClub.latitude,
@@ -104,7 +105,6 @@ const App: React.FC = () => {
       if (loadingScreen) {
         loadingScreen.classList.add("out");
       }
-      setLoading(false);
     }, 2500); // Simulate loading time
     return () => clearTimeout(timer);
   }, []);
@@ -131,8 +131,6 @@ const App: React.FC = () => {
     setModalData({ name: "", data: "" });
   }, []);
 
-  console.log("clubData", clubData);
-
   return (
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
@@ -140,11 +138,21 @@ const App: React.FC = () => {
         onCityClick={showCityModal}
         data={clubData as DataType[]}
         ref={worldRef}
+        cityList={cityOptions}
       />
       <div className="fixed top-0 left-0 w-full z-50">
-        <Headers children="Logo" />
+        <Headers
+          children="Logo"
+          fetchClubs={handleFilterSubmit}
+          loading={clubsLoading}
+        />
       </div>
-      <Filters onFilterSubmit={handleFilterSubmit} loading={clubsLoading} />
+      <Filters
+        onFilterSubmit={handleFilterSubmit}
+        loading={clubsLoading}
+        cityOptions={cityOptions}
+        setCityOptions={setCityOptions}
+      />
       <Tooltip />
       <ClubDetailsModal
         isOpen={detailsModal}

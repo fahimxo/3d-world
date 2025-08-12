@@ -12,12 +12,51 @@ export interface PublicClubFilter {
   currentName?: string;
 }
 
+export type DataType = {
+  id: number;
+  reImaginedName: string;
+  originalClubName: string;
+  lore: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  logoUrl: string;
+  videoUrl: string;
+  status: number;
+  isActive: boolean;
+  displayOrder: number;
+  sportId: number;
+  sportName: string;
+  sectorId: number;
+  sectorName: string;
+  sectorColorCode: string;
+  countryId: number;
+  countryName: string;
+  anthemUrl: string;
+  kitImageUrl: string;
+  kitVideoUrl: string;
+  stadiumImageUrl: string;
+  stadiumVideoUrl: string;
+  bestPlayerImageUrl: string;
+  bestPlayerVideoUrl: string;
+  coachImageUrl: string;
+  coachVideoUrl: string;
+  vehicleImageUrl: string;
+  vehicleVideoUrl: string;
+  symbolImageUrl: string;
+  symbolVideoUrl: string;
+  averageRating: number;
+  totalRatings: number;
+  created: string;
+  lastModified: string;
+};
+
 export interface PublicClubResult {
   [key: string]: any;
 }
 
 export function usePublicClubs() {
-  const [data, setData] = useState<PublicClubResult[] | null>(null);
+  const [data, setData] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
