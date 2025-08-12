@@ -11,6 +11,7 @@ import AddClubForm from "./components/AddClubForm";
 const App: React.FC = () => {
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isLocationsModalOpen, setLocationsModalOpen] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
 
   const worldRef = useRef<WorldHandle>(null);

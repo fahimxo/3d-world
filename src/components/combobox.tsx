@@ -19,6 +19,7 @@ interface ComboboxProps {
   name?: string;
   error?: string;
   addClub?: string;
+  salt?: boolean;
   addCc?: string;
 }
 
@@ -33,6 +34,7 @@ const ComboboxMenu = ({
   name,
   triggerRef,
   futuristicClipPath,
+  salt,
 }) => {
   const [position, setPosition] = useState({});
   const menuRef = useRef<HTMLDivElement>(null);
@@ -112,7 +114,10 @@ const ComboboxMenu = ({
                   setOpen(false);
                   setSearchValue("");
                 }}
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none hover:bg-cyan-400/20"
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
+                  salt ? "hover:bg-red-400/20" : "hover:bg-cyan-400/20" // Changed background based on salt
+                )}
               >
                 <span className="truncate flex-1">{option.label}</span>
                 {option.value === value && (
@@ -121,7 +126,12 @@ const ComboboxMenu = ({
               </div>
             ))
           ) : (
-            <p className="text-center text-sm text-cyan-400/60 py-2">
+            <p
+              className={cn(
+                "text-center text-sm ",
+                salt ? "text-[#415C52] py-2" : "text-cyan-400/60 py-2"
+              )}
+            >
               No results found.
             </p>
           )}
@@ -142,6 +152,7 @@ const Combobox: React.FC<ComboboxProps> = ({
   name,
   error,
   addClub,
+  salt,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -208,6 +219,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             name={name}
             triggerRef={triggerRef}
             futuristicClipPath={futuristicClipPath}
+            salt={salt}
           />
         )}
         {typeof error === "string" && error && (
