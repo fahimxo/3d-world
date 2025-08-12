@@ -543,9 +543,6 @@ export default class earth {
           material: pointMaterial,
         });
 
-        cityPoint.name = "city_point";
-        cityPoint.userData = { type: "City", city: item.city, data: item };
-
         this.cityGroup.add(cityPoint);
         this.clickablePoints.push(cityPoint);
 
@@ -725,44 +722,6 @@ export default class earth {
     //   })
     // );
   }
-
-  // async createSpriteLabel() {
-  //   await Promise.all(
-  //     this.data.map(async (item) => {
-  //       let cityArry = [];
-  //       cityArry.push(item.startArray);
-  //       cityArry = cityArry.concat(...item.endArray);
-  //       await Promise.all(
-  //         cityArry.map(async (e) => {
-  //           const p = lon2xyz(this.options.earth.radius * 1.001, e.E, e.N);
-  //           const div = `<div class="fire-div">${e.name}</div>`;
-  //           const shareContent = document.getElementById("html2canvas");
-  //           shareContent.innerHTML = div;
-  //           const opts = {
-  //             backgroundColor: null, // 背景透明
-  //             scale: 6,
-  //             dpi: window.devicePixelRatio,
-  //           };
-  //           const canvas = await html2canvas(
-  //             document.getElementById("html2canvas"),
-  //             opts
-  //           );
-  //           const dataURL = canvas.toDataURL("image/png");
-  //           const map = new TextureLoader().load(dataURL);
-  //           const material = new SpriteMaterial({
-  //             map: map,
-  //             transparent: true,
-  //           });
-  //           const sprite = new Sprite(material);
-  //           const len = 5 + (e.name.length - 2) * 2;
-  //           sprite.scale.set(len, 3, 1);
-  //           sprite.position.set(p.x * 1.1, p.y * 1.1, p.z * 1.1);
-  //           this.earth.add(sprite);
-  //         })
-  //       );
-  //     })
-  //   );
-  // }
 
   public createSpriteLabel() {
     const continents = [

@@ -27,8 +27,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // اگر بارگذاری اولیه تمام شده باشد و نتیجه فیلتر دقیقا یک باشگاه باشد
-    if (!isInitialLoad && clubData && worldRef.current) {
-      const targetClub = clubData[6];
+    if (
+      !isInitialLoad &&
+      clubData &&
+      clubData?.length > 0 &&
+      worldRef.current
+    ) {
+      const targetClub = clubData[0];
       worldRef.current.rotateToCoordinates(
         targetClub.latitude,
         targetClub.longitude
@@ -76,7 +81,11 @@ const App: React.FC = () => {
         cityList={cityOptions}
       />
       <div className="fixed top-0 left-0 w-full z-50">
-        <Headers children="Logo" />
+        <Headers
+          children="Logo"
+          fetchClubs={handleFilterSubmit}
+          loading={clubsLoading}
+        />
       </div>
       <Filters
         onFilterSubmit={handleFilterSubmit}

@@ -3,7 +3,6 @@ import api from "../config/axios";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { usePublicClubs } from "../lib/usePublicClubs";
 import { Button } from "./button";
 import Combobox, { ComboboxOption } from "./combobox";
 import { FilterButton } from "./filterButton";
@@ -28,7 +27,7 @@ const getOptionsFor = async (
       Array.isArray(responseData.result)
     ) {
       return responseData.result.map((item: any) => ({
-        value: item?.id?.toString(),
+        value: item?.id?.toString() || item?.name,
         label: item?.name,
       }));
     }
@@ -130,7 +129,6 @@ export const Filters: React.FC<FiltersProps> = ({
       setLoadingStates((prev) => ({ ...prev, cities: true }));
       getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, "Cities").then(
         (data) => {
-          console.log("cities ", data);
           setCityOptions(data);
           setLoadingStates((prev) => ({ ...prev, cities: false }));
         }
@@ -140,23 +138,18 @@ export const Filters: React.FC<FiltersProps> = ({
 
   const onSubmit: SubmitHandler<FilterFormValues> = async (data) => {
     setIsFormSubmitting(true);
-    const filterPayload: { [key: string]: any } = {};
-    if (data.sportType) {
-      const sportId = parseInt(data.sportType, 10);
-      if (sportId !== 0) filterPayload.sportId = sportId;
-    }
-    if (data.technoSector) {
-      const sectorId = parseInt(data.technoSector, 10);
-      if (sectorId !== 0) filterPayload.sectorId = sectorId;
-    }
-    if (data.country) {
-      const countryId = parseInt(data.country, 10);
-      if (countryId !== 0) filterPayload.countryId = countryId;
-    }
-    if (data.reimaginedName) filterPayload.reimaginedName = data.reimaginedName;
-    if (data.currentName) filterPayload.currentName = data.currentName;
+
+    const filterPayload: Record<string, string | number> = {
+      city: data.city,
+      reimaginedName: data.reimaginedName,
+      currentName: data.currentName,
+      sportId: data.sportType ? +data.sportType : undefined,
+      sectorId: data.technoSector ? +data.technoSector : undefined,
+      countryId: data.country ? +data.country : undefined,
+    };
+
     try {
-      await onFilterSubmit(filterPayload);
+      onFilterSubmit(filterPayload);
       setFilterModalVisible(false);
     } catch (error) {
       console.error("Failed to submit filters:", error);
@@ -183,9 +176,7 @@ export const Filters: React.FC<FiltersProps> = ({
                   options={sportOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder={
-                    loadingStates.sports ? "Loading..." : "Select Sport"
-                  }
+                  placeholder={loadingStates.sports ? "Loading..." : "Select"}
                   label="Sport Type"
                   error={errors.sportType?.message}
                 />
@@ -200,7 +191,7 @@ export const Filters: React.FC<FiltersProps> = ({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder={
-                    loadingStates.technoSectors ? "Loading..." : "Select Sector"
+                    loadingStates.technoSectors ? "Loading..." : "Select"
                   }
                   label="Techno Sector"
                   error={errors.technoSector?.message}
