@@ -6,7 +6,7 @@ import { Headers } from "./layouts/header/Header";
 import { Filters } from "./components/filters";
 import { ComboboxOption, Tooltip } from "./components";
 import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
-import AddClubForm from "./components/AddClubForm";
+import ClubsManagement from "./components/ClubsManagement";
 
 const App: React.FC = () => {
   const [modalData, setModalData] = useState({ name: "", data: "" });
@@ -74,53 +74,54 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="app-container">
-      {/* The component that will render your Three.js world in the background */}
-      <WorldComponent
-        onCityClick={showCityModal}
-        data={clubData}
-        ref={worldRef}
-        cityList={cityOptions}
-      />
-      <div className="fixed top-0 left-0 w-full z-50">
-        <Headers
-          children="Logo"
-          fetchClubs={handleFilterSubmit}
-          loading={clubsLoading}
-        />
-      </div>
-      <Filters
-        onFilterSubmit={handleFilterSubmit}
-        loading={clubsLoading}
-        cityOptions={cityOptions}
-        setCityOptions={setCityOptions}
-      />
-      <Tooltip />
-      {/* Loading Indicator (can remain outside the main container) */}
-      <div id="loading">
-        <div className="sk-chase">
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-          <div className="sk-chase-dot"></div>
-        </div>
-        <div>Loading resources...</div>
-      </div>
-      {/* Modal Dialog */}
-      {modalVisible && (
-        <div id="cityModal" className="modal">
-          <div className="modal-content">
-            <span className="close-button" onClick={hideCityModal}>
-              &times;
-            </span>
-            <h3 className="text-amber-800">{modalData.name}</h3>
-            <p id="cityData">{modalData.data}</p>
-          </div>
-        </div>
-      )}
-    </div>
+    // <div className="app-container">
+    //   {/* The component that will render your Three.js world in the background */}
+    //   <WorldComponent
+    //     onCityClick={showCityModal}
+    //     data={clubData}
+    //     ref={worldRef}
+    //     cityList={cityOptions}
+    //   />
+    //   <div className="fixed top-0 left-0 w-full z-50">
+    //     <Headers
+    //       children="Logo"
+    //       fetchClubs={handleFilterSubmit}
+    //       loading={clubsLoading}
+    //     />
+    //   </div>
+    //   <Filters
+    //     onFilterSubmit={handleFilterSubmit}
+    //     loading={clubsLoading}
+    //     cityOptions={cityOptions}
+    //     setCityOptions={setCityOptions}
+    //   />
+    //   <Tooltip />
+    //   {/* Loading Indicator (can remain outside the main container) */}
+    //   <div id="loading">
+    //     <div className="sk-chase">
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //       <div className="sk-chase-dot"></div>
+    //     </div>
+    //     <div>Loading resources...</div>
+    //   </div>
+    //   {/* Modal Dialog */}
+    //   {modalVisible && (
+    //     <div id="cityModal" className="modal">
+    //       <div className="modal-content">
+    //         <span className="close-button" onClick={hideCityModal}>
+    //           &times;
+    //         </span>
+    //         <h3 className="text-amber-800">{modalData.name}</h3>
+    //         <p id="cityData">{modalData.data}</p>
+    //       </div>
+    //     </div>
+    //   )}
+    // </div>
+    <ClubsManagement />
   );
 };
 

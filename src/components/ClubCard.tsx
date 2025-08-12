@@ -106,7 +106,7 @@ const ClubCard = ({
         </div>
 
         <div className="flex  flex-col  items-center gap-3 col-span-1 justify-center">
-          <button className="pointer ">
+          <button className="cursor-pointer ">
             <svg
               width="14"
               height="14"
@@ -120,14 +120,14 @@ const ClubCard = ({
               />
             </svg>
           </button>
-          <button className="pointer " onClick={removeClub}>
+          <button className="cursor-pointer " onClick={removeClub}>
             <svg
               width="20"
               height="20"
               viewBox="0 0 20 20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="pointer "
+              className="cursor-pointer "
             >
               <mask
                 id="mask0_283_3144"

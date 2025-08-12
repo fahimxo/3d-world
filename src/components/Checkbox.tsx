@@ -4,7 +4,7 @@ import React from "react";
 interface CheckboxProps {
   label: string;
   checked: boolean;
-  onChange: (checked: boolean) => void;
+  onChange: (checked: boolean, name: string) => void;
   name: string;
 }
 
@@ -26,7 +26,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           type="checkbox"
           className="sr-only"
           checked={checked}
-          onChange={(e) => onChange(e.target.checked)}
+          onChange={(e) => onChange(e.target.checked, name)}
         />
         <div
           className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center ${
