@@ -9,6 +9,7 @@ import {
   Vector3,
   Quaternion,
   Euler,
+  MathUtils,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
@@ -88,10 +89,6 @@ export default class World {
     this.labelRenderer.domElement.style.top = "0px";
     this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
     this.option.dom.appendChild(this.labelRenderer.domElement);
-
-    this.raycaster = new Raycaster();
-    this.mouse = new Vector2();
-    window.addEventListener("click", this.onPointClick.bind(this));
 
     this.tooltipElement = document.getElementById("tooltip");
     // Add the event listener for mouse movement
@@ -321,6 +318,8 @@ export default class World {
     const yClamped = Math.max(-1, Math.min(1, worldDir.y));
     const phiPoint = Math.acos(yClamped); // پولار از +Y
 
+    const pitchTilt = MathUtils.degToRad(4); // - یعنی کمی از بالا نگاه کند (مایل‌تر شود)
+
     // 4) به اندازه‌ای کره را حول Y بچرخانیم که آزیماس نقطه = آزیماس دوربین شود
     const currentY = this.earth.earthGroup.rotation.y;
     let deltaYaw = camAz - thetaPoint;
@@ -328,6 +327,9 @@ export default class World {
     // نرمال‌سازی به کوتاه‌ترین مسیر [-PI, PI]
     deltaYaw = ((deltaYaw + Math.PI) % (2 * Math.PI)) - Math.PI;
     const targetY = currentY + deltaYaw;
+
+    const clampPhi = (phi: number) =>
+      Math.min(Math.max(phi, 0.2), Math.PI - 0.2);
 
     // 5) انیمیشن
     const state = {
@@ -340,7 +342,7 @@ export default class World {
 
     gsap.to(state, {
       y: targetY,
-      phi: phiPoint, // دوربین را به عرض جغرافیایی نقطه می‌بریم
+      phi: clampPhi(phiPoint + pitchTilt), // دوربین را به عرض جغرافیایی نقطه می‌بریم
       d: 80, // فاصله دلخواه
       duration: 2.0,
       ease: "power3.inOut",
@@ -352,6 +354,7 @@ export default class World {
       },
       onComplete: () => {
         this.controls.enabled = true;
+        this.handleZoom();
       },
     });
   }
