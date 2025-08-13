@@ -1,12 +1,17 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LocationsModal } from "../assets/icons/LocationsModal";
 import { Accordion } from "./Accordion";
 import { Button } from "./button";
-import Combobox from "./combobox";
+import Combobox, { ComboboxOption } from "./combobox";
 import { Checkbox } from "./Checkbox";
 import { FileUpload } from "./FileUpload";
 import Input from "./input";
 import ClubList from "./ClubList";
+import { API_ENDPOINTS } from "src/config/endpoint";
+import api from "src/config/axios";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const countryOptions = [
   { value: "usa", label: "United States" },
@@ -14,14 +19,55 @@ const countryOptions = [
   { value: "uk", label: "United Kingdom" },
 ];
 
+// The getOptionsFor function remains unchanged.
+const getOptionsFor = async (
+  endpoint: string,
+  listName: string
+): Promise<ComboboxOption[]> => {
+  console.log(`[DEBUG] Fetching data for: ${listName} from ${endpoint}`);
+  try {
+    const response = await api.post(endpoint, {
+      filter: { searchTerm: "" },
+    });
+    const responseData = response.data ? response.data : response;
+    if (
+      responseData &&
+      responseData.code === 0 &&
+      Array.isArray(responseData.result)
+    ) {
+      return responseData.result.map((item: any) => ({
+        value: item?.id?.toString() || item?.name,
+        label: item?.name,
+      }));
+    }
+    console.warn(`[DEBUG] Could not parse a valid result for ${listName}.`);
+    return [];
+  } catch (error: any) {
+    console.error(`[DEBUG] Error fetching ${listName}:`, error.message);
+    return [];
+  }
+};
+
+// Schema for form validation (City removed).
+const filterSchema = z.object({
+  sportType: z.string().optional(),
+  technoSector: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  reimaginedName: z.string().optional(),
+  currentName: z.string().optional(),
+});
+type FilterFormValues = z.infer<typeof filterSchema>;
+
+
 const ClubInfo = ({ onClose, prevData }) => {
   const [formData, setFormData] = useState({
     coordinates: "",
     city: "",
     reimaginedName: "",
     country: "",
-    sportType: "",
-    tecnoSector: "",
+    countries: "",
+    technoSectorOptions: "",
     currentName: "",
     clubAnthem: "",
     description: "",
@@ -30,10 +76,81 @@ const ClubInfo = ({ onClose, prevData }) => {
     lockClub: false,
     hideClub: true,
   });
+  const [isDragging, setIsDragging] = useState(false);
+  const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
+  const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
+  const [technoSectorOptions, setTechnoSectorOptions] = useState<
+    ComboboxOption[]
+  >([]);
+  const [countryOptions, setCountryOptions] = useState<ComboboxOption[]>([]);
+  const [loadingStates, setLoadingStates] = useState({
+    sports: false,
+    technoSectors: false,
+    countries: false,
+    cities: false,
+  });
+
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FilterFormValues>({
+    resolver: zodResolver(filterSchema),
+    defaultValues: {
+      sportType: "",
+      technoSector: "",
+      country: "",
+      city: "",
+      reimaginedName: "",
+      currentName: "",
+    },
+  });
+
+  useEffect(() => {
+    if (sportOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, sports: true }));
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
+        (data) => {
+          setSportOptions(data);
+          setLoadingStates((prev) => ({ ...prev, sports: false }));
+        }
+      );
+    }
+    if (technoSectorOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
+      getOptionsFor(
+        API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
+        "Techno Sectors"
+      ).then((data) => {
+        setTechnoSectorOptions(data);
+        setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
+      });
+    }
+    if (countryOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, countries: true }));
+      getOptionsFor(
+        API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
+        "Countries"
+      ).then((data) => {
+        setCountryOptions(data);
+        setLoadingStates((prev) => ({ ...prev, countries: false }));
+      });
+    }
+    if (cityOptions.length === 0) {
+      setLoadingStates((prev) => ({ ...prev, cities: true }));
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, "Cities").then(
+        (data) => {
+          setCityOptions(data);
+          setLoadingStates((prev) => ({ ...prev, cities: false }));
+        }
+      );
+    }
+  }, []);
+
 
   const updateScrollPosition = useCallback((clientY: number) => {
     const scrollEl = scrollRef.current;
@@ -75,6 +192,27 @@ const ClubInfo = ({ onClose, prevData }) => {
   const handleFileChange = (file) => {
     setFormData((prev) => ({ ...prev, clubLogo: file }));
   };
+
+  if (technoSectorOptions.length === 0) {
+    setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
+    getOptionsFor(
+      API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
+      "Techno Sectors"
+    ).then((data) => {
+      setTechnoSectorOptions(data);
+      setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
+    });
+  }
+  if (countryOptions.length === 0) {
+    setLoadingStates((prev) => ({ ...prev, countries: true }));
+    getOptionsFor(
+      API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
+      "Countries"
+    ).then((data) => {
+      setCountryOptions(data);
+      setLoadingStates((prev) => ({ ...prev, countries: false }));
+    });
+  }
 
   const submit = () => {
     const a = {
@@ -133,10 +271,10 @@ const ClubInfo = ({ onClose, prevData }) => {
 
             <Combobox
               label="Country"
-              name="country"
+              name="countries"
               options={countryOptions}
               placeholder="Select Country"
-              value={formData.country}
+              value={formData.countries}
               onChange={(value) => handleComboboxChange("country", value)}
               addClub="true"
               salt={true}
@@ -153,11 +291,11 @@ const ClubInfo = ({ onClose, prevData }) => {
             />
             <Combobox
               label="Tecno Sector"
-              name="TecnoSector"
+              name="Techno Sectors"
               options={[]}
               placeholder="Select Tecno Sector"
-              value={formData.tecnoSector}
-              onChange={(value) => handleComboboxChange("tecnoSector", value)}
+              value={formData.technoSectorOptions}
+              onChange={(value) => handleComboboxChange("technoSectorOptions", value)}
               addClub="true"
             />
             <Combobox
