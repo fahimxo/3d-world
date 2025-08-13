@@ -1,5 +1,5 @@
 import axios from "axios";
-// import { showErrorToast } from "../services/toastService";
+import { showToast } from "./toastService";
 
 const api = axios.create({
   baseURL: "http://194.5.175.183:4444",
@@ -21,14 +21,17 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
+    showToast(response?.data?.message, "failed");
+
     return response.data;
   },
   (error) => {
-    const message = error.response?.data?.message || "error";
+    const message = error.response?.data?.message || "An error occurred";
 
-    // showErrorToast(message);
+    showToast(message, "failed");
 
     if (error.response?.status === 401) {
+      // کارهای مربوط به لاگ‌اوت یا ریدایرکت
     }
 
     return Promise.reject(error);
