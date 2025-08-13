@@ -62,7 +62,7 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    const message = error.response?.data?.message || "خطایی رخ داده است";
+    const message = error.response?.data?.message || "An error occurred";
 
     showToast(message, "failed");
 
