@@ -289,8 +289,7 @@ export default class World {
           </div>
           `;
         } else {
-          const labelText =
-            hit.userData?.clubName || hit.userData?.city || "Club";
+          const labelText = hit.userData?.data?.reImaginedName || "Club";
           this.tooltipElement.textContent = labelText;
         }
 

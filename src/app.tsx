@@ -38,8 +38,8 @@ const App: React.FC = () => {
     ) {
       const targetClub = clubData[0];
       worldRef.current.rotateToCoordinates(
-        targetClub.latitude,
-        targetClub.longitude
+        +targetClub.latitude,
+        +targetClub.longitude
       );
     }
   }, [clubData, isInitialLoad]);

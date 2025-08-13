@@ -475,8 +475,8 @@ export default class earth {
 
     await Promise.all(
       clubs.map(async (item) => {
-        const lon = item.longitude;
-        const lat = item.latitude;
+        const lon = +item.longitude;
+        const lat = +item.latitude;
         const color = item?.isActive ? 0xffa500 : 0x525354;
 
         // خود ستون نور
@@ -516,8 +516,8 @@ export default class earth {
 
     await Promise.all(
       cities.map(async (item) => {
-        const lon = item.longitude;
-        const lat = item.latitude;
+        const lon = +item.longitude;
+        const lat = +item.latitude;
         const color = 0xffa500;
 
         const pointMaterial = new MeshBasicMaterial({

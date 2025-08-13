@@ -10,7 +10,7 @@ import {
   Vector3,
 } from "three";
 import { punctuation } from "../world/Earth";
-import { DataType } from "src/app";
+import { DataType } from "src/lib/usePublicClubs";
 
 /**
  * 经纬度坐标转球面坐标
@@ -95,7 +95,6 @@ export const createLightPillar = (options: {
   group.add(mesh, mesh.clone().rotateZ(Math.PI / 2)); //几何体绕x轴旋转了，所以mesh旋转轴变为z
   // 经纬度转球面坐标
   group.name = "light_pillar"; // Assign a unique name
-  group.userData = { city: options.data.name, data: options.data };
   const SphereCoord = lon2xyz(options.radius, options.lon, options.lat); //SphereCoord球面坐标
   group.position.set(SphereCoord.x, SphereCoord.y, SphereCoord.z); //设置mesh位置
   const coordVec3 = new Vector3(
