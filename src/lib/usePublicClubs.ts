@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../config/axios";
 import { API_ENDPOINTS } from "../config/endpoint";
+import { showToast } from "../config/toastService";
 
 export interface PublicClubFilter {
   sportId?: number;
@@ -70,6 +71,8 @@ export function usePublicClubs() {
       );
 
       if (response?.code === 0) {
+        showToast("با موفقیت انجام شد", "success");
+
         setData(response?.result || []);
       } else {
         setData([]);
