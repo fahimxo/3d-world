@@ -167,6 +167,7 @@ const ClubInfo = ({ onClose, prevData }) => {
               placeholder="Select Sport Type"
               value={formData.sportType}
               onChange={(value) => handleComboboxChange("sportType", value)}
+              addClub="true"
             />
             <Input
               label="Reimagined Name"
