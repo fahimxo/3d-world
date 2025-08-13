@@ -10,7 +10,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
   className,
 }) => {
   return (
-    <div className={`relative w-full max-w-4xl ${className}`}>
+    <div className={`relative top-32 lef w-full max-w-4xl ${className}`}>
       <svg
         width="866"
         height="762"

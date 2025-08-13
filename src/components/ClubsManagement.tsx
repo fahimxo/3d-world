@@ -27,7 +27,7 @@ const ClubsManagement = ({ onClose }) => {
 
   return (
     <div
-      className=" inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 "
+      className="inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 "
       onClick={onClose}
     >
       <div onClick={(e) => e.stopPropagation()}>
