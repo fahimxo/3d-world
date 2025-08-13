@@ -36,11 +36,17 @@ const LoginForm = ({ onCancel }: LoginFormProps) => {
         },
       });
       const token = response?.result?.token;
+      const userId = response?.result?.userId;
       if (token) {
         localStorage.setItem("token", token);
+        if (userId) {
+          localStorage.setItem("userId", userId.toString());
+        }
         if (onCancel) onCancel();
       }
-    } catch (error: any) {}
+    } catch (error: any) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
