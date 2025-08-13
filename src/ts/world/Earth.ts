@@ -59,13 +59,6 @@ export type punctuation = {
   };
 };
 
-export interface CityData {
-  city: string;
-  latitude: number;
-  longitude: number;
-  // ... هر فیلد دیگه‌ای که بعداً لازم داری
-}
-
 type options = {
   data: DataType[];
   cityList: ComboboxOption[];
@@ -518,7 +511,7 @@ export default class earth {
   }
 
   // 2) ساخت Point Mesh برای شهرها
-  public async createCityPoints(cities: CityData[] = []) {
+  public async createCityPoints(cities: ComboboxOption[] = []) {
     const radius = this.options.earth.radius;
 
     await Promise.all(
@@ -545,7 +538,7 @@ export default class earth {
         this.clickablePoints.push(cityPoint);
 
         // لیبل HTML (اختیاری)
-        const label = this.createHTMLLabel(item.city);
+        const label = this.createHTMLLabel(item.value);
         label.visible = false;
 
         const labelPos = lon2xyz(radius + 1, lon, lat);
@@ -567,32 +560,8 @@ export default class earth {
 
     await this.createClubPillars(data);
 
-    const cities = [
-      {
-        city: "London",
-        longitude: -0.1276,
-        latitude: 51.5074,
-        color: 0xffa500,
-      },
-      { city: "Paris", longitude: 2.3522, latitude: 48.8566, color: 0xffa500 },
-      { city: "Berlin", longitude: 13.405, latitude: 52.52, color: 0xffa500 },
-
-      {
-        city: "barcelona",
-        longitude: 0.8181,
-        latitude: 41.9091,
-        color: 0xffa500,
-      },
-      {
-        city: "Rome",
-        longitude: 12.5716,
-        latitude: 42.823,
-        color: 0xffa500,
-      },
-    ];
-
     // وقتی دیتای شهر اضافه شد، کافی‌ست این خط را هم صدا بزنید:
-    await this.createCityPoints(cities);
+    await this.createCityPoints(cityList);
 
     // await Promise.all(
     //   data?.map(async (item) => {

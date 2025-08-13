@@ -6,6 +6,8 @@ import Input from "./input";
 export interface ComboboxOption {
   value: string;
   label: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface ComboboxProps {

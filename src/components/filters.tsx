@@ -29,6 +29,8 @@ const getOptionsFor = async (
       return responseData.result.map((item: any) => ({
         value: item?.id?.toString() || item?.name,
         label: item?.name,
+        latitude: item?.latitude,
+        longitude: item?.longitude,
       }));
     }
     console.warn(`[DEBUG] Could not parse a valid result for ${listName}.`);
