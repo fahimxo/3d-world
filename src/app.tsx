@@ -11,6 +11,7 @@ const App: React.FC = () => {
   const [modalData, setModalData] = useState({ name: "", data: "" });
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
+  const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -85,6 +86,8 @@ const App: React.FC = () => {
           children="Logo"
           fetchClubs={handleFilterSubmit}
           loading={clubsLoading}
+          setFilterModalVisible={setFilterModalVisible}
+          filterModalVisible={filterModalVisible}
         />
       </div>
       <Filters
@@ -92,6 +95,8 @@ const App: React.FC = () => {
         loading={clubsLoading}
         cityOptions={cityOptions}
         setCityOptions={setCityOptions}
+        filterModalVisible={filterModalVisible}
+        setFilterModalVisible={setFilterModalVisible}
       />
       <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
