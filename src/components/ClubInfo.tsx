@@ -7,17 +7,13 @@ import { Checkbox } from "./Checkbox";
 import { FileUpload } from "./FileUpload";
 import Input from "./input";
 import ClubList from "./ClubList";
-import { API_ENDPOINTS } from "src/config/endpoint";
-import api from "src/config/axios";
-import { useForm } from "react-hook-form";
+import { API_ENDPOINTS } from "../config/endpoint";
+import api from "../config/axios";
+import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const countryOptions = [
-  { value: "usa", label: "United States" },
-  { value: "jp", label: "Japan" },
-  { value: "uk", label: "United Kingdom" },
-];
+
 
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
@@ -193,26 +189,6 @@ const ClubInfo = ({ onClose, prevData }) => {
     setFormData((prev) => ({ ...prev, clubLogo: file }));
   };
 
-  if (technoSectorOptions.length === 0) {
-    setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
-    getOptionsFor(
-      API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
-      "Techno Sectors"
-    ).then((data) => {
-      setTechnoSectorOptions(data);
-      setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
-    });
-  }
-  if (countryOptions.length === 0) {
-    setLoadingStates((prev) => ({ ...prev, countries: true }));
-    getOptionsFor(
-      API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
-      "Countries"
-    ).then((data) => {
-      setCountryOptions(data);
-      setLoadingStates((prev) => ({ ...prev, countries: false }));
-    });
-  }
 
   const submit = () => {
     const a = {
@@ -269,43 +245,74 @@ const ClubInfo = ({ onClose, prevData }) => {
               />
             </div>
 
-            <Combobox
-              label="Country"
-              name="countries"
-              options={countryOptions}
-              placeholder="Select Country"
-              value={formData.countries}
-              onChange={(value) => handleComboboxChange("country", value)}
-              addClub="true"
-              salt={true}
+            <Controller
+              name="country"
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={countryOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    loadingStates.countries ? "Loading..." : "Select"
+                  }
+                  label="Country"
+                  error={errors.country?.message}
+                  addClub="true"
+                  salt={true}
+                />
+              )}
             />
-            <Combobox
-              label="City"
+            <Controller
               name="city"
-              options={[]}
-              placeholder="Select City"
-              value={formData.city}
-              onChange={(value) => handleComboboxChange("city", value)}
-              addClub="true"
-              salt={true}
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={cityOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={loadingStates.cities ? "Loading..." : "Select"}
+                  label="City"
+                  error={errors.city?.message}
+                  addClub="true"
+                  salt={true}
+                />
+              )}
             />
-            <Combobox
-              label="Tecno Sector"
-              name="Techno Sectors"
-              options={[]}
-              placeholder="Select Tecno Sector"
-              value={formData.technoSectorOptions}
-              onChange={(value) => handleComboboxChange("technoSectorOptions", value)}
-              addClub="true"
+
+            <Controller
+              name="technoSector"
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={technoSectorOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={
+                    loadingStates.technoSectors ? "Loading..." : "Select"
+                  }
+                  label="Techno Sector"
+                  error={errors.technoSector?.message}
+                   addClub="true"
+                  salt={true}
+                />
+              )}
             />
-            <Combobox
-              label="Sport Type"
+            <Controller
               name="sportType"
-              options={[]}
-              placeholder="Select Sport Type"
-              value={formData.sportType}
-              onChange={(value) => handleComboboxChange("sportType", value)}
-              addClub="true"
+              control={control}
+              render={({ field }) => (
+                <Combobox
+                  options={sportOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={loadingStates.sports ? "Loading..." : "Select"}
+                  label="Sport Type"
+                  error={errors.sportType?.message}
+                   addClub="true"
+                  salt={true}
+                />
+              )}
             />
             <Input
               label="Reimagined Name"

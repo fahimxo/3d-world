@@ -179,7 +179,8 @@ export const Filters: React.FC<FiltersProps> = ({
                   placeholder={loadingStates.sports ? "Loading..." : "Select"}
                   label="Sport Type"
                   error={errors.sportType?.message}
-                />
+                  addClub="true"
+                  />
               )}
             />
             <Controller
