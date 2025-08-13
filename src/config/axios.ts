@@ -21,7 +21,9 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    showToast(response?.data?.message, "failed");
+    if (response?.data?.code !== 0) {
+      showToast(response?.data?.message, "failed");
+    }
 
     return response.data;
   },
