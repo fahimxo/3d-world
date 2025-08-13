@@ -48,7 +48,7 @@ const CardInfoModal = ({
           {data?.originalClubName}
         </h3>
         <p className="text-xs text-gray-300 text-center mt-2.5 tracking-widest">
-          {data?.countryName} | {data?.city} | {data?.sectorName}
+          {data?.sectorName} | {data?.countryName} | {data?.city}
         </p>
       </div>
     </div>

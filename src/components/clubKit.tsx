@@ -1,29 +1,41 @@
-const ClubKit = ({ data }: { data: any }) => {
+import React from "react";
+import ReactPlayer from "react-player";
+
+interface InfoSectionProps {
+  title: string;
+  description: string | null | undefined;
+  videoUrl: string | null | undefined;
+}
+
+const InfoSection: React.FC<InfoSectionProps> = ({
+  title,
+  description,
+  videoUrl,
+}) => {
   return (
-    <>
-      <p className="mt-8 text-gray-300 text-sm leading-6 tracking-widest">
-        {data?.lore}
-      </p>
+    <div className="mt-3.5">
       <div className="mt-4.5 h-px bg-white w-full opacity-50" />
-      <div className="mt-3.5">
-        <h3 className="text-white text-lg font-bold mb-3.5">Club Kit</h3>
-        <div className="w-full flex items-stretch gap-4 h-[192px]">
-          <div className="flex-1 h-full">
-            <video
-              src={data?.kitVideoUrl}
-              controls
-              className="w-full h-full rounded-lg border-none object-cover"
+      <h3 className="text-white text-lg font-bold my-3.5">{title}</h3>
+      <div className="w-full flex items-stretch gap-4 h-[192px]">
+        <div className="flex-1 h-full bg-black rounded-lg">
+          {videoUrl && (
+            <ReactPlayer
+              src={videoUrl}
+              width="100%"
+              height="100%"
+              controls={true}
+              light={true}
             />
-          </div>
-          <div className="flex-1 h-full overflow-hidden relative">
-            <p className="text-gray-300 text-sm leading-6 tracking-widest h-full overflow-hidden">
-              {data?.lore}
-            </p>
-          </div>
+          )}
+        </div>
+        <div className="flex-1 h-full overflow-hidden relative ">
+          <p className="text-gray-300 text-sm leading-6 tracking-widest h-full overflow-auto">
+            {description}
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default ClubKit;
+export default InfoSection;
