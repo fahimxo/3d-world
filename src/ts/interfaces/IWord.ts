@@ -6,4 +6,5 @@ export interface IWord {
   onPointClick?: (data: any) => void;
   data: DataType[];
   cityList: ComboboxOption[];
+  onLoaded?: () => void;
 }

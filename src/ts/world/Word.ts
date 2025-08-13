@@ -131,6 +131,10 @@ export default class World {
         this.cachedData = null;
       }
 
+      if (this.option.onLoaded) {
+        this.option.onLoaded();
+      }
+
       this.handleZoom();
       // 开始渲染
       this.render();

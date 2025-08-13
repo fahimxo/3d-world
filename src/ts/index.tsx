@@ -13,6 +13,7 @@ interface WorldComponentProps {
   onCityClick: (name: string, data: string) => void;
   data: DataType[];
   cityList: ComboboxOption[];
+  onLoaded: () => void;
 }
 
 export interface WorldHandle {
@@ -20,7 +21,7 @@ export interface WorldHandle {
 }
 
 const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
-  ({ onCityClick, data, cityList }, ref) => {
+  ({ onCityClick, data, cityList, onLoaded }, ref) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const worldInstance = useRef<World | null>(null);
 
@@ -50,6 +51,7 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           },
           data: [],
           cityList: [],
+          onLoaded: onLoaded,
         });
       }
 
