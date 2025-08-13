@@ -8,6 +8,7 @@ import { ComboboxOption, Tooltip } from "./components";
 import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
 import { Loading } from "./components/loading";
 import ClubsManagement from "./components/ClubsManagement";
+import { Locations } from "./assets/icons/Locations";
 
 const App: React.FC = () => {
   const [modalData, setModalData] = useState({ name: "", data: "" });
@@ -16,7 +17,7 @@ const App: React.FC = () => {
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [isLocationsModalOpen, setLocationsModalOpen] = useState(true);
+  const [isLocationsModalOpen, setLocationsModalOpen] = useState(false);
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -105,6 +106,13 @@ const App: React.FC = () => {
         filterModalVisible={filterModalVisible}
         setFilterModalVisible={setFilterModalVisible}
       />
+      <div className="fixed top-20 right-4 z-40">
+        <Locations
+          className="w-40 h-40 p-2  border border-cyan-400/30 shadow-lg shadow-cyan-400/20 cursor-pointer hover:bg-cyan-400/30 transition-colors duration-300"
+          onClick={() => setLocationsModalOpen(true)}
+        />
+      </div>
+      {/* <ClubsManagement /> */}
       <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}
@@ -120,9 +128,9 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-      <ClubsManagement />
+      {/* <ClubsManagement /> */}
     </div>
-    
+
   );
 };
 
