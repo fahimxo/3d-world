@@ -71,7 +71,7 @@ export function usePublicClubs() {
       );
 
       if (response?.code === 0) {
-        showToast("با موفقیت انجام شد", "success");
+        showToast("Done successfully", "success");
 
         setData(response?.result || []);
       } else {
