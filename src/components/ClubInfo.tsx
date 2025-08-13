@@ -13,8 +13,6 @@ import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
-
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
   endpoint: string,
@@ -52,9 +50,11 @@ const filterSchema = z.object({
   city: z.string().optional(),
   reimaginedName: z.string().optional(),
   currentName: z.string().optional(),
+  coordinates: z.string(),
+  clubAnthem: z.string(),
+  clubLore: z.string(),
 });
 type FilterFormValues = z.infer<typeof filterSchema>;
-
 
 const ClubInfo = ({ onClose, prevData }) => {
   const [formData, setFormData] = useState({
@@ -86,7 +86,6 @@ const ClubInfo = ({ onClose, prevData }) => {
     cities: false,
   });
 
-
   const scrollRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const [thumbTop, setThumbTop] = useState(0);
@@ -103,6 +102,9 @@ const ClubInfo = ({ onClose, prevData }) => {
       city: "",
       reimaginedName: "",
       currentName: "",
+      coordinates: "",
+      clubAnthem: "",
+      clubLore: "",
     },
   });
 
@@ -147,7 +149,6 @@ const ClubInfo = ({ onClose, prevData }) => {
     }
   }, []);
 
-
   const updateScrollPosition = useCallback((clientY: number) => {
     const scrollEl = scrollRef.current;
     const thumbEl = thumbRef.current;
@@ -188,7 +189,6 @@ const ClubInfo = ({ onClose, prevData }) => {
   const handleFileChange = (file) => {
     setFormData((prev) => ({ ...prev, clubLogo: file }));
   };
-
 
   const submit = () => {
     const a = {
@@ -235,13 +235,17 @@ const ClubInfo = ({ onClose, prevData }) => {
         <Accordion title="Club Info">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
             <div className="col-span-2">
-              <Input
-                label="Coordinates"
+              <Controller
                 name="coordinates"
-                value={formData.coordinates}
-                onChange={handleInputChange}
-                placeholder="Example: 50.510281, 4.719585"
-                addClub="true"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Coordinates"
+                    {...field}
+                    placeholder="Example: 50.510281, 4.719585"
+                    addClub="true"
+                  />
+                )}
               />
             </div>
 
@@ -293,7 +297,7 @@ const ClubInfo = ({ onClose, prevData }) => {
                   }
                   label="Techno Sector"
                   error={errors.technoSector?.message}
-                   addClub="true"
+                  addClub="true"
                   salt={true}
                 />
               )}
@@ -309,45 +313,65 @@ const ClubInfo = ({ onClose, prevData }) => {
                   placeholder={loadingStates.sports ? "Loading..." : "Select"}
                   label="Sport Type"
                   error={errors.sportType?.message}
-                   addClub="true"
+                  addClub="true"
                   salt={true}
                 />
               )}
             />
-            <Input
-              label="Reimagined Name"
-              name="reimaginedName"
-              value={formData.reimaginedName}
-              onChange={handleInputChange}
-              placeholder="Example: Galactic Crown"
-              addClub="true"
-            />
-            <Input
-              label="Current Name"
-              name="currentName"
-              value={formData.currentName}
-              onChange={handleInputChange}
-              placeholder="Example: Real Madrid"
-              addClub="true"
-            />
-            <Input
-              label="Club anthem"
-              name="clubAnthem"
-              value={formData.clubAnthem}
-              onChange={handleInputChange}
-              placeholder="Enter youtube link"
-              addClub="true"
-            />
 
+            <Controller
+              name="reimaginedName"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  label="Reimagined Name"
+                  name="reimaginedName"
+                  {...field}
+                  placeholder="Example: Galactic Crown"
+                  addClub="true"
+                />
+              )}
+            />
+            <Controller
+              name="currentName"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  label="Current Name"
+                  name="currentName"
+                  {...field}
+                  placeholder="Example: Real Madrid"
+                  addClub="true"
+                />
+              )}
+            />
+            <Controller
+              name="clubAnthem"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  label="Club anthem"
+                  name="clubAnthem"
+                  {...field}
+                  placeholder="Enter youtube link"
+                  addClub="true"
+                />
+              )}
+            />
             <div className="col-span-2">
-              <Input
-                label="Club anthem"
-                name="clubAnthem"
-                value={formData.clubAnthem}
-                onChange={handleInputChange}
-                placeholder="Enter youtube link"
-                area="true"
-                addClub="true"
+              <Controller
+                name="clubLore"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Club lore"
+                    name="clubLore"
+                    {...field}
+                    placeholder="Enter youtube link"
+                    addClub="true"
+                    area="true"
+                  />
+                )}
               />
             </div>
             <FileUpload

@@ -189,7 +189,7 @@ export const Filters: React.FC<FiltersProps> = ({
                   label="Sport Type"
                   error={errors.sportType?.message}
                   addClub="true"
-                  />
+                />
               )}
             />
             <Controller
@@ -221,6 +221,7 @@ export const Filters: React.FC<FiltersProps> = ({
                   }
                   label="Country"
                   error={errors.country?.message}
+                  salt={true}
                 />
               )}
             />
