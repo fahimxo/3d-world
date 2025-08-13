@@ -7,14 +7,23 @@ import LoginForm from "../../components/LoginForm";
 import api from "../../config/axios";
 import { API_ENDPOINTS } from "../../config/endpoint";
 import { PublicClubFilter } from "src/lib/usePublicClubs";
+import { FilterButton } from "../../components";
 
 type HeaderProps = {
   children: React.ReactNode;
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
+  setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  filterModalVisible: boolean;
 };
 
-export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
+export const Headers = ({
+  children,
+  fetchClubs,
+  loading,
+  setFilterModalVisible,
+  filterModalVisible,
+}: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showLogin, setShowLogin] = useState(false);
@@ -62,12 +71,17 @@ export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
   };
 
   return (
-    <div className="w-full px-[45px]">
-      <div className="w-full px-8 pt-[33px] flex items-center justify-between relative">
+    <div className="w-full px-5 md:px-[45px]">
+      <div className="w-full p-0 md:px-8 pt-[33px] flex items-center justify-between relative">
+        <FilterButton
+          onClick={() => setFilterModalVisible((prev) => !prev)}
+          className="block md:hidden"
+          filterModalVisible={filterModalVisible}
+        />
         <p className="font-normal text-[26px] text-cyan-300 orbitron-font">
           {children}
         </p>
-        <div className="relative w-[443px] h-[44px]">
+        <div className="relative w-[443px] h-[44px] hidden md:block">
           <Search />
           <div className="relative w-full h-full">
             <input
@@ -122,6 +136,21 @@ export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
       </div>
 
       <div className="mt-6 h-[1px] bg-cyan-500/30 w-full" />
+
+      <div className="relative w-full h-[44px] block md:hidden mt-4">
+        <Search />
+        <div className="relative w-full h-full">
+          <input
+            type="text"
+            placeholder="Enter club name or city"
+            className="w-full h-full border-none outline-none pl-12 pr-4 text-cyan-300 placeholder-cyan-400/50 font-medium text-sm"
+            value={searchValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+          />
+        </div>
+      </div>
 
       {showLogin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
