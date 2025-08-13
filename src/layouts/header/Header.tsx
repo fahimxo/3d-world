@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SiteLogo from "../../../static/images/logo.png";
 import MenuIcon from "../../assets/icons/MenuIcon";
 import Search from "../../assets/icons/SearchIcon";
 import { SciFiMenuBorder } from "../../assets/icons/SciFiMenuBorder";
@@ -9,12 +10,11 @@ import { API_ENDPOINTS } from "../../config/endpoint";
 import { PublicClubFilter } from "src/lib/usePublicClubs";
 
 type HeaderProps = {
-  children: React.ReactNode;
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
 };
 
-export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
+export const Headers = ({ fetchClubs, loading }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [showLogin, setShowLogin] = useState(false);
@@ -64,9 +64,7 @@ export const Headers = ({ children, fetchClubs, loading }: HeaderProps) => {
   return (
     <div className="w-full px-[45px]">
       <div className="w-full px-8 pt-[33px] flex items-center justify-between relative">
-        <p className="font-normal text-[26px] text-cyan-300 orbitron-font">
-          {children}
-        </p>
+        <img src={SiteLogo} alt="Site Logo" className="h-12 w-auto" />
         <div className="relative w-[443px] h-[44px]">
           <Search />
           <div className="relative w-full h-full">

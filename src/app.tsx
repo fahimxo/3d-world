@@ -141,11 +141,7 @@ const App: React.FC = () => {
         cityList={cityOptions}
       />
       <div className="fixed top-0 left-0 w-full z-50">
-        <Headers
-          children="Logo"
-          fetchClubs={handleFilterSubmit}
-          loading={clubsLoading}
-        />
+        <Headers fetchClubs={handleFilterSubmit} loading={clubsLoading} />
       </div>
       <Filters
         onFilterSubmit={handleFilterSubmit}

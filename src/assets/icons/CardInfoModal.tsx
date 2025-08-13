@@ -39,7 +39,7 @@ const CardInfoModal = ({
       <div className="relative z-10 flex flex-col items-center text-white px-4 py-8 w-full h-full justify-center">
         <div className="w-[100px] h-[100px] flex items-center justify-center mb-3">
           <img
-            src={data?.logoUrl}
+            src={`data:image/png;base64,${data?.logoUrl}`}
             alt="Logo"
             className="w-full h-full object-contain"
           />

@@ -153,7 +153,7 @@ const DetailsModal: React.FC<{
         {children}
       </div>
       {onClose && (
-        <div className="relative z-20 flex justify-center py-8 cursor-pointer">
+        <div className="relative z-20 flex justify-center py-8">
           <button
             onClick={onClose}
             className="relative flex items-center justify-center"
@@ -172,12 +172,17 @@ const DetailsModal: React.FC<{
                 fill="#00C9FF"
               />
             </svg>
-            <span className="text-black font-bold relative z-20">Close</span>
+            <span className="text-black font-bold relative z-20 cursor-pointer">
+              Close
+            </span>
           </button>
         </div>
       )}
       {showScrollbar && (
-        <div className="absolute right-4 top-0 bottom-0 z-10 w-2 rounded-full backdrop-blur-sm transition-opacity duration-300" style={{ backgroundColor: '#42005E'}} />
+        <div
+          className="absolute right-4 top-0 bottom-0 z-10 w-2 rounded-full backdrop-blur-sm transition-opacity duration-300"
+          style={{ backgroundColor: "#42005E" }}
+        />
       )}
       {showScrollbar && (
         <div
