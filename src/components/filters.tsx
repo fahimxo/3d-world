@@ -29,6 +29,8 @@ const getOptionsFor = async (
       return responseData.result.map((item: any) => ({
         value: item?.id?.toString() || item?.name,
         label: item?.name,
+        latitude: item?.latitude,
+        longitude: item?.longitude,
       }));
     }
     console.warn(`[DEBUG] Could not parse a valid result for ${listName}.`);
@@ -56,6 +58,8 @@ interface FiltersProps {
   loading: boolean;
   cityOptions: ComboboxOption[];
   setCityOptions: React.Dispatch<React.SetStateAction<ComboboxOption[]>>;
+  filterModalVisible: boolean;
+  setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Filters: React.FC<FiltersProps> = ({
@@ -63,8 +67,9 @@ export const Filters: React.FC<FiltersProps> = ({
   loading,
   cityOptions,
   setCityOptions,
+  filterModalVisible,
+  setFilterModalVisible,
 }) => {
-  const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
     ComboboxOption[]
@@ -161,8 +166,12 @@ export const Filters: React.FC<FiltersProps> = ({
   const areAnyComboboxesLoading = Object.values(loadingStates).some(Boolean);
 
   return (
-    <div className="absolute top-30 left-8 w-full max-w-sm space-y-8 z-40">
-      <FilterButton onClick={() => setFilterModalVisible((prev) => !prev)} />
+    <div className="absolute top-44 md:top-30 left-5 md:left-10 max-w-sm space-y-8 z-40">
+      <FilterButton
+        onClick={() => setFilterModalVisible((prev) => !prev)}
+        className="hidden md:block mb-2"
+        filterModalVisible={filterModalVisible}
+      />
 
       {filterModalVisible && (
         <Modal>
@@ -251,12 +260,16 @@ export const Filters: React.FC<FiltersProps> = ({
                 />
               )}
             />
-            <Button
-              type="submit"
-              disabled={areAnyComboboxesLoading || isFormSubmitting || loading}
-            >
-              {isFormSubmitting || loading ? "Submitting..." : "Apply Filters"}
-            </Button>
+            <div className="w-1/2 mx-auto">
+              <Button
+                type="submit"
+                disabled={
+                  areAnyComboboxesLoading || isFormSubmitting || loading
+                }
+              >
+                {isFormSubmitting || loading ? "Submitting..." : "Filter"}
+              </Button>
+            </div>
           </form>
         </Modal>
       )}

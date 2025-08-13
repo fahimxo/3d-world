@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Input from "./input";
@@ -7,6 +7,8 @@ import { cn } from "../lib/utils";
 export interface ComboboxOption {
   value: string;
   label: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface ComboboxProps {
@@ -165,6 +167,11 @@ const Combobox: React.FC<ComboboxProps> = ({
       "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
   };
 
+  const handleClear = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation(); // This is crucial to prevent the dropdown from opening
+    onChange(""); // Pass an empty string to clear the selection
+  };
+
   return (
     <div className="w-full space-y-3">
       {label && (
@@ -203,7 +210,19 @@ const Combobox: React.FC<ComboboxProps> = ({
                 {placeholder}
               </span>
             )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <div className="flex items-center">
+              {/* 3. Conditionally render the clear button when a value is selected */}
+              {selectedOption && (
+                <span
+                  onClick={handleClear}
+                  className="p-1 rounded-full hover:bg-white/10"
+                  aria-label="Clear selection"
+                >
+                  <X className="h-4 w-4 text-cyan-400/70 cursor-pointer" />
+                </span>
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </div>
           </button>
         </div>
 

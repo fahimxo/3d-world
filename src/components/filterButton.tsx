@@ -3,17 +3,19 @@ import React from "react";
 interface FilterButtonProps {
   className?: string;
   onClick?: () => void;
+  filterModalVisible: boolean;
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({
   className,
   onClick,
+  filterModalVisible,
 }) => (
   <svg
     width="52"
     height="41"
     viewBox="0 0 52 41"
-    fill="none"
+    fill={filterModalVisible ? "#00C9FF" : "#011231E5"}
     xmlns="http://www.w3.org/2000/svg"
     className={className}
     onClick={onClick}
@@ -46,7 +48,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
     <g mask="url(#mask0_113_75)">
       <path
         d="M25.0001 29C24.7167 29 24.4792 28.9042 24.2876 28.7125C24.0959 28.5208 24.0001 28.2833 24.0001 28V22L18.2001 14.6C17.9501 14.2667 17.9126 13.9167 18.0876 13.55C18.2626 13.1833 18.5667 13 19.0001 13H33.0001C33.4334 13 33.7376 13.1833 33.9126 13.55C34.0876 13.9167 34.0501 14.2667 33.8001 14.6L28.0001 22V28C28.0001 28.2833 27.9042 28.5208 27.7126 28.7125C27.5209 28.9042 27.2834 29 27.0001 29H25.0001Z"
-        fill="#00C9FF"
+        fill={filterModalVisible ? "#011231" : "#00C9FF"}
       />
     </g>
     <defs>

@@ -484,7 +484,7 @@ export default class earth {
       clubs.map(async (item) => {
         const lon = item.longitude;
         const lat = item.latitude;
-        const color = 0xffa500;
+        const color = item?.isActive ? 0xffa500 : 0x525354;
 
         // خود ستون نور
         const pillar = createLightPillar({
@@ -518,7 +518,7 @@ export default class earth {
   }
 
   // 2) ساخت Point Mesh برای شهرها
-  public async createCityPoints(cities: CityData[] = []) {
+  public async createCityPoints(cities: ComboboxOption[] = []) {
     const radius = this.options.earth.radius;
 
     await Promise.all(
@@ -545,7 +545,7 @@ export default class earth {
         this.clickablePoints.push(cityPoint);
 
         // لیبل HTML (اختیاری)
-        const label = this.createHTMLLabel(item.city);
+        const label = this.createHTMLLabel(item.value);
         label.visible = false;
 
         const labelPos = lon2xyz(radius + 1, lon, lat);
@@ -567,32 +567,8 @@ export default class earth {
 
     await this.createClubPillars(data);
 
-    const cities = [
-      {
-        city: "London",
-        longitude: -0.1276,
-        latitude: 51.5074,
-        color: 0xffa500,
-      },
-      { city: "Paris", longitude: 2.3522, latitude: 48.8566, color: 0xffa500 },
-      { city: "Berlin", longitude: 13.405, latitude: 52.52, color: 0xffa500 },
-
-      {
-        city: "barcelona",
-        longitude: 0.8181,
-        latitude: 41.9091,
-        color: 0xffa500,
-      },
-      {
-        city: "Rome",
-        longitude: 12.5716,
-        latitude: 42.823,
-        color: 0xffa500,
-      },
-    ];
-
     // وقتی دیتای شهر اضافه شد، کافی‌ست این خط را هم صدا بزنید:
-    await this.createCityPoints(cities);
+    await this.createCityPoints(cityList);
 
     // await Promise.all(
     //   data?.map(async (item) => {
@@ -629,8 +605,7 @@ export default class earth {
     //     // Position the marker with a bit of distance from the surface
     //     // const position = lon2xyz(
     //     //   this.options.earth.radius + 0.4,
-    //     //   item.E,
-    //   item.N
+    //     //   lon, lat
     //     // ); // The '+ 2' controls distance
     //     // marker3D.position.set(position.x, position.y, position.z);
 

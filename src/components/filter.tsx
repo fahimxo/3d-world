@@ -1,11 +1,11 @@
 export const Filter = () => {
   return (
     <svg
-      width="338"
-      height="682"
       viewBox="0 0 338 682"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className=" inset-0 w-full h-full"
+      preserveAspectRatio="xMidYMid meet"
     >
       <g filter="url(#filter0_i_53_257)">
         <path

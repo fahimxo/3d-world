@@ -3,12 +3,11 @@ import React from "react";
 const Search: React.FC = ({ className }: { className?: string }) => {
   return (
     <svg
-      width="445"
-      height="44"
       viewBox="0 0 445 44"
-      fill="none"
+      fill="#011231E5"
       xmlns="http://www.w3.org/2000/svg"
-      className={`absolute top-0 left-0 pointer-events-none z-0 ${className}`}
+      preserveAspectRatio="none"
+      className={`absolute top-0 left-0 pointer-events-none z-0 inset-0 w-full h-full ${className}`}
     >
       <g filter="url(#filter0_i_1_100)">
         <path
@@ -48,8 +47,8 @@ const Search: React.FC = ({ className }: { className?: string }) => {
           id="filter0_i_1_100"
           x="0.5"
           y="0.5"
-          width="444"
-          height="43"
+          // width="444"
+          // height="43"
           filterUnits="userSpaceOnUse"
           colorInterpolationFilters="sRGB"
         >

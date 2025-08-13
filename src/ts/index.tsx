@@ -13,6 +13,7 @@ interface WorldComponentProps {
   onCityClick: (name: string, data: string) => void;
   data: DataType[];
   cityList: ComboboxOption[];
+  onLoaded: () => void;
 }
 
 export interface WorldHandle {
@@ -20,7 +21,7 @@ export interface WorldHandle {
 }
 
 const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
-  ({ onCityClick, data, cityList }, ref) => {
+  ({ onCityClick, data, cityList, onLoaded }, ref) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const worldInstance = useRef<World | null>(null);
 
@@ -43,9 +44,14 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           dom: currentMount,
           // Pass the callback function to your World class
           // You will need to update your IWord interface and World constructor to accept this
-          onPointClick: (data) => onCityClick(data.city, JSON.stringify(data)),
+          onPointClick: (data) => {
+            if (data?.isActive === true) {
+              onCityClick(data.city, JSON.stringify(data));
+            }
+          },
           data: [],
           cityList: [],
+          onLoaded: onLoaded,
         });
       }
 
