@@ -40,15 +40,15 @@ const ClubsManagement = ({ onClose }) => {
               Edit Club
             </Button>
           </div>
-          {/* <CustomScrollPanel> */}
-          <div className="px-10 pb-8">
-            {currentTab === tabs.add ? (
-              <ClubInfo onClose={onClose} />
-            ) : (
-              <ClubList />
-            )}
-          </div>
-          {/* </CustomScrollPanel> */}
+          <CustomScrollPanel>
+            <div className="px-10 pb-8">
+              {currentTab === tabs.add ? (
+                <ClubInfo onClose={onClose} />
+              ) : (
+                <ClubList />
+              )}
+            </div>
+          </CustomScrollPanel>
         </LocationsModal>
       </div>
     </div>
