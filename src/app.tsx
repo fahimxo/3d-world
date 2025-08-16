@@ -10,6 +10,7 @@ import {
   usePublicClubs,
   PublicClubResult,
 } from "./lib/usePublicClubs";
+import { Loading } from "./components/loading";
 
 export type DataType = {
   id: number;
@@ -61,7 +62,6 @@ const App: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const worldRef = useRef<WorldHandle>(null);
 
