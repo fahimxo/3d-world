@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import SiteLogo from "../../../static/images/logo.png";
 import MenuIcon from "../../assets/icons/MenuIcon";
 import Search from "../../assets/icons/SearchIcon";
 import { SciFiMenuBorder } from "../../assets/icons/SciFiMenuBorder";
@@ -10,7 +11,6 @@ import { PublicClubFilter } from "src/lib/usePublicClubs";
 import { FilterButton } from "../../components";
 
 type HeaderProps = {
-  children: React.ReactNode;
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;

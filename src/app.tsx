@@ -4,12 +4,60 @@ import WorldComponent, { WorldHandle } from "./ts/index";
 import "./app.css";
 import { Headers } from "./layouts/header/Header";
 import { Filters } from "./components/filters";
-import { ComboboxOption, Tooltip } from "./components";
-import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
-import { Loading } from "./components/loading";
+import { Tooltip, ComboboxOption, ClubDetailsModal } from "./components";
+import {
+  PublicClubFilter,
+  usePublicClubs,
+  PublicClubResult,
+} from "./lib/usePublicClubs";
+
+export type DataType = {
+  id: number;
+  reImaginedName: string;
+  originalClubName: string;
+  lore: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  logoUrl: string;
+  videoUrl: string;
+  status: number;
+  isActive: boolean;
+  displayOrder: number;
+  sportId: number;
+  sportName: string;
+  sectorId: number;
+  sectorName: string;
+  sectorColorCode: string;
+  countryId: number;
+  countryName: string;
+  anthemUrl: string;
+  kitImageUrl: string;
+  kitVideoUrl: string;
+  stadiumImageUrl: string;
+  stadiumVideoUrl: string;
+  bestPlayerImageUrl: string;
+  bestPlayerVideoUrl: string;
+  coachImageUrl: string;
+  coachVideoUrl: string;
+  vehicleImageUrl: string;
+  vehicleVideoUrl: string;
+  symbolImageUrl: string;
+  symbolVideoUrl: string;
+  averageRating: number;
+  totalRatings: number;
+  created: string;
+  lastModified: string;
+};
 
 const App: React.FC = () => {
+  const [selectedSport, setSelectedSport] = useState<string>("");
+  const [detailsModal, setDetailsModal] = useState(false);
   const [modalData, setModalData] = useState({ name: "", data: "" });
+  const [selectedClubData, setSelectedClubData] = useState<
+    PublicClubResult | undefined
+  >();
+  const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
@@ -53,15 +101,27 @@ const App: React.FC = () => {
   };
 
   // This function can be passed to the WorldComponent to show the modal
-  const [modalVisible, setModalVisible] = useState(false);
+
   const showCityModal = useCallback((name: string, data: string) => {
-    setModalData({ name, data });
-    setModalVisible(true);
+    try {
+      const clubData = JSON.parse(data);
+      console.log("Clicked club data:", clubData);
+      if (clubData && clubData.id) {
+        setModalData({ name, data });
+        setSelectedClubData(clubData);
+        setDetailsModal(true);
+      }
+    } catch (error) {
+      console.error("Error parsing club data:", error);
+    }
   }, []);
 
   const hideCityModal = useCallback(() => {
-    setModalVisible(false);
+    setDetailsModal(false);
+    setSelectedClubData(undefined);
+    setModalData({ name: "", data: "" });
   }, []);
+
 
   const handleWorldLoaded = useCallback(() => {
     const loadingScreen = document.getElementById("loading");
@@ -80,7 +140,7 @@ const App: React.FC = () => {
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent
         onCityClick={showCityModal}
-        data={clubData}
+        data={clubData as DataType[]}
         ref={worldRef}
         cityList={cityOptions}
         onLoaded={handleWorldLoaded}
@@ -103,10 +163,15 @@ const App: React.FC = () => {
         setFilterModalVisible={setFilterModalVisible}
       />
       <Tooltip />
+      <ClubDetailsModal
+        isOpen={detailsModal}
+        onClose={hideCityModal}
+        clubData={selectedClubData}
+      />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}
       {/* Modal Dialog */}
-      {modalVisible && (
+      {/* {modalVisible && (
         <div id="cityModal" className="modal">
           <div className="modal-content">
             <span className="close-button" onClick={hideCityModal}>
@@ -116,7 +181,7 @@ const App: React.FC = () => {
             <p id="cityData">{modalData.data}</p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

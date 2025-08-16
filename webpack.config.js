@@ -85,6 +85,12 @@ module.exports = {
         test: /\.(glsl|vs|fs)$/,
         loader: "ts-shader-loader",
       },
+      // --- این تیکه رو برات اضافه کردم ---
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: "asset/resource",
+      },
+      // ---------------------------------
     ],
   },
 

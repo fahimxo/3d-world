@@ -5,6 +5,8 @@ export const API_ENDPOINTS = {
     GET_COUNTRIES_LIST: "/api/WorldMap/GetCountriesList/GetCountriesList",
     GET_CITIES_LIST: "/api/WorldMap/GetCitiesList/GetCitiesList",
     GET_PUBLIC_CLUB: "/api/WorldMap/GetPublicClubs/GetPublicClubs",
+    getSportsList: "/api/WorldMap/GetSportsList/GetSportsList",
+    getClubDetails: "/api/WorldMap/GetClubDetails/GetClubDetails",
   },
   USER: {
     LOGIN: "/api/User/Login",

@@ -3,6 +3,7 @@ import api from "../config/axios";
 import { API_ENDPOINTS } from "../config/endpoint";
 
 export interface PublicClubFilter {
+  id?: number;
   sportId?: number;
   sectorId?: number;
   countryId?: number;
