@@ -11,6 +11,7 @@ import { PublicClubFilter } from "src/lib/usePublicClubs";
 import { FilterButton } from "../../components";
 
 type HeaderProps = {
+  children: React.ReactNode;
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
