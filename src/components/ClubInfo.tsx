@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LocationsModal } from "../assets/icons/LocationsModal";
 import { Accordion } from "./Accordion";
 import { Button } from "./button";
 import Combobox, { ComboboxOption } from "./combobox";
 import { Checkbox } from "./Checkbox";
 import { FileUpload } from "./FileUpload";
 import Input from "./input";
-import ClubList from "./ClubList";
 import { API_ENDPOINTS } from "../config/endpoint";
 import api from "../config/axios";
 import { Controller, useForm } from "react-hook-form";
@@ -56,7 +54,8 @@ const filterSchema = z.object({
 });
 type FilterFormValues = z.infer<typeof filterSchema>;
 
-const ClubInfo = ({ onClose, prevData }) => {
+const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     coordinates: "",
     city: "",
@@ -72,7 +71,7 @@ const ClubInfo = ({ onClose, prevData }) => {
     lockClub: false,
     hideClub: true,
   });
-  const [isDragging, setIsDragging] = useState(false);
+  // const [isDragging, setIsDragging] = useState(false);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
@@ -86,9 +85,6 @@ const ClubInfo = ({ onClose, prevData }) => {
     cities: false,
   });
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const thumbRef = useRef<HTMLDivElement>(null);
-  const [thumbTop, setThumbTop] = useState(0);
   const {
     control,
     handleSubmit,
@@ -149,31 +145,6 @@ const ClubInfo = ({ onClose, prevData }) => {
     }
   }, []);
 
-  const updateScrollPosition = useCallback((clientY: number) => {
-    const scrollEl = scrollRef.current;
-    const thumbEl = thumbRef.current;
-    if (!scrollEl || !thumbEl) return;
-
-    const { top, height } = scrollEl.getBoundingClientRect();
-    const thumbHeight = 69;
-    const clickPosition = clientY - top - thumbHeight / 2;
-    const maxTop = height - thumbHeight;
-    const newTop = Math.max(0, Math.min(maxTop, clickPosition));
-
-    const scrollHeight = scrollEl.scrollHeight;
-    const maxScroll = scrollHeight - height;
-    const scrollPosition = (newTop / maxTop) * maxScroll;
-
-    setThumbTop(newTop);
-    scrollEl.scrollTo(0, scrollPosition);
-  }, []);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    updateScrollPosition(e.clientY);
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -182,55 +153,80 @@ const ClubInfo = ({ onClose, prevData }) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
-  const handleComboboxChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleFileChange = (file) => {
     setFormData((prev) => ({ ...prev, clubLogo: file }));
   };
 
-  const submit = () => {
-    const a = {
-      createClub_VM: {
-        reImaginedName: "string",
-        originalClubName: "string",
-        lore: "string",
-        city: "string",
-        latitude: 90,
-        longitude: 180,
-        logoUrl: "string",
-        videoUrl: "string",
+  const onSubmit = async (data: FilterFormValues) => {
+    setIsLoading(true);
+
+    const coords = data.coordinates.split(",").map((c) => c.trim());
+    const latitude = coords[0] || "";
+    const longitude = coords[1] || "";
+
+    const apiPayload = {
+      createClub_VM: {            
+        reImaginedName: data.reimaginedName,
+        originalClubName: data.currentName,
+        lore: data.clubLore,
+        city: data.city,
+        latitude: latitude,
+        longitude: longitude,
+        logoUrl: "temp_logo.jpg",
+        videoUrl: "",
         status: 1,
-        lockStatus: 1,
-        sportId: 0,
-        sectorId: 0,
-        countryId: 0,
+        lockStatus: formData.lockClub ? 1 : 0,
+        sportId: parseInt(data.sportType, 10) || 0,
+        sectorId: parseInt(data.technoSector, 10) || 0,
+        countryId: parseInt(data.country, 10) || 0,
         displayOrder: 0,
-        anthemUrl: "string",
-        kitImageUrl: "string",
-        kitVideoUrl: "string",
-        kitDiscription: "string",
-        stadiumImageUrl: "string",
-        stadiumVideoUrl: "string",
-        staduimDiscription: "string",
-        bestPlayerImageUrl: "string",
-        bestPlayerVideoUrl: "string",
-        bestPlayerDiscription: "string",
-        coachImageUrl: "string",
-        coachVideoUrl: "string",
-        coachDiscription: "string",
-        vehicleImageUrl: "string",
-        vehicleVideoUrl: "string",
-        vehicleDiscription: "string",
-        symbolImageUrl: "string",
-        symbolVideoUrl: "string",
-        symbolDiscription: "string",
+        anthemUrl: data.clubAnthem,
+        kitImageUrl: "",
+        kitVideoUrl: "",
+        kitDiscription: "",
+        stadiumImageUrl: "",
+        stadiumVideoUrl: "",
+        staduimDiscription: "",
+        bestPlayerImageUrl: "",
+        bestPlayerVideoUrl: "",
+        bestPlayerDiscription: "",
+        coachImageUrl: "",
+        coachVideoUrl: "",
+        coachDiscription: "",
+        vehicleImageUrl: "",
+        vehicleVideoUrl: "",
+        vehicleDiscription: "",
+        symbolImageUrl: "",
+        symbolVideoUrl: "",
+        symbolDiscription: "",
       },
     };
+
+    console.log("Payload to be sent:", JSON.stringify(apiPayload, null, 2));
+
+    try {
+      const response = await api.post(
+        API_ENDPOINTS.ADMIN.CREATE_CLUB,
+        apiPayload
+      );
+
+      if (response.data && response.data.code === 0) {
+        onClose();
+      } else {
+        alert(
+          "serer error: " +
+            (response.data?.message || "Unknown error")
+        );
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
-    <div onClick={onClose}>
+    <div>
       <div className="grid grid-cols-1 h-full ">
         <Accordion title="Club Info">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
@@ -411,25 +407,18 @@ const ClubInfo = ({ onClose, prevData }) => {
         />
         <RepeatedItem
           title="Club Transport"
-          desName="kitVideoUrl" //
-          urlName="kitImageUrl" //
+          desName="kitVideoUrl"
+          urlName="kitImageUrl"
           formData={formData}
           handleInputChange={handleInputChange}
         />
         <RepeatedItem
           title="Club Mascot"
-          desName="kitVideoUrl" //
-          urlName="kitImageUrl" //
+          desName="kitVideoUrl"
+          urlName="kitImageUrl"
           formData={formData}
           handleInputChange={handleInputChange}
         />
-
-        {/* <div className="space-y-4"> */}
-
-        {/* <Accordion title="Club stadium">
-            <p className="text-cyan-200/80">Stadium form elements go here...</p>
-          </Accordion> */}
-        {/* </div> */}
 
         <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20">
           <div className="flex gap-4">
@@ -447,74 +436,25 @@ const ClubInfo = ({ onClose, prevData }) => {
             />
           </div>
           <div className="flex gap-4">
-            <div className="relative z-20 flex justify-center py-8 ">
-              <button
+            <div className="relative flex justify-center py-8 ">
+              <Button
                 onClick={onClose}
                 className="relative flex items-center justify-center cursor-pointer"
-                style={{ width: 114, height: 36 }}
               >
-                <svg
-                  width="114"
-                  height="36"
-                  viewBox="0 0 114 36"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="absolute inset-0"
-                >
-                  <path
-                    d="M0 0H107.5L114 7.75385V36H6L0 29.3538V0Z"
-                    fill="#00C9FF"
-                  />
-                </svg>
-                <span className="text-black font-bold relative z-20">
-                  Close
-                </span>
-              </button>
+                Close
+              </Button>
             </div>
             <div className="relative z-20 flex justify-center py-8 ">
-              <button
-                onClick={submit}
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                disabled={isLoading}
                 className="relative flex items-center justify-center cursor-pointer"
-                style={{ width: 114, height: 36 }}
               >
-                <svg
-                  width="114"
-                  height="36"
-                  viewBox="0 0 114 36"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="absolute inset-0"
-                >
-                  <path
-                    d="M0 0H107.5L114 7.75385V36H6L0 29.3538V0Z"
-                    fill="#00C9FF"
-                  />
-                </svg>
-                <span className="text-black font-bold relative z-20">Add</span>
-              </button>
+                Add
+              </Button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div
-        ref={thumbRef}
-        className="absolute right-4 top-0 z-20 cursor-pointer"
-        style={{
-          transform: `translateY(${thumbTop}px)`,
-          transition: isDragging ? "none" : "transform 0.05s linear",
-        }}
-        onMouseDown={handleMouseDown}
-      >
-        <svg
-          width="7"
-          height="69"
-          viewBox="0 0 7 69"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#00784E" />
-        </svg>
       </div>
     </div>
   );

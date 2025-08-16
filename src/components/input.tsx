@@ -46,7 +46,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             style={futuristicClipPath}
           >
             {Icon && (
-              <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-cyan-400/60" />
+              <Icon className={cn(
+                "absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5",
+                addClub ? "text-[#49675D]" : "text-cyan-400/60"
+              )} />
             )}
             <input
               type={type}

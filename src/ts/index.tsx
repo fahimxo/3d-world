@@ -14,6 +14,7 @@ interface WorldComponentProps {
   data: DataType[];
   cityList: ComboboxOption[];
   onLoaded: () => void;
+  setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface WorldHandle {
@@ -21,7 +22,7 @@ export interface WorldHandle {
 }
 
 const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
-  ({ onCityClick, data, cityList, onLoaded }, ref) => {
+  ({ onCityClick, data, cityList, onLoaded, setFilterModalVisible }, ref) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const worldInstance = useRef<World | null>(null);
 
@@ -46,6 +47,8 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           // You will need to update your IWord interface and World constructor to accept this
           onPointClick: (data) => {
             if (data?.isActive === true) {
+              // بستن مودال فیلتر وقتی روی کلاب کلیک می‌شود
+              setFilterModalVisible(false);
               onCityClick(data.city, JSON.stringify(data));
             }
           },

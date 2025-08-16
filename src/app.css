@@ -14,6 +14,14 @@ body {
   background: #010826; /* Moved from #earth-canvas for consistent bg */
   font-family: Orbitron, sans-serif; /* Added a default font */
 }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;  
+  -ms-overflow-style: none;  
+}
 h1,
 h2 {
   position: absolute;

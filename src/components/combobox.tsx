@@ -37,6 +37,7 @@ const ComboboxMenu = ({
   triggerRef,
   futuristicClipPath,
   salt,
+  addClub,
 }) => {
   const [position, setPosition] = useState({});
   const menuRef = useRef<HTMLDivElement>(null);
@@ -88,11 +89,19 @@ const ComboboxMenu = ({
       style={{ ...position, ...futuristicClipPath }}
     >
       <div
-        className="absolute inset-0 bg-gradient-to-br from-cyan-400/50 to-blue-600/50 blur-[1px]"
+        className={cn(
+          "absolute inset-0 blur-[1px]",
+          addClub
+            ? "bg-[#415C52]"
+            : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+        )}
         style={futuristicClipPath}
       ></div>
       <div
-        className="relative bg-[#0A192F] text-cyan-200"
+        className={cn(
+          "relative text-cyan-200",
+          addClub ? "bg-[#001b11] border-2 border-[#415C52]" : "bg-[#0A192F]"
+        )}
         style={futuristicClipPath}
       >
         <div className="p-2">
@@ -101,6 +110,7 @@ const ComboboxMenu = ({
             icon={Search}
             value={searchValue}
             name={name}
+            addClub={addClub}
             onChange={(event) => {
               setSearchValue?.(event.target.value);
             }}
@@ -118,12 +128,21 @@ const ComboboxMenu = ({
                 }}
                 className={cn(
                   "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
-                  salt ? "hover:bg-red-400/20" : "hover:bg-cyan-400/20" // Changed background based on salt
+                  addClub
+                    ? "text-[#00FFA6] hover:bg-[#00FFA6]/10"
+                    : salt
+                    ? "hover:bg-red-400/20"
+                    : "hover:bg-cyan-400/20 text-cyan-200"
                 )}
               >
                 <span className="truncate flex-1">{option.label}</span>
                 {option.value === value && (
-                  <Check className="ml-auto h-4 w-4" />
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      addClub ? "text-[#00FFA6]" : "text-cyan-400"
+                    )}
+                  />
                 )}
               </div>
             ))
@@ -178,7 +197,7 @@ const Combobox: React.FC<ComboboxProps> = ({
         <label
           htmlFor={name}
           className={cn(
-            "text-sm   block tracking-wider mb-1",
+            "text-sm block tracking-wider mb-1",
             addClub ? "text-[#00FFA6]" : "text-cyan-300/80 font-bold"
           )}
         >
@@ -187,6 +206,15 @@ const Combobox: React.FC<ComboboxProps> = ({
       )}
       <div className="relative w-full">
         <div className="p-[2px]" style={futuristicClipPath}>
+          <div
+            className={cn(
+              "absolute inset-0 blur-[1px]",
+              addClub
+                ? "bg-[#415C52]"
+                : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+            )}
+            style={futuristicClipPath}
+          ></div>
           <button
             type="button"
             ref={triggerRef}
@@ -194,10 +222,10 @@ const Combobox: React.FC<ComboboxProps> = ({
             aria-expanded={open}
             onClick={() => setOpen(!open)}
             className={cn(
-              "relative flex h-12 w-full  items-center justify-between  px-3 py-2 text-base text-[#49675D] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              "relative flex h-12 w-full items-center justify-between px-3 py-2 text-base focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               addClub
-                ? "bg-[#001b11] border-2 border-[#415C52] "
-                : "shadow-[var(--shadow-neon)] bg-[#0A192F]d"
+                ? "bg-[#001b11] text-[#49675D]"
+                : "bg-[#0A192F] text-cyan-200"
             )}
             style={futuristicClipPath}
           >
@@ -239,6 +267,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             triggerRef={triggerRef}
             futuristicClipPath={futuristicClipPath}
             salt={salt}
+            addClub={addClub}
           />
         )}
         {typeof error === "string" && error && (

@@ -67,6 +67,8 @@ const App: React.FC = () => {
     setModalVisible(false);
   }, []);
 
+
+
   const handleWorldLoaded = useCallback(() => {
     const loadingScreen = document.getElementById("loading");
     if (loadingScreen) {
@@ -88,6 +90,7 @@ const App: React.FC = () => {
         ref={worldRef}
         cityList={cityOptions}
         onLoaded={handleWorldLoaded}
+        setFilterModalVisible={setFilterModalVisible}
       />
       <div className="fixed top-0 left-0 w-full z-50">
         <Headers
@@ -109,7 +112,7 @@ const App: React.FC = () => {
       <div className="fixed top-30 right-40 z-40">
         <Clubs onClick={() => setLocationsModalOpen(true)} />
       </div>
-      {locationsModalOpen && <ClubsManagement />}
+      {locationsModalOpen && <ClubsManagement onClose={() => setLocationsModalOpen(false)} />}
       <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}

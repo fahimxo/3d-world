@@ -1,4 +1,3 @@
-// src/components/Checkbox.tsx
 import React from "react";
 
 interface CheckboxProps {
@@ -17,7 +16,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   return (
     <label
       htmlFor={name}
-      className="flex items-center cursor-pointer text-cyan-300/80"
+      className="flex items-center cursor-pointer text-[#00FFA6]"
     >
       <div className="relative">
         <input
@@ -29,13 +28,15 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           onChange={(e) => onChange(e.target.checked, name)}
         />
         <div
-          className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center ${
-            checked ? "bg-cyan-400 border-cyan-400" : "border-cyan-300/50"
+          className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors ${
+            checked
+              ? "bg-[#00FFA6] border-[#00FFA6]"
+              : "border-[#00FFA6]/50"
           }`}
         >
           {checked && (
             <svg
-              className="w-4 h-4 text-gray-900"
+              className="w-4 h-4 text-[#011231]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

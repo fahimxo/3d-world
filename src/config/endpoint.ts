@@ -14,5 +14,6 @@ export const API_ENDPOINTS = {
   ADMIN: {
     GET_CLUBS_LIST: "/api/Admin/GetClubsList/GetClubsList",
     DELETE_CLUB: "/api/Admin/DeleteClub/DeleteClub",
+    CREATE_CLUB: "api/Admin/CreateClub/CreateClub",
   },
 };

@@ -10,7 +10,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
   className,
 }) => {
   return (
-    <div className={`relative top-32 lef w-full max-w-4xl ${className}`}>
+    <div className={`relative top-32 w-full max-w-4xl ${className}`}>
       <svg
         width="866"
         height="762"
@@ -79,7 +79,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
           </radialGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 p-8 overflow-y-auto ">{children}</div>
+      <div className="absolute inset-0 p-8 ">{children}</div>
     </div>
   );
 };
