@@ -1,8 +1,10 @@
-import { FC, useEffect, useState } from "react";
-import ClubCard, { ClubData } from "./ClubCard";
+import { FC, useEffect, useState } from 'react';
+import ClubCard, { ClubData } from './ClubCard';
 // import api from "src/config/axios";
-import { API_ENDPOINTS } from "../config/endpoint";
-import api from "../config/axios";
+import { API_ENDPOINTS } from '../config/endpoint';
+import api from '../config/axios';
+import { set } from 'lodash';
+import ClubInfo from './ClubInfo';
 
 interface ClubListProps {
   isShowVisibleClubs?: boolean;
@@ -13,27 +15,21 @@ const ClubList: FC<ClubListProps> = ({
   isShowLockedClubs = false,
 }) => {
   const [clubsData, setClubData] = useState<ClubData[]>([]);
+  const [clubDataForEdit, setClubDataForEdit] = useState<boolean>({});
+  const [isShowClubInfo, setIsShowClubInfo] = useState<ClubData>(false);
 
   const getClubsData = async () => {
     try {
       const data: any = await api.post(API_ENDPOINTS.ADMIN.GET_CLUBS_LIST, {
         filter: {
-          // "sportId": 0,
-          // "sectorId": 0,
-          // "countryId": 0,
-          // "reImaginedName": "string",
-          // "originalClubName": "string",
-          // "city": "string",
           onlyVisible: isShowVisibleClubs,
           page: 1,
           pageSize: 100,
-          // "sortBy": "string",
-          // "sortDirection": "string"
         },
       });
       setClubData(data?.result);
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     }
   };
 
@@ -43,11 +39,28 @@ const ClubList: FC<ClubListProps> = ({
 
   return (
     <div className="py-6 flex flex-col gap-3">
-      {Array.isArray(clubsData) &&
+      {!isShowClubInfo &&
+        Array.isArray(clubsData) &&
         clubsData.length > 0 &&
         clubsData?.map((data) => (
-          <ClubCard clubData={data} getClubsData={getClubsData} key={data.id} />
+          <ClubCard
+            clubData={data}
+            getClubsData={getClubsData}
+            key={data.id}
+            setClubDataForEdit={setClubDataForEdit}
+            setIsShowClubInfo={setIsShowClubInfo}
+          />
         ))}
+      {isShowClubInfo && (
+        <ClubInfo
+          onClose={() => {
+            setIsShowClubInfo(false);
+            setClubDataForEdit({});
+          }}
+          prevData={clubDataForEdit}
+        />
+      )}
+
       {/* <ClubCard
         name="Galactic Crown"
         technoSector="Eurovia"

@@ -1,17 +1,17 @@
 // src/App.tsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import WorldComponent, { WorldHandle } from "./ts/index";
-import "./app.css";
-import { Headers } from "./layouts/header/Header";
-import { Filters } from "./components/filters";
-import { ComboboxOption, Tooltip } from "./components";
-import { PublicClubFilter, usePublicClubs } from "./lib/usePublicClubs";
-import { Loading } from "./components/loading";
-import ClubsManagement from "./components/ClubsManagement";
-import { Clubs } from "./assets/icons/Locations";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import WorldComponent, { WorldHandle } from './ts/index';
+import './app.css';
+import { Headers } from './layouts/header/Header';
+import { Filters } from './components/filters';
+import { ComboboxOption, Tooltip } from './components';
+import { PublicClubFilter, usePublicClubs } from './lib/usePublicClubs';
+import { Loading } from './components/loading';
+import ClubsManagement from './components/ClubsManagement';
+import { Clubs } from './assets/icons/Locations';
 
 const App: React.FC = () => {
-  const [modalData, setModalData] = useState({ name: "", data: "" });
+  const [modalData, setModalData] = useState({ name: '', data: '' });
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
@@ -67,13 +67,11 @@ const App: React.FC = () => {
     setModalVisible(false);
   }, []);
 
-
-
   const handleWorldLoaded = useCallback(() => {
-    const loadingScreen = document.getElementById("loading");
+    const loadingScreen = document.getElementById('loading');
     if (loadingScreen) {
       // This class will trigger your fade-out animation
-      loadingScreen.classList.add("out");
+      loadingScreen.classList.add('out');
     }
     // Set loading to false after a short delay to allow the animation to play
     setTimeout(() => {
@@ -82,6 +80,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
+    // <ClubsManagement onClose={() => setLocationsModalOpen(false)} />
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent
@@ -112,7 +111,9 @@ const App: React.FC = () => {
       <div className="fixed top-30 right-40 z-40">
         <Clubs onClick={() => setLocationsModalOpen(true)} />
       </div>
-      {locationsModalOpen && <ClubsManagement onClose={() => setLocationsModalOpen(false)} />}
+      {locationsModalOpen && (
+        <ClubsManagement onClose={() => setLocationsModalOpen(false)} />
+      )}
       <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}

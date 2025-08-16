@@ -1,25 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Accordion } from "./Accordion";
-import { Button } from "./button";
-import Combobox, { ComboboxOption } from "./combobox";
-import { Checkbox } from "./Checkbox";
-import { FileUpload } from "./FileUpload";
-import Input from "./input";
-import { API_ENDPOINTS } from "../config/endpoint";
-import api from "../config/axios";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Accordion } from './Accordion';
+import { Button } from './button';
+import Combobox, { ComboboxOption } from './combobox';
+import { Checkbox } from './Checkbox';
+import { FileUpload } from './FileUpload';
+import Input from './input';
+import { API_ENDPOINTS } from '../config/endpoint';
+import api from '../config/axios';
+import { Controller, useForm } from 'react-hook-form';
+import z, { url } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import tr from 'zod/v4/locales/tr.cjs';
 
+enum hideClub {
+  hide = 1,
+  show = 2,
+}
+enum lockClub {
+  lock = 1,
+  unLock = 2,
+}
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
   endpoint: string,
   listName: string
 ): Promise<ComboboxOption[]> => {
-  console.log(`[DEBUG] Fetching data for: ${listName} from ${endpoint}`);
   try {
     const response = await api.post(endpoint, {
-      filter: { searchTerm: "" },
+      filter: { searchTerm: '' },
     });
     const responseData = response.data ? response.data : response;
     if (
@@ -32,10 +40,8 @@ const getOptionsFor = async (
         label: item?.name,
       }));
     }
-    console.warn(`[DEBUG] Could not parse a valid result for ${listName}.`);
     return [];
   } catch (error: any) {
-    console.error(`[DEBUG] Error fetching ${listName}:`, error.message);
     return [];
   }
 };
@@ -47,31 +53,45 @@ const filterSchema = z.object({
   country: z.string().optional(),
   city: z.string().optional(),
   reimaginedName: z.string().optional(),
-  currentName: z.string().optional(),
+  originalClubName: z.string().optional(),
   coordinates: z.string(),
   clubAnthem: z.string(),
-  clubLore: z.string(),
+  lore: z.string(),
+  kitVideoUrl: z.string().optional(),
+  kitDiscription: z.string().optional(),
+  stadiumVideoUrl: z.string().optional(),
+  staduimDiscription: z.string().optional(),
+  bestPlayerDiscription: z.string().optional(),
+  bestPlayerVideoUrl: z.string().optional(),
+  coachDiscription: z.string().optional(),
+  coachVideoUrl: z.string().optional(),
+  vehicleDiscription: z.string().optional(),
+  vehicleVideoUrl: z.string().optional(),
+  symbolDiscription: z.string().optional(),
+  symbolVideoUrl: z.string().optional(),
 });
 type FilterFormValues = z.infer<typeof filterSchema>;
 
 const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    coordinates: "",
-    city: "",
-    reimaginedName: "",
-    country: "",
-    countries: "",
-    technoSectorOptions: "",
-    currentName: "",
-    clubAnthem: "",
-    description: "",
-    clubKitVideo: "",
-    clubLogo: null,
-    lockClub: false,
-    hideClub: true,
+    // coordinates: '',
+    // city: '',
+    // reimaginedName: '',
+    // country: '',
+    // countries: '',
+    // technoSectorOptions: '',
+    // originalClubName: '',
+    // clubAnthem: '',
+    // description: '',
+    // clubKitVideo: '',
+    // logoUrl: null,
+    lockClub: prevData?.lockClub === lockClub.lock ? true : false,
+    hideClub: prevData?.status === hideClub.hide ? true : false,
   });
   // const [isDragging, setIsDragging] = useState(false);
+
+  console.log('prevDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', prevData);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
@@ -85,29 +105,58 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     cities: false,
   });
 
+  console.log(formData, 'formData');
   const {
     control,
     handleSubmit,
     formState: { errors },
+    values,
+    setValue,
   } = useForm<FilterFormValues>({
     resolver: zodResolver(filterSchema),
-    defaultValues: {
-      sportType: "",
-      technoSector: "",
-      country: "",
-      city: "",
-      reimaginedName: "",
-      currentName: "",
-      coordinates: "",
-      clubAnthem: "",
-      clubLore: "",
-    },
+    defaultValues: prevData
+      ? {
+          ...prevData,
+          coordinates: `${prevData.latitude},${prevData.longitude}`,
+          sportType: prevData.sportId,
+          technoSector: prevData.sectorId,
+          country: prevData.countryId,
+          clubAnthem: prevData.anthemUrl,
+        }
+      : {
+          sportType: '',
+          technoSector: '',
+          country: '',
+          city: '',
+          reimaginedName: '',
+          originalClubName: '',
+          coordinates: '',
+          clubAnthem: '',
+          lore: '',
+          kitVideoUrl: '',
+          kitDiscription: '',
+          stadiumVideoUrl: '',
+          staduimDiscription: '',
+          bestPlayerDiscription: '',
+          bestPlayerVideoUrl: '',
+          coachDiscription: '',
+          coachVideoUrl: '',
+          vehicleDiscription: '',
+          vehicleVideoUrl: '',
+          symbolDiscription: '',
+          symbolVideoUrl: '',
+        },
   });
+
+  console.log(
+    values,
+    'valueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+  );
 
   useEffect(() => {
     if (sportOptions.length === 0) {
       setLoadingStates((prev) => ({ ...prev, sports: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, 'Sports').then(
         (data) => {
           setSportOptions(data);
           setLoadingStates((prev) => ({ ...prev, sports: false }));
@@ -118,91 +167,92 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
       getOptionsFor(
         API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
-        "Techno Sectors"
+        'Techno Sectors'
       ).then((data) => {
         setTechnoSectorOptions(data);
         setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
       });
     }
-    if (countryOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, countries: true }));
-      getOptionsFor(
-        API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
-        "Countries"
-      ).then((data) => {
-        setCountryOptions(data);
-        setLoadingStates((prev) => ({ ...prev, countries: false }));
-      });
-    }
-    if (cityOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, cities: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, "Cities").then(
-        (data) => {
-          setCityOptions(data);
-          setLoadingStates((prev) => ({ ...prev, cities: false }));
-        }
-      );
-    }
+
+    // reset(defaultValues);
+    // if (countryOptions.length === 0) {
+    //   setLoadingStates((prev) => ({ ...prev, countries: true }));
+    //   getOptionsFor(
+    //     API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
+    //     'Countries'
+    //   ).then((data) => {
+    //     setCountryOptions(data);
+    //     setLoadingStates((prev) => ({ ...prev, countries: false }));
+    //   });
+    // }
+    // if (cityOptions.length === 0) {
+    //   setLoadingStates((prev) => ({ ...prev, cities: true }));
+    //   getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, 'Cities').then(
+    //     (data) => {
+    //       setCityOptions(data);
+    //       setLoadingStates((prev) => ({ ...prev, cities: false }));
+    //     }
+    //   );
+    // }
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
   const handleCheckboxChange = (checked, name) => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
   const handleFileChange = (file) => {
-    setFormData((prev) => ({ ...prev, clubLogo: file }));
+    console.log(file, 'file');
+    setFormData((prev) => ({ ...prev, logoUrl: file }));
   };
+
+  console.log(formData, 'formData');
 
   const onSubmit = async (data: FilterFormValues) => {
     setIsLoading(true);
-
-    const coords = data.coordinates.split(",").map((c) => c.trim());
-    const latitude = coords[0] || "";
-    const longitude = coords[1] || "";
+    console.log(data, 'data  in submittttttttttttttttttttt');
+    const coords = data.coordinates.split(',').map((c) => c.trim());
+    const latitude = coords[0] || '';
+    const longitude = coords[1] || '';
 
     const apiPayload = {
-      createClub_VM: {            
+      createClub_VM: {
         reImaginedName: data.reimaginedName,
-        originalClubName: data.currentName,
-        lore: data.clubLore,
+        originalClubName: data.originalClubName,
+        lore: data.lore,
         city: data.city,
         latitude: latitude,
         longitude: longitude,
-        logoUrl: "temp_logo.jpg",
-        videoUrl: "",
-        status: 1,
-        lockStatus: formData.lockClub ? 1 : 0,
+        logoUrl: formData.logoUrl,
+        // videoUrl: '',
+        status: formData.hideClub ? hideClub.hide : hideClub.show,
+        lockStatus: formData.lockClub ? lockClub.lock : lockClub.unLock,
         sportId: parseInt(data.sportType, 10) || 0,
         sectorId: parseInt(data.technoSector, 10) || 0,
         countryId: parseInt(data.country, 10) || 0,
-        displayOrder: 0,
+        // displayOrder: 0, //
         anthemUrl: data.clubAnthem,
-        kitImageUrl: "",
-        kitVideoUrl: "",
-        kitDiscription: "",
-        stadiumImageUrl: "",
-        stadiumVideoUrl: "",
-        staduimDiscription: "",
-        bestPlayerImageUrl: "",
-        bestPlayerVideoUrl: "",
-        bestPlayerDiscription: "",
-        coachImageUrl: "",
-        coachVideoUrl: "",
-        coachDiscription: "",
-        vehicleImageUrl: "",
-        vehicleVideoUrl: "",
-        vehicleDiscription: "",
-        symbolImageUrl: "",
-        symbolVideoUrl: "",
-        symbolDiscription: "",
+        // kitImageUrl: '',
+        kitVideoUrl: data.kitVideoUrl,
+        kitDiscription: data.kitDiscription,
+        // stadiumImageUrl: '',
+        stadiumVideoUrl: data.stadiumVideoUrl,
+        staduimDiscription: data.staduimDiscription,
+        // bestPlayerImageUrl: '',
+        bestPlayerVideoUrl: data.bestPlayerVideoUrl,
+        bestPlayerDiscription: data.bestPlayerDiscription,
+        // coachImageUrl: '',
+        coachVideoUrl: data.coachVideoUrl,
+        coachDiscription: data.coachDiscription,
+        // vehicleImageUrl: '',
+        vehicleVideoUrl: data.vehicleVideoUrl,
+        vehicleDiscription: data.vehicleDiscription,
+        // symbolImageUrl: '',
+        symbolVideoUrl: data.symbolVideoUrl,
+        symbolDiscription: data.symbolDiscription,
       },
     };
 
-    console.log("Payload to be sent:", JSON.stringify(apiPayload, null, 2));
+    console.log('Payload to be sent:', JSON.stringify(apiPayload, null, 2));
 
     try {
       const response = await api.post(
@@ -213,15 +263,44 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       if (response.data && response.data.code === 0) {
         onClose();
       } else {
-        alert(
-          "serer error: " +
-            (response.data?.message || "Unknown error")
-        );
+        alert('serer error: ' + (response.data?.message || 'Unknown error'));
       }
     } catch (error) {
-      console.error("API Error:", error);
+      console.error('API Error:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getCountryAndCityNameWithCoordinates = async (data: string) => {
+    setIsLoading(true);
+
+    const coordinates = data.replace(/"/g, ' ').trim();
+
+    if (coordinates.replace(/ /g, '').length > 0) {
+      try {
+        const response = await api.post(
+          API_ENDPOINTS.WORLD_MAP.GET_COUNTRY_AND_CITY_NAME_WITH_COORDINATES,
+          { coordinates }
+        );
+
+        if (response.result && response.code === 0) {
+          setFormData((prev) => ({
+            ...prev,
+            city: response.result.cityName,
+            country: response.result.countryName,
+          }));
+          setValue('city', response.result.cityName);
+          setValue('country', response.result.countryName);
+        } else {
+          alert('serer error: ' + (response.data?.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+      } finally {
+        setIsLoading(false);
+        console.log('API Error:');
+      }
     }
   };
 
@@ -234,49 +313,113 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               <Controller
                 name="coordinates"
                 control={control}
+                render={({ field }) => {
+                  const timeoutRef = useRef<any>(null);
+
+                  const handleChange = (e: any) => {
+                    field.onChange(e);
+
+                    if (timeoutRef.current) {
+                      clearTimeout(timeoutRef.current);
+                    }
+
+                    timeoutRef.current = setTimeout(() => {
+                      getCountryAndCityNameWithCoordinates(e.target.value);
+                      trigger(['city', 'country']);
+
+                      // console.log('handleChange', e.target.value);
+                    }, 1000);
+                  };
+
+                  return (
+                    <Input
+                      label="Coordinates"
+                      {...field}
+                      placeholder="Example: 50.510281, 4.719585"
+                      addClub="true"
+                      rules={{}}
+                    />
+                  );
+                }}
+              />
+              {/* <Controller
+                name="coordinates"
+                control={control}
                 render={({ field }) => (
                   <Input
                     label="Coordinates"
                     {...field}
                     placeholder="Example: 50.510281, 4.719585"
                     addClub="true"
+                    rules={{
+                      onChange: () => {
+                        if (
+                          ((getValues("currency") as CurrencyItem)
+                            ?.id as string) === "IRR"
+                        ) {
+                          setValue("equivalentWithRial", "1");
+                        } else {
+                          setValue("equivalentWithRial", "");
+                        }
+                        trigger(["equivalentWithRial"]);
+                      },
+                    }}
                   />
                 )}
-              />
+              /> */}
             </div>
 
             <Controller
               name="country"
               control={control}
-              render={({ field }) => (
-                <Combobox
-                  options={countryOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={
-                    loadingStates.countries ? "Loading..." : "Select"
-                  }
-                  label="Country"
-                  error={errors.country?.message}
-                  addClub="true"
-                  salt={true}
-                />
-              )}
+              render={({ field }) => {
+                console.log('field', field);
+                return (
+                  <Input
+                    label="Country"
+                    name="country"
+                    disabled={true}
+                    value={field.value}
+                    placeholder="Country"
+                    addClub="true"
+                  />
+                  // <Combobox
+                  //   options={countryOptions}
+                  //   value={field.value}
+                  //   onChange={field.onChange}
+                  //   placeholder={
+                  //     loadingStates.countries ? 'Loading...' : 'Select'
+                  //   }
+                  //   label="Country"
+                  //   error={errors.country?.message}
+                  //   addClub="true"
+                  //   salt={true}
+                  // />
+                );
+              }}
             />
             <Controller
               name="city"
               control={control}
               render={({ field }) => (
-                <Combobox
-                  options={cityOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={loadingStates.cities ? "Loading..." : "Select"}
+                <Input
                   label="City"
-                  error={errors.city?.message}
+                  name="city"
+                  disabled={true}
+                  value={field.value}
+                  placeholder="City"
                   addClub="true"
-                  salt={true}
                 />
+                // <Combobox
+                //   options={cityOptions}
+                //   value={field.value}
+                //   onChange={field.onChange}
+                //   placeholder={loadingStates.cities ? 'Loading...' : 'Select'}
+                //   label="City"
+                //   error={errors.city?.message}
+                //   addClub="true"
+                //   salt={true}
+                // />
               )}
             />
 
@@ -289,7 +432,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   value={field.value}
                   onChange={field.onChange}
                   placeholder={
-                    loadingStates.technoSectors ? "Loading..." : "Select"
+                    loadingStates.technoSectors ? 'Loading...' : 'Select'
                   }
                   label="Techno Sector"
                   error={errors.technoSector?.message}
@@ -306,7 +449,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   options={sportOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder={loadingStates.sports ? "Loading..." : "Select"}
+                  placeholder={loadingStates.sports ? 'Loading...' : 'Select'}
                   label="Sport Type"
                   error={errors.sportType?.message}
                   addClub="true"
@@ -329,12 +472,12 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               )}
             />
             <Controller
-              name="currentName"
+              name="originalClubName"
               control={control}
               render={({ field }) => (
                 <Input
                   label="Current Name"
-                  name="currentName"
+                  name="originalClubName"
                   {...field}
                   placeholder="Example: Real Madrid"
                   addClub="true"
@@ -356,12 +499,12 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
             />
             <div className="col-span-2">
               <Controller
-                name="clubLore"
+                name="lore"
                 control={control}
                 render={({ field }) => (
                   <Input
                     label="Club lore"
-                    name="clubLore"
+                    name="lore"
                     {...field}
                     placeholder="Enter youtube link"
                     addClub="true"
@@ -372,52 +515,46 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
             </div>
             <FileUpload
               label="Club Logo"
-              name="clubLogo"
+              name="logoUrl"
               onChange={handleFileChange}
             />
           </div>
         </Accordion>
         <RepeatedItem
           title="Club Kit"
-          desName="kitVideoUrl"
-          urlName="kitImageUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="kitDiscription"
+          urlName="kitVideoUrl"
+          control={control}
         />
         <RepeatedItem
           title="Club Stadium"
-          desName="kitVideoUrl"
-          urlName="kitImageUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="staduimDiscription"
+          urlName="stadiumVideoUrl"
+          control={control}
         />
         <RepeatedItem
           title="Club Best Player"
-          desName="staduimDiscription"
-          urlName="stadiumVideoUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="bestPlayerDiscription"
+          urlName="bestPlayerVideoUrl"
+          control={control}
         />
         <RepeatedItem
           title="Club Manager"
-          desName="bestPlayerDiscription"
-          urlName="bestPlayerVideoUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="coachDiscription"
+          urlName="coachVideoUrl"
+          control={control}
         />
         <RepeatedItem
           title="Club Transport"
-          desName="kitVideoUrl"
-          urlName="kitImageUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="vehicleDiscription"
+          urlName="vehicleVideoUrl"
+          control={control}
         />
         <RepeatedItem
           title="Club Mascot"
-          desName="kitVideoUrl"
-          urlName="kitImageUrl"
-          formData={formData}
-          handleInputChange={handleInputChange}
+          desName="symbolDiscription"
+          urlName="symbolVideoUrl"
+          control={control}
         />
 
         <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20">
@@ -450,7 +587,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                 disabled={isLoading}
                 className="relative flex items-center justify-center cursor-pointer"
               >
-                Add
+                {prevData ? 'Save' : 'Add'}
               </Button>
             </div>
           </div>
@@ -466,30 +603,40 @@ const RepeatedItem = ({
   title,
   desName,
   urlName,
-  formData,
-  handleInputChange,
+
+  control,
 }) => {
   return (
     <Accordion title={title}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
-        <Input
-          label="Video"
-          name={name}
-          value={formData.clubKitVideo}
-          onChange={handleInputChange}
-          placeholder="Example:url.com"
-          addClub="true"
+        <Controller
+          name={urlName}
+          control={control}
+          render={({ field }) => (
+            <Input
+              label="Video"
+              name={urlName}
+              placeholder="Example:url.com"
+              addClub="true"
+              {...field}
+            />
+          )}
         />
 
         <div className="col-span-2">
-          <Input
-            label="Description"
-            name={urlName}
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Enter youtube link"
-            area="true"
-            addClub="true"
+          <Controller
+            name={desName}
+            control={control}
+            render={({ field }) => (
+              <Input
+                label="Description"
+                name={desName}
+                placeholder="Enter youtube link"
+                area="true"
+                addClub="true"
+                {...field}
+              />
+            )}
           />
         </div>
       </div>

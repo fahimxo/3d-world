@@ -1,7 +1,7 @@
-import { useState } from "react";
-import ClubPreview from "./ClubPreview";
-import api from "../config/axios";
-import { API_ENDPOINTS } from "../config/endpoint";
+import { useState } from 'react';
+import ClubPreview from './ClubPreview';
+import api from '../config/axios';
+import { API_ENDPOINTS } from '../config/endpoint';
 
 export interface ClubData {
   id: number;
@@ -47,11 +47,15 @@ export interface ClubData {
 interface ClubCardProps {
   clubData: ClubData;
   getClubsData: () => void;
+  setClubDataForEdit: () => void;
+  setIsShowClubInfo: () => void;
 }
 const ClubCard = ({
   getClubsData = () => {
     return;
   },
+  setIsShowClubInfo = (data: boolean) => {},
+  setClubDataForEdit = (data: ClubData) => {},
   ...props
 }: ClubCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,23 +70,28 @@ const ClubCard = ({
       });
       if (result?.result) getClubsData();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     }
+  };
+
+  const editClub = async (e) => {
+    setIsShowClubInfo(true);
+    setClubDataForEdit(props.clubData);
   };
   return (
     <div className=" text-white w-full ">
       <div
         style={{
-          clipPath: "polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0)",
+          clipPath: 'polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0)',
         }}
         className={`grid grid-cols-8 px-8 cursor-pointer ${
-          isOpen ? "bg-[rgba(0,119,86,0.7)]" : "bg-[rgba(0,119,86,0.25)]"
+          isOpen ? 'bg-[rgba(0,119,86,0.7)]' : 'bg-[rgba(0,119,86,0.25)]'
         } transition h-[81px] `}
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3 col-span-2">
           <img
-            src={logoUrl}
+            src={`data:image/png;base64,${logoUrl}`}
             alt={originalClubName}
             className="w-[80px] h-auto "
           />
@@ -106,7 +115,7 @@ const ClubCard = ({
         </div>
 
         <div className="flex  flex-col  items-center gap-3 col-span-1 justify-center">
-          <button className="cursor-pointer ">
+          <button className="cursor-pointer " onClick={editClub}>
             <svg
               width="14"
               height="14"
