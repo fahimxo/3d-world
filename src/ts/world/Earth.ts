@@ -460,11 +460,19 @@ export default class earth {
   }
 
   public clearMarkers() {
-    // Remove all children from the markupPoint group
-    while (this.markupPoint.children.length > 0) {
-      this.markupPoint.remove(this.markupPoint.children[0]);
-    }
-    // Clear the helper arrays
+    // 1) DOM لیبل‌های قبلی را هم جدا کن تا چیزی در صفحه باقی نمونه
+    this.cityLabels.forEach((lbl) => {
+      if (lbl.element && lbl.element.parentNode) {
+        lbl.element.parentNode.removeChild(lbl.element);
+      }
+    });
+
+    // 2) گروه‌های گرافیکی را کامل خالی کن
+    if (this.cityGroup) this.cityGroup.clear(); // 👈 مهم
+    if (this.clubGroup) this.clubGroup.clear(); // 👈 مهم
+    if (this.markupPoint) this.markupPoint.clear(); // برای کدهای legacy
+
+    // 3) آرایه‌ها را ریست کن
     this.clickablePoints = [];
     this.cityLabels = [];
     this.data = [];
@@ -1030,27 +1038,24 @@ export default class earth {
 
     allLabels.forEach((label) => {
       // This logic only runs for labels that are currently supposed to be visible based on zoom level.
-      if (label.visible) {
-        const labelPosition = new Vector3();
-        // Get the label's absolute world position
-        label.getWorldPosition(labelPosition);
+      if (!label.visible) {
+        label.element.style.display = "none"; // 👈 اضافه کن
+        return;
+      }
+      const labelPosition = new Vector3();
+      label.getWorldPosition(labelPosition);
 
-        // For a sphere at the origin, the normal vector is just its normalized position
-        const labelNormal = labelPosition.clone().normalize();
+      const labelNormal = labelPosition.clone().normalize();
 
-        // Calculate the dot product. This tells us if the label's normal is facing the camera.
-        const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
+      const cameraPosition = new Vector3();
+      camera.getWorldPosition(cameraPosition);
 
-        // If the dot product is less than a small threshold, the label is on the back side.
-        // We use a small positive number (like 0.1) to hide labels right at the edge of the globe
-        // to prevent them from popping in and out abruptly.
-        if (dotProduct < 0.1) {
-          // Hide the HTML element
-          label.element.style.display = "none";
-        } else {
-          // Show the HTML element
-          label.element.style.display = "block";
-        }
+      const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
+
+      if (dotProduct < 0.1) {
+        label.element.style.display = "none";
+      } else {
+        label.element.style.display = "block";
       }
     });
   }

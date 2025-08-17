@@ -164,6 +164,7 @@ export default class World {
         newData?.clubList,
         newData?.cityList
       );
+      this.handleZoom();
     } else {
       this.cachedData = newData;
     }
@@ -194,7 +195,10 @@ export default class World {
     this.earth.countryLabels.forEach(
       (label) => (label.visible = showCountries)
     );
-    this.earth.cityLabels.forEach((label) => (label.visible = showCities));
+    this.earth.cityLabels.forEach((label) => {
+      label.visible = showCities;
+      label.element.style.display = showCities ? "block" : "none";
+    });
 
     // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
     const shouldBeZoomedIn = showCountries || showCities;
@@ -363,6 +367,7 @@ export default class World {
         // آزیماس دوربین را ثابت نگه می‌داریم، فقط φ و فاصله را انیمیت می‌کنیم
         this.camera.position.setFromSphericalCoords(state.d, state.phi, camAz);
         this.controls.update();
+        this.handleZoom();
       },
       onComplete: () => {
         this.controls.enabled = true;
