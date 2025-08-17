@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 
+const PADDING = 20;
+
 const DetailsModal: React.FC<{
   children: React.ReactNode;
   onClose?: () => void;
@@ -9,81 +11,133 @@ const DetailsModal: React.FC<{
   const [thumbTop, setThumbTop] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [showScrollbar, setShowScrollbar] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [startTop, setStartTop] = useState(0);
 
-  const updateScrollPosition = useCallback((clientY: number) => {
+  const calculateScrollPosition = useCallback((clientY: number) => {
     const scrollEl = scrollRef.current;
-    const thumbEl = thumbRef.current;
-    if (!scrollEl || !thumbEl) return;
+    if (!scrollEl) return { newTop: 0, scrollPosition: 0 };
 
     const { top, height } = scrollEl.getBoundingClientRect();
     const thumbHeight = 69;
-    const clickPosition = clientY - top - thumbHeight / 2;
-    const maxTop = height - thumbHeight;
-    const newTop = Math.max(0, Math.min(maxTop, clickPosition));
+    const trackHeight = height - PADDING * 2;
+    const maxTop = trackHeight - thumbHeight;
 
-    const scrollHeight = scrollEl.scrollHeight;
-    const maxScroll = scrollHeight - height;
-    const scrollPosition = (newTop / maxTop) * maxScroll;
+    const clickYRelative = clientY - (top + PADDING) - thumbHeight / 2;
+    const newTop = Math.max(0, Math.min(maxTop, clickYRelative));
 
-    setThumbTop(newTop);
-    scrollEl.scrollTo(0, scrollPosition);
+    const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+    const scrollPosition = maxTop > 0 ? (newTop / maxTop) * maxScroll : 0;
+
+    return { newTop, scrollPosition };
   }, []);
+
+  const updateScrollPosition = useCallback(
+    (clientY: number) => {
+      const { newTop, scrollPosition } = calculateScrollPosition(clientY);
+      setThumbTop(newTop);
+      scrollRef.current?.scrollTo(0, scrollPosition);
+    },
+    [calculateScrollPosition]
+  );
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    updateScrollPosition(e.clientY);
+    setStartY(e.clientY);
+    setStartTop(thumbTop);
   };
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging) return;
-      updateScrollPosition(e.clientY);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setStartY(e.touches[0].clientY);
+    setStartTop(thumbTop);
+  };
+
+  const handleMove = useCallback(
+    (clientY: number) => {
+      if (!isDragging || !scrollRef.current) return;
+
+      const deltaY = clientY - startY;
+      const newThumbTop = Math.max(
+        0,
+        Math.min(
+          scrollRef.current.clientHeight - PADDING * 2 - 69,
+          startTop + deltaY
+        )
+      );
+
+      setThumbTop(newThumbTop);
+
+      const maxTop = scrollRef.current.clientHeight - PADDING * 2 - 69;
+      const maxScroll =
+        scrollRef.current.scrollHeight - scrollRef.current.clientHeight;
+      const scrollPosition = (newThumbTop / maxTop) * maxScroll;
+
+      scrollRef.current.scrollTo(0, scrollPosition);
     },
-    [isDragging, updateScrollPosition]
+    [isDragging, startY, startTop]
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => handleMove(e.clientY),
+    [handleMove]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+      handleMove(e.touches[0].clientY);
+    },
+    [handleMove]
+  );
+
+  const handleEndDrag = useCallback(() => {
     setIsDragging(false);
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollEl = scrollRef.current;
-      if (scrollEl && !isDragging) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollEl;
-        const thumbHeight = 69;
-        const maxScroll = scrollHeight - clientHeight;
-        const maxTop = clientHeight - thumbHeight;
-        const newTop = maxScroll > 0 ? (scrollTop / maxScroll) * maxTop : 0;
-        setThumbTop(newTop);
-        setShowScrollbar(maxScroll > 0);
-      }
+    const el = scrollRef.current;
+    const onScroll = () => {
+      if (!el || isDragging) return;
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const thumbHeight = 69;
+      const trackHeight = clientHeight - PADDING * 2;
+      const maxTop = Math.max(0, trackHeight - thumbHeight);
+      const maxScroll = Math.max(0, scrollHeight - clientHeight);
+      const newTop = maxScroll > 0 ? (scrollTop / maxScroll) * maxTop : 0;
+      setThumbTop(newTop);
+      setShowScrollbar(maxScroll > 0);
     };
 
-    const el = scrollRef.current;
     if (el) {
-      el.addEventListener("scroll", handleScroll);
-      const { scrollHeight, clientHeight } = el;
-      setShowScrollbar(scrollHeight > clientHeight);
+      el.addEventListener("scroll", onScroll);
+      const hasScroll = el.scrollHeight > el.clientHeight;
+      setShowScrollbar(hasScroll);
+      onScroll(); // Initialize position
     }
-    return () => {
-      if (el) el.removeEventListener("scroll", handleScroll);
-    };
+    return () => el?.removeEventListener("scroll", onScroll);
   }, [isDragging]);
 
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+    if (!isDragging) return;
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleEndDrag);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleEndDrag);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleEndDrag);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleEndDrag);
+    };
+  }, [isDragging, handleMouseMove, handleTouchMove, handleEndDrag]);
+
   return (
-    <div className="relative flex flex-col w-[95vw] max-w-[812px] h-[640px] md:h-[534px]">
+    <div className="relative flex flex-col w-[95vw] max-w-[812px] h-[640px] md:h-[534px] touch-none">
       <svg
         width="100%"
         height="100%"
@@ -93,6 +147,7 @@ const DetailsModal: React.FC<{
         className="absolute inset-0 z-20"
         preserveAspectRatio="none"
       >
+        {/* SVG background paths - unchanged from original */}
         <g filter="url(#filter0_i_80_110)">
           <path
             d="M1 1.97229H40L42 5.5H109.5L112 1.97229H399.829L794.5 0.500003L804.851 13.4621V217.664L811 221.889V297.183L804.851 302.839V533.5H792H522L516.5 528.905H464.236L458.5 533.5H8.5L1 525.507V73.583L5.5 70.3403V44.4346L1 40.9377V1.97229Z"
@@ -147,12 +202,23 @@ const DetailsModal: React.FC<{
           </radialGradient>
         </defs>
       </svg>
+      <svg
+        width="7"
+        height="30"
+        viewBox="0 0 7 69"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="drop-shadow-lg"
+      >
+        <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#C42FFF" />
+      </svg>
       <div
         ref={scrollRef}
-        className="relative z-20 flex-1 px-10 py-8 text-white overflow-y-auto hide-scrollbar"
+        className="relative z-20 flex-1 overflow-y-auto hide-scrollbar"
       >
-        {children}
+        <div className="px-10 text-white min-h-full">{children}</div>
       </div>
+
       {onClose && (
         <div className="relative z-20 flex justify-center py-8">
           <button
@@ -179,33 +245,39 @@ const DetailsModal: React.FC<{
           </button>
         </div>
       )}
+
       {showScrollbar && (
-        <div
-          className="absolute right-4 top-0 bottom-0 z-10 w-2 rounded-full backdrop-blur-sm transition-opacity duration-300"
-          style={{ backgroundColor: "#42005E" }}
-        />
-      )}
-      {showScrollbar && (
-        <div
-          ref={thumbRef}
-          className="absolute right-4 top-0 z-20 cursor-pointer hover:scale-105 transition-all duration-200"
-          style={{
-            transform: `translateY(${thumbTop}px)`,
-            transition: isDragging ? "none" : "transform 0.1s ease-out",
-          }}
-          onMouseDown={handleMouseDown}
-        >
-          <svg
-            width="7"
-            height="69"
-            viewBox="0 0 7 69"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="drop-shadow-lg"
+        <>
+          <div
+            className="absolute right-4 z-10 w-2 rounded-full backdrop-blur-sm transition-opacity duration-300"
+            style={{
+              top: PADDING,
+              bottom: PADDING,
+              backgroundColor: "rgba(66, 0, 94, 0.6)",
+            }}
+          />
+          <div
+            ref={thumbRef}
+            className="absolute right-4 z-20 cursor-pointer hover:scale-105 transition-all duration-200 touch-pan-y select-none"
+            style={{
+              top: PADDING + thumbTop,
+              transition: isDragging ? "none" : "transform 0.1s ease-out",
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
           >
-            <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#C42FFF" />
-          </svg>
-        </div>
+            <svg
+              width="7"
+              height="69"
+              viewBox="0 0 7 69"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="drop-shadow-lg"
+            >
+              <path d="M0 0V63.0432L7 69V7.44604L0 0Z" fill="#C42FFF" />
+            </svg>
+          </div>
+        </>
       )}
     </div>
   );

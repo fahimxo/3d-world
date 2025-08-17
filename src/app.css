@@ -245,3 +245,8 @@ h2 a {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+@media (max-width: 640px) {
+  .scroll-thumb {
+    width: 12px;
+  }
+}
