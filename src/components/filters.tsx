@@ -6,9 +6,9 @@ import { z } from "zod";
 import { Button } from "./button";
 import Combobox, { ComboboxOption } from "./combobox";
 import { FilterButton } from "./filterButton";
-import { Modal } from "./modal";
 import Input from "./input";
 import { API_ENDPOINTS } from "../config/endpoint";
+import { Filter } from "./filter";
 
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
@@ -174,103 +174,112 @@ export const Filters: React.FC<FiltersProps> = ({
       />
 
       {filterModalVisible && (
-        <Modal>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* The rest of the form remains unchanged */}
-            <Controller
-              name="sportType"
-              control={control}
-              render={({ field }) => (
-                <Combobox
-                  options={sportOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={loadingStates.sports ? "Loading..." : "Select"}
-                  label="Sport Type"
-                  error={errors.sportType?.message}
+        <div className="max-h-[calc(100vh-12rem)] overflow-y-auto">
+          <div className="relative w-[335px] h-[682px]">
+            <Filter />
+            <div className="absolute inset-x-6 top-7 z-10 space-y-4 ">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {/* The rest of the form remains unchanged */}
+                <Controller
+                  name="sportType"
+                  control={control}
+                  render={({ field }) => (
+                    <Combobox
+                      options={sportOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={
+                        loadingStates.sports ? "Loading..." : "Select"
+                      }
+                      label="Sport Type"
+                      error={errors.sportType?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="technoSector"
-              control={control}
-              render={({ field }) => (
-                <Combobox
-                  options={technoSectorOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={
-                    loadingStates.technoSectors ? "Loading..." : "Select"
-                  }
-                  label="Techno Sector"
-                  error={errors.technoSector?.message}
+                <Controller
+                  name="technoSector"
+                  control={control}
+                  render={({ field }) => (
+                    <Combobox
+                      options={technoSectorOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={
+                        loadingStates.technoSectors ? "Loading..." : "Select"
+                      }
+                      label="Techno Sector"
+                      error={errors.technoSector?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="country"
-              control={control}
-              render={({ field }) => (
-                <Combobox
-                  options={countryOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={
-                    loadingStates.countries ? "Loading..." : "Select"
-                  }
-                  label="Country"
-                  error={errors.country?.message}
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <Combobox
+                      options={countryOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={
+                        loadingStates.countries ? "Loading..." : "Select"
+                      }
+                      label="Country"
+                      error={errors.country?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="city"
-              control={control}
-              render={({ field }) => (
-                <Combobox
-                  options={cityOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder={loadingStates.cities ? "Loading..." : "Select"}
-                  label="City"
-                  error={errors.city?.message}
+                <Controller
+                  name="city"
+                  control={control}
+                  render={({ field }) => (
+                    <Combobox
+                      options={cityOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={
+                        loadingStates.cities ? "Loading..." : "Select"
+                      }
+                      label="City"
+                      error={errors.city?.message}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="reimaginedName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Write reimagined name"
-                  label="Reimagined Name"
+                <Controller
+                  name="reimaginedName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Write reimagined name"
+                      label="Reimagined Name"
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name="currentName"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Write current name"
-                  label="Current Name"
+                <Controller
+                  name="currentName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Write current name"
+                      label="Current Name"
+                    />
+                  )}
                 />
-              )}
-            />
-            <div className="w-1/2 mx-auto">
-              <Button
-                type="submit"
-                disabled={
-                  areAnyComboboxesLoading || isFormSubmitting || loading
-                }
-              >
-                {isFormSubmitting || loading ? "Submitting..." : "Filter"}
-              </Button>
+                <div className="w-1/2 mx-auto pt-2">
+                  <Button
+                    type="submit"
+                    disabled={
+                      areAnyComboboxesLoading || isFormSubmitting || loading
+                    }
+                  >
+                    {isFormSubmitting || loading ? "Submitting..." : "Filter"}
+                  </Button>
+                </div>
+              </form>
             </div>
-          </form>
-        </Modal>
+          </div>
+        </div>
       )}
     </div>
   );
