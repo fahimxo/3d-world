@@ -12,49 +12,8 @@ import {
 } from "./lib/usePublicClubs";
 import { Loading } from "./components/loading";
 
-export type DataType = {
-  id: number;
-  reImaginedName: string;
-  originalClubName: string;
-  lore: string;
-  city: string;
-  latitude: number;
-  longitude: number;
-  logoUrl: string;
-  videoUrl: string;
-  status: number;
-  isActive: boolean;
-  displayOrder: number;
-  sportId: number;
-  sportName: string;
-  sectorId: number;
-  sectorName: string;
-  sectorColorCode: string;
-  countryId: number;
-  countryName: string;
-  anthemUrl: string;
-  kitImageUrl: string;
-  kitVideoUrl: string;
-  stadiumImageUrl: string;
-  stadiumVideoUrl: string;
-  bestPlayerImageUrl: string;
-  bestPlayerVideoUrl: string;
-  coachImageUrl: string;
-  coachVideoUrl: string;
-  vehicleImageUrl: string;
-  vehicleVideoUrl: string;
-  symbolImageUrl: string;
-  symbolVideoUrl: string;
-  averageRating: number;
-  totalRatings: number;
-  created: string;
-  lastModified: string;
-};
-
 const App: React.FC = () => {
-  const [selectedSport, setSelectedSport] = useState<string>("");
   const [detailsModal, setDetailsModal] = useState(false);
-  const [modalData, setModalData] = useState({ name: "", data: "" });
   const [selectedClubData, setSelectedClubData] = useState<
     PublicClubResult | undefined
   >();
@@ -90,7 +49,7 @@ const App: React.FC = () => {
         +targetClub.longitude
       );
     }
-  }, [clubData, isInitialLoad]);
+  }, [clubData]);
 
   const handleFilterSubmit = async (filterPayload: PublicClubFilter) => {
     // وقتی کاربر فیلتر می‌کند، دیگر بارگذاری اولیه نیست
@@ -107,7 +66,6 @@ const App: React.FC = () => {
       const clubData = JSON.parse(data);
       console.log("Clicked club data:", clubData);
       if (clubData && clubData.id) {
-        setModalData({ name, data });
         setSelectedClubData(clubData);
         setDetailsModal(true);
       }
@@ -119,9 +77,7 @@ const App: React.FC = () => {
   const hideCityModal = useCallback(() => {
     setDetailsModal(false);
     setSelectedClubData(undefined);
-    setModalData({ name: "", data: "" });
   }, []);
-
 
   const handleWorldLoaded = useCallback(() => {
     const loadingScreen = document.getElementById("loading");
@@ -140,7 +96,7 @@ const App: React.FC = () => {
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent
         onCityClick={showCityModal}
-        data={clubData as DataType[]}
+        data={clubData}
         ref={worldRef}
         cityList={cityOptions}
         onLoaded={handleWorldLoaded}
@@ -170,18 +126,6 @@ const App: React.FC = () => {
       />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}
-      {/* Modal Dialog */}
-      {/* {modalVisible && (
-        <div id="cityModal" className="modal">
-          <div className="modal-content">
-            <span className="close-button" onClick={hideCityModal}>
-              &times;
-            </span>
-            <h3 className="text-amber-800">{modalData.name}</h3>
-            <p id="cityData">{modalData.data}</p>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

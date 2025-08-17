@@ -467,11 +467,15 @@ export default class earth {
     // Clear the helper arrays
     this.clickablePoints = [];
     this.cityLabels = [];
+    this.data = [];
   }
 
   // 1) ساخت Light Pillar برای باشگاه‌ها
   public async createClubPillars(clubs: DataType[] = []) {
     const radius = this.options.earth.radius;
+
+    this.clubGroup.clear();
+    this.clickablePoints.length = 0;
 
     await Promise.all(
       clubs.map(async (item) => {
@@ -560,7 +564,6 @@ export default class earth {
 
     await this.createClubPillars(data);
 
-    // وقتی دیتای شهر اضافه شد، کافی‌ست این خط را هم صدا بزنید:
     await this.createCityPoints(cityList);
 
     // await Promise.all(
