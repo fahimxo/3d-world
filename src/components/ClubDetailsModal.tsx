@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal } from "./modal";
 import DetailsModal from "../assets/icons/DetailsModal";
 import CardInfoModal from "../assets/icons/CardInfoModal";
@@ -6,6 +6,7 @@ import ReactPlayer from "react-player";
 import FanbasePower from "./fanBase";
 import { PublicClubResult } from "../lib/usePublicClubs";
 import InfoSection from "./clubKit";
+import { useTooltip } from "./tooltipContext";
 
 interface ClubDetailsModalProps {
   isOpen: boolean;
@@ -21,15 +22,22 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
   if (!isOpen || !clubData) {
     return null;
   }
+  const { setTooltipVisibility } = useTooltip();
+  useEffect(() => {
+    setTooltipVisibility(false);
 
+    return () => {
+      setTooltipVisibility(true);
+    };
+  }, [isOpen, setTooltipVisibility]);
   return (
     <Modal mode="center">
       <DetailsModal onClose={onClose}>
-        <div className="flex items-stretch gap-6 text-white h-[232px]">
-          <div className="w-[240px] h-full">
+        <div className="flex flex-col lg:flex-row items-stretch gap-6 text-white lg:h-[232px]">
+          <div className="lg:w-[240px] w-full h-full">
             <CardInfoModal data={clubData} className="h-full" />
           </div>
-          <div className="flex-1 h-full mt-0.5">
+          <div className="lg:flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
             {clubData.videoUrl && (
               <ReactPlayer
                 src={clubData.videoUrl}

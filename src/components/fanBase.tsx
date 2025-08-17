@@ -40,7 +40,7 @@ const FanbasePower: React.FC<FanbasePowerProps> = ({ power }) => {
     <div className="mt-4">
       <div className="mt-4.5 h-px bg-white w-full opacity-50" />
       <h3 className="text-white text-lg font-bold my-4">Fanbase Power</h3>
-      <div className="flex items-center gap-4 rounded-lg bg-black bg-opacity-30 w-[490px] m-auto p-[19px]">
+      <div className="flex items-center gap-4 rounded-lg bg-black bg-opacity-30 md:w-[490px] m-auto p-[19px]">
         <div className="w-16 h-12 flex items-center justify-center bg-cyan-400 rounded-md">
           <span className="text-black text-2xl font-bold">{power}</span>
         </div>

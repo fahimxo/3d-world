@@ -1,10 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./app"; // Your main App component
-import { initToastContainer } from "../src/config/toastService";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './app'; // Your main App component
+import { initToastContainer } from '../src/config/toastService';
 
-const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Failed to find the root element");
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Failed to find the root element');
+import { TooltipProvider } from './components/tooltipContext';
 
 initToastContainer();
 
@@ -12,15 +13,17 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <App />
+    <TooltipProvider>
+      <App />
+    </TooltipProvider>
   </React.StrictMode>
 );
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((reg) => console.log("Service Worker registered:", reg))
-      .catch((err) => console.error("SW registration failed:", err));
+      .register('/service-worker.js')
+      .then((reg) => console.log('Service Worker registered:', reg))
+      .catch((err) => console.error('SW registration failed:', err));
   });
 }
