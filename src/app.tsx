@@ -24,6 +24,27 @@ const App: React.FC = () => {
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
   const [locationsModalOpen, setLocationsModalOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // وقتی کامپوننت لود میشه مقدار localStorage رو بخون
+    const admin = localStorage.getItem('isAdmin');
+    console.log('admin', admin);
+
+    setIsAdmin(admin === 'true');
+
+    // لیسنر بذار برای تغییرات localStorage (مثلاً وقتی لاگ‌اوت بشه)
+    const handleStorageChange = () => {
+      const updatedAdmin = localStorage.getItem('isAdmin');
+      setIsAdmin(updatedAdmin === 'true');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -112,6 +133,7 @@ const App: React.FC = () => {
           loading={clubsLoading}
           setFilterModalVisible={setFilterModalVisible}
           filterModalVisible={filterModalVisible}
+          setIsAdmin={setIsAdmin}
         />
       </div>
       <Filters
@@ -123,7 +145,14 @@ const App: React.FC = () => {
         setFilterModalVisible={setFilterModalVisible}
       />
       <div className="fixed top-30 right-40 z-40">
-        <Clubs onClick={() => setLocationsModalOpen(true)} />
+        {isAdmin && (
+          <Clubs
+            onClick={() => {
+              setLocationsModalOpen(true);
+              setFilterModalVisible(false);
+            }}
+          />
+        )}
       </div>
       {locationsModalOpen && (
         <ClubsManagement onClose={() => setLocationsModalOpen(false)} />

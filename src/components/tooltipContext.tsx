@@ -6,7 +6,7 @@ interface TooltipContextType {
 }
 
 export const TooltipContext = createContext<TooltipContextType>({
-  isTooltipVisible: true,
+  isTooltipVisible: false,
   setTooltipVisibility: () => {
     return;
   },
@@ -19,7 +19,7 @@ export const TooltipProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false);
 
   return (
     <TooltipContext.Provider

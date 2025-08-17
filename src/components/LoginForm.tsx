@@ -1,24 +1,25 @@
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import LoginIcon from "../assets/icons/LoginIcon";
-import Input from "./input";
-import { Button } from "./button";
-import api from "../config/axios";
-import { API_ENDPOINTS } from "../config/endpoint";
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import LoginIcon from '../assets/icons/LoginIcon';
+import Input from './input';
+import { Button } from './button';
+import api from '../config/axios';
+import { API_ENDPOINTS } from '../config/endpoint';
 
 const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(4, "Password is wrong"),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(4, 'Password is wrong'),
 });
 
 type LoginFormFields = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onCancel?: () => void;
+  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const LoginForm = ({ onCancel }: LoginFormProps) => {
+const LoginForm = ({ onCancel, setIsAdmin }: LoginFormProps) => {
   const {
     register,
     handleSubmit,
@@ -37,15 +38,19 @@ const LoginForm = ({ onCancel }: LoginFormProps) => {
       });
       const token = response?.result?.token;
       const userId = response?.result?.userId;
+      const userType = response?.result?.userType;
       if (token) {
-        localStorage.setItem("token", token);
+        localStorage.setItem('token', token);
+        localStorage.setItem('isAdmin', userType === 'Admin' ? 'true' : null);
+
+        setIsAdmin(userType === 'Admin' ? true : false);
         if (userId) {
-          localStorage.setItem("userId", userId.toString());
+          localStorage.setItem('userId', userId.toString());
         }
         if (onCancel) onCancel();
       }
     } catch (error: any) {
-      console.error("Login failed:", error);
+      console.error('Login failed:', error);
     }
   };
 
@@ -64,7 +69,7 @@ const LoginForm = ({ onCancel }: LoginFormProps) => {
               placeholder="Username"
               label="Username"
               autoComplete="username"
-              {...register("username", { required: "Username is required" })}
+              {...register('username', { required: 'Username is required' })}
             />
             {errors.username && (
               <span className="text-red-400 text-xs mt-1 block">
@@ -79,7 +84,7 @@ const LoginForm = ({ onCancel }: LoginFormProps) => {
               placeholder="Password"
               label="Password"
               autoComplete="current-password"
-              {...register("password", { required: "Password is required" })}
+              {...register('password', { required: 'Password is required' })}
             />
             {errors.password && (
               <span className="text-red-400 text-xs mt-1 block">

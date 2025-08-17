@@ -9,11 +9,13 @@ import api from '../../config/axios';
 import { API_ENDPOINTS } from '../../config/endpoint';
 import { PublicClubFilter } from 'src/lib/usePublicClubs';
 import { FilterButton } from '../../components';
+import { showToast } from '../../config/toastService';
 
 type HeaderProps = {
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
   filterModalVisible: boolean;
 };
 
@@ -22,6 +24,7 @@ export const Headers = ({
   loading,
   setFilterModalVisible,
   filterModalVisible,
+  setIsAdmin,
 }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -48,16 +51,21 @@ export const Headers = ({
     const userId = localStorage.getItem('userId');
     if (token && userId) {
       try {
-        await api.post(API_ENDPOINTS.USER.LOGOUT, {
+        const result = await api.post(API_ENDPOINTS.USER.LOGOUT, {
           logoutDto: {
             userId: Number(userId),
             token,
           },
         });
+        if (result?.code === 0) {
+          showToast(result?.message, 'success');
+          setIsAdmin(false);
+        }
       } catch (error) {
         console.error('Logout failed:', error);
       }
     }
+    localStorage.removeItem('isAdmin');
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     setIsLoggedIn(false);
@@ -156,6 +164,7 @@ export const Headers = ({
               setShowLogin(false);
               setIsLoggedIn(!!localStorage.getItem('token'));
             }}
+            setIsAdmin={setIsAdmin}
           />
         </div>
       )}

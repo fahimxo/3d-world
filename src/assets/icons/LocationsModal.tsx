@@ -15,7 +15,7 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
       //   clipPath:
       //     'polygon(, 0% 0%, 0% 0%0% 0%, 97% 0%, 97% 0%, 97% 0%, 100% 3%, 100% 3%, 100% 100%, 80% 100%, 80% 100%, 76% 96%, 76% 96%, 76% 96%, 68% 97%, 68% 97%, 65% 100%, 2% 99%, 2% 99%, 0% 94%, 0% 94%, 0% 94%, 0% 31%, 0% 31%, 0% 31%, 4% 28%, 4% 28%, 4% 28%, 4% 21%, 4% 21%, 4% 21%, 0% 16%, 0% 16%, 0% 16%)',
       // }}
-      className={`relative top-32 max-w-4xl ${className}  h-fit w-fit`}
+      className={`relative top-10 max-w-4xl ${className}  h-fit w-fit`}
     >
       <svg
         // width="866"
