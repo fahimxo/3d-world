@@ -42,7 +42,7 @@ textures.push({
 });
 
 const resources: IResources = {
-  textures, 
+  textures,
 };
 
 export { resources };

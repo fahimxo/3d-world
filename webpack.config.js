@@ -7,6 +7,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const ESLintPlugin = require("eslint-webpack-plugin");
+const { InjectManifest } = require("workbox-webpack-plugin");
 
 // webpack中的所有的配置信息都应该写在module.exports中
 module.exports = {
@@ -85,12 +86,10 @@ module.exports = {
         test: /\.(glsl|vs|fs)$/,
         loader: "ts-shader-loader",
       },
-      // --- این تیکه رو برات اضافه کردم ---
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: "asset/resource",
       },
-      // ---------------------------------
     ],
   },
 
@@ -106,6 +105,10 @@ module.exports = {
       // This ensures that if you have a file at 'static/images/earth/light_column.png',
       // it will be accessible from the URL '/images/earth/light_column.png', fixing the 404 error.
       patterns: [{ from: path.resolve(__dirname, "./static"), to: "." }],
+    }),
+    new InjectManifest({
+      swSrc: "./src/custom-sw.js",
+      swDest: "service-worker.js",
     }),
 
     new ESLintPlugin({
