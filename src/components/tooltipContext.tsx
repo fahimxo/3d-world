@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from 'react';
 
 interface TooltipContextType {
   isTooltipVisible: boolean;
@@ -7,7 +7,9 @@ interface TooltipContextType {
 
 export const TooltipContext = createContext<TooltipContextType>({
   isTooltipVisible: true,
-  setTooltipVisibility: () => {},
+  setTooltipVisibility: () => {
+    return;
+  },
 });
 
 export const useTooltip = () => useContext(TooltipContext);
