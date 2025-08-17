@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
-import SiteLogo from "../../../static/images/logo.png";
-import MenuIcon from "../../assets/icons/MenuIcon";
-import Search from "../../assets/icons/SearchIcon";
-import { SciFiMenuBorder } from "../../assets/icons/SciFiMenuBorder";
-import { HamburgerMenu } from "../../assets/icons/hamburgerMenu";
-import LoginForm from "../../components/LoginForm";
-import api from "../../config/axios";
-import { API_ENDPOINTS } from "../../config/endpoint";
-import { PublicClubFilter } from "src/lib/usePublicClubs";
-import { FilterButton } from "../../components";
+import React, { useState, useEffect } from 'react';
+import SiteLogo from '../../../static/images/logo.png';
+import MenuIcon from '../../assets/icons/MenuIcon';
+import Search from '../../assets/icons/SearchIcon';
+import { SciFiMenuBorder } from '../../assets/icons/SciFiMenuBorder';
+import { HamburgerMenu } from '../../assets/icons/hamburgerMenu';
+import LoginForm from '../../components/LoginForm';
+import api from '../../config/axios';
+import { API_ENDPOINTS } from '../../config/endpoint';
+import { PublicClubFilter } from 'src/lib/usePublicClubs';
+import { FilterButton } from '../../components';
 
 type HeaderProps = {
-  children: React.ReactNode;
   fetchClubs: (payload: PublicClubFilter) => void;
   loading: boolean;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,19 +18,18 @@ type HeaderProps = {
 };
 
 export const Headers = ({
-  children,
   fetchClubs,
   loading,
   setFilterModalVisible,
   filterModalVisible,
 }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [showLogin, setShowLogin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   }, [showLogin]);
 
@@ -40,14 +38,14 @@ export const Headers = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchValue.trim()) {
+    if (e.key === 'Enter' && searchValue.trim()) {
       fetchClubs({ city: searchValue.trim(), currentName: searchValue.trim() });
     }
   };
 
   const handleSignOut = async () => {
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
     if (token && userId) {
       try {
         await api.post(API_ENDPOINTS.USER.LOGOUT, {
@@ -57,11 +55,11 @@ export const Headers = ({
           },
         });
       } catch (error) {
-        console.error("Logout failed:", error);
+        console.error('Logout failed:', error);
       }
     }
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     setIsLoggedIn(false);
     setIsMenuOpen(false);
   };
@@ -79,9 +77,7 @@ export const Headers = ({
           className="block md:hidden"
           filterModalVisible={filterModalVisible}
         />
-        <p className="font-normal text-[26px] text-cyan-300 orbitron-font">
-          {children}
-        </p>
+        <img src={SiteLogo} alt="Site Logo" className="h-12 w-auto" />
         <div className="relative w-[443px] h-[44px] hidden md:block">
           <Search />
           <div className="relative w-full h-full">
@@ -158,7 +154,7 @@ export const Headers = ({
           <LoginForm
             onCancel={() => {
               setShowLogin(false);
-              setIsLoggedIn(!!localStorage.getItem("token"));
+              setIsLoggedIn(!!localStorage.getItem('token'));
             }}
           />
         </div>

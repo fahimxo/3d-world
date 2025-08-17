@@ -107,7 +107,6 @@ const App: React.FC = () => {
       />
       <div className="fixed top-0 left-0 w-full z-50">
         <Headers
-          children="Logo"
           fetchClubs={handleFilterSubmit}
           loading={clubsLoading}
           setFilterModalVisible={setFilterModalVisible}
