@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import ClubPreview from './ClubPreview';
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/endpoint';
+import { showToast } from '../config/toastService';
 
 export interface ClubData {
   id: number;
@@ -68,7 +69,12 @@ const ClubCard = ({
       const result: any = await api.post(API_ENDPOINTS.ADMIN.DELETE_CLUB, {
         id,
       });
-      if (result?.result) getClubsData();
+      if (result?.result) {
+        getClubsData();
+        showToast(result?.message, 'success');
+      } else {
+        showToast(result?.message, 'failed');
+      }
     } catch (error) {
       console.error('Logout failed:', error);
     }

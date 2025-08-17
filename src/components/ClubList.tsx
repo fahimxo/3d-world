@@ -19,9 +19,11 @@ const ClubList: FC<ClubListProps> = ({
   const [clubsData, setClubData] = useState<ClubData[]>([]);
   const [clubDataForEdit, setClubDataForEdit] = useState<ClubData>({});
   const [isShowClubInfo, setIsShowClubInfo] = useState<boolean>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getClubsData = async () => {
     try {
+      setLoading(true);
       const data: any = await api.post(API_ENDPOINTS.ADMIN.GET_CLUBS_LIST, {
         filter: {
           onlyVisible: isShowVisibleClubs,
@@ -32,6 +34,8 @@ const ClubList: FC<ClubListProps> = ({
       setClubData(data?.result);
     } catch (error) {
       console.error('Logout failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,7 +58,7 @@ const ClubList: FC<ClubListProps> = ({
           ))
         ) : (
           <div className="flex justify-center items-center">
-            there is no club!
+            {loading ? '... Loading' : ' there is no club!'}
           </div>
         ))}
 
@@ -67,14 +71,16 @@ const ClubList: FC<ClubListProps> = ({
           prevData={clubDataForEdit}
         />
       )}
-      <div className="flex gap-4 justify-end mt-7">
-        <Button
-          onClick={onClose}
-          className="relative flex items-center justify-center cursor-pointer"
-        >
-          Close
-        </Button>
-      </div>
+      {!isShowClubInfo && (
+        <div className="flex gap-4 justify-end mt-7">
+          <Button
+            onClick={onClose}
+            className="relative flex items-center justify-center cursor-pointer"
+          >
+            Close
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

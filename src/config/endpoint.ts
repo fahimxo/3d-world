@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
     GET_COUNTRIES_LIST: '/api/WorldMap/GetCountriesList/GetCountriesList',
     GET_CITIES_LIST: '/api/WorldMap/GetCitiesList/GetCitiesList',
     GET_PUBLIC_CLUB: '/api/WorldMap/GetPublicClubs/GetPublicClubs',
+
     GET_COUNTRY_AND_CITY_NAME_WITH_COORDINATES:
       '/api/WorldMap/GetCountryAndCityNameWithCoordinates/GetCountryAndCityNameWithCoordinates',
   },
@@ -17,5 +18,6 @@ export const API_ENDPOINTS = {
     GET_CLUBS_LIST: '/api/Admin/GetClubsList/GetClubsList',
     DELETE_CLUB: '/api/Admin/DeleteClub/DeleteClub',
     CREATE_CLUB: 'api/Admin/CreateClub/CreateClub',
+    UPDATE_CLUB: 'api/Admin/UpdateClub/UpdateClub',
   },
 };

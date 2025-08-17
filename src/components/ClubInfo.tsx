@@ -11,6 +11,7 @@ import { Controller, useForm } from 'react-hook-form';
 import z, { url } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import tr from 'zod/v4/locales/tr.cjs';
+import { showToast } from '../config/toastService';
 
 enum hideClub {
   hide = 1,
@@ -50,25 +51,31 @@ const getOptionsFor = async (
 const filterSchema = z.object({
   sportType: z.string().optional(),
   technoSector: z.string().optional(),
-  country: z.string().optional(),
-  city: z.string().optional(),
+  country: z.union([z.string(), z.number()]).optional().transform(String),
+  city: z.union([z.string(), z.number()]).optional().transform(String),
   reimaginedName: z.string().optional(),
   originalClubName: z.string().optional(),
-  coordinates: z.string(),
-  clubAnthem: z.string(),
-  lore: z.string(),
-  kitVideoUrl: z.string().optional(),
+  coordinates: z.string().min(1, 'Coordinates field is required.'),
+  clubAnthem: z.string().url('Club anthem must be a URL.').optional(),
+  lore: z.string().optional(),
+  kitVideoUrl: z.string().url('Club Kit url must be a URL.').optional(),
   kitDiscription: z.string().optional(),
-  stadiumVideoUrl: z.string().optional(),
+  stadiumVideoUrl: z.string().url('Club Stadium url must be a URL.').optional(),
   staduimDiscription: z.string().optional(),
   bestPlayerDiscription: z.string().optional(),
-  bestPlayerVideoUrl: z.string().optional(),
+  bestPlayerVideoUrl: z
+    .string()
+    .url('Club Best Player url must be a URL.')
+    .optional(),
   coachDiscription: z.string().optional(),
-  coachVideoUrl: z.string().optional(),
+  coachVideoUrl: z.string().url('Club Manager url must be a URL.').optional(),
   vehicleDiscription: z.string().optional(),
-  vehicleVideoUrl: z.string().optional(),
+  vehicleVideoUrl: z
+    .string()
+    .url('Club Transport url must be a URL.')
+    .optional(),
   symbolDiscription: z.string().optional(),
-  symbolVideoUrl: z.string().optional(),
+  symbolVideoUrl: z.string().url('Club Mascot url must be a URL.').optional(),
 });
 type FilterFormValues = z.infer<typeof filterSchema>;
 
@@ -91,13 +98,13 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     cities: false,
   });
 
-  console.log(formData, 'formData');
   const {
     control,
     handleSubmit,
     formState: { errors },
     setValue,
     trigger,
+    watch,
   } = useForm<FilterFormValues>({
     resolver: zodResolver(filterSchema),
     defaultValues: prevData
@@ -133,6 +140,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           symbolVideoUrl: '',
         },
   });
+  console.log(formData, 'formData', watch('sportType'), watch('technoSector'));
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -182,13 +190,13 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
   };
 
   const handleFileChange = (file) => {
-    console.log(file, 'file');
     setFormData((prev) => ({ ...prev, logoUrl: file }));
   };
 
   console.log(formData, 'formData');
 
   const onSubmit = async (data: FilterFormValues) => {
+    console.log('herrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeee', errors);
     setIsLoading(true);
 
     const coords = data.coordinates.split(',').map((c) => c.trim());
@@ -204,7 +212,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
         latitude: latitude,
         longitude: longitude,
         logoUrl:
-          formData?.logoUrl.length > 0
+          formData?.logoUrl && formData?.logoUrl?.length > 0
             ? formData?.logoUrl.replace('data:image/png;base64,', '')
             : '',
         // videoUrl: '',
@@ -239,15 +247,22 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     console.log('Payload to be sent:', JSON.stringify(apiPayload, null, 2));
 
     try {
-      const response = await api.post(
-        API_ENDPOINTS.ADMIN.CREATE_CLUB,
-        apiPayload
+      let response;
+      if (prevData) {
+        response = await api.put(API_ENDPOINTS.ADMIN.UPDATE_CLUB, apiPayload);
+      } else {
+        response = await api.post(API_ENDPOINTS.ADMIN.CREATE_CLUB, apiPayload);
+      }
+      console.log(
+        'ressssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
+        response
       );
-
       if (response.data && response.data.code === 0) {
         onClose();
+        showToast(response.data?.message, 'success');
       } else {
         alert('serer error: ' + (response.data?.message || 'Unknown error'));
+        showToast(response.data?.message, 'failed');
       }
     } catch (error) {
       console.error('API Error:', error);
@@ -276,7 +291,8 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           setValue('city', response.result?.cityName);
           setValue('country', response.result?.countryName);
         } else {
-          alert('server error: ' + (response.data?.message || 'Unknown error'));
+          showToast(response?.message, 'failed');
+          // alert('server error: ' + (response.data?.message || 'Unknown error'));
         }
       } catch (error) {
         console.error('API Error:', error);
@@ -354,7 +370,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               name="country"
               control={control}
               render={({ field }) => {
-                console.log('field', field);
                 return (
                   <Input
                     label="Country"
@@ -564,11 +579,35 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
             </div>
             <div className="relative z-20 flex justify-center py-8 ">
               <Button
-                onClick={handleSubmit(onSubmit)}
+                onClick={async () => {
+                  setIsLoading(true);
+                  await trigger();
+                  setTimeout(() => {
+                    trigger().then((isValid) => {
+                      if (!isValid) {
+                        console.log(errors);
+                        const errorArray = Object.entries(errors).map(
+                          ([field, error]) => ({
+                            field,
+                            message: error.message,
+                            type: error.type,
+                          })
+                        );
+
+                        errorArray.map(({ message }) =>
+                          showToast(message, 'failed')
+                        );
+                        setIsLoading(true);
+                      } else {
+                        handleSubmit(onSubmit)();
+                      }
+                    });
+                  }, 500);
+                }}
                 disabled={isLoading}
                 className="relative flex items-center justify-center cursor-pointer"
               >
-                {prevData ? 'Save' : 'Add'}
+                {isLoading ? '...Loading' : prevData ? 'Save' : 'Add'}
               </Button>
             </div>
           </div>

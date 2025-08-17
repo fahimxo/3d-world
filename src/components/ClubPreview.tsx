@@ -120,7 +120,7 @@ const ClubInfo: FC<ClubData> = ({
           </span>
           <span className="text-[12px] font-[400] ">
             <img
-              src={logoUrl}
+              src={`data:image/png;base64,${logoUrl}`}
               alt={originalClubName}
               className="w-[80px] h-auto "
             />
