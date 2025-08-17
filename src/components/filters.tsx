@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import api from "../config/axios";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "./button";
-import Combobox, { ComboboxOption } from "./combobox";
-import { FilterButton } from "./filterButton";
-import Input from "./input";
-import { API_ENDPOINTS } from "../config/endpoint";
-import { Filter } from "./filter";
+import { useEffect, useState } from 'react';
+import api from '../config/axios';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from './button';
+import Combobox, { ComboboxOption } from './combobox';
+import { FilterButton } from './filterButton';
+import Input from './input';
+import { API_ENDPOINTS } from '../config/endpoint';
+import { Filter } from './filter';
 
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
@@ -18,7 +18,7 @@ const getOptionsFor = async (
   console.log(`[DEBUG] Fetching data for: ${listName} from ${endpoint}`);
   try {
     const response = await api.post(endpoint, {
-      filter: { searchTerm: "" },
+      filter: { searchTerm: '' },
     });
     const responseData = response.data ? response.data : response;
     if (
@@ -91,19 +91,19 @@ export const Filters: React.FC<FiltersProps> = ({
   } = useForm<FilterFormValues>({
     resolver: zodResolver(filterSchema),
     defaultValues: {
-      sportType: "",
-      technoSector: "",
-      country: "",
-      city: "",
-      reimaginedName: "",
-      currentName: "",
+      sportType: '',
+      technoSector: '',
+      country: '',
+      city: '',
+      reimaginedName: '',
+      currentName: '',
     },
   });
 
   useEffect(() => {
     if (sportOptions.length === 0) {
       setLoadingStates((prev) => ({ ...prev, sports: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, "Sports").then(
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, 'Sports').then(
         (data) => {
           setSportOptions(data);
           setLoadingStates((prev) => ({ ...prev, sports: false }));
@@ -114,7 +114,7 @@ export const Filters: React.FC<FiltersProps> = ({
       setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
       getOptionsFor(
         API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
-        "Techno Sectors"
+        'Techno Sectors'
       ).then((data) => {
         setTechnoSectorOptions(data);
         setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
@@ -124,7 +124,7 @@ export const Filters: React.FC<FiltersProps> = ({
       setLoadingStates((prev) => ({ ...prev, countries: true }));
       getOptionsFor(
         API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
-        "Countries"
+        'Countries'
       ).then((data) => {
         setCountryOptions(data);
         setLoadingStates((prev) => ({ ...prev, countries: false }));
@@ -132,7 +132,7 @@ export const Filters: React.FC<FiltersProps> = ({
     }
     if (cityOptions.length === 0) {
       setLoadingStates((prev) => ({ ...prev, cities: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, "Cities").then(
+      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, 'Cities').then(
         (data) => {
           setCityOptions(data);
           setLoadingStates((prev) => ({ ...prev, cities: false }));
@@ -157,7 +157,7 @@ export const Filters: React.FC<FiltersProps> = ({
       onFilterSubmit(filterPayload);
       setFilterModalVisible(false);
     } catch (error) {
-      console.error("Failed to submit filters:", error);
+      console.error('Failed to submit filters:', error);
     } finally {
       setIsFormSubmitting(false);
     }
@@ -189,7 +189,7 @@ export const Filters: React.FC<FiltersProps> = ({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder={
-                        loadingStates.sports ? "Loading..." : "Select"
+                        loadingStates.sports ? 'Loading...' : 'Select'
                       }
                       label="Sport Type"
                       error={errors.sportType?.message}
@@ -205,7 +205,7 @@ export const Filters: React.FC<FiltersProps> = ({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder={
-                        loadingStates.technoSectors ? "Loading..." : "Select"
+                        loadingStates.technoSectors ? 'Loading...' : 'Select'
                       }
                       label="Techno Sector"
                       error={errors.technoSector?.message}
@@ -221,7 +221,7 @@ export const Filters: React.FC<FiltersProps> = ({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder={
-                        loadingStates.countries ? "Loading..." : "Select"
+                        loadingStates.countries ? 'Loading...' : 'Select'
                       }
                       label="Country"
                       error={errors.country?.message}
@@ -237,7 +237,7 @@ export const Filters: React.FC<FiltersProps> = ({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder={
-                        loadingStates.cities ? "Loading..." : "Select"
+                        loadingStates.cities ? 'Loading...' : 'Select'
                       }
                       label="City"
                       error={errors.city?.message}
@@ -273,7 +273,7 @@ export const Filters: React.FC<FiltersProps> = ({
                       areAnyComboboxesLoading || isFormSubmitting || loading
                     }
                   >
-                    {isFormSubmitting || loading ? "Submitting..." : "Filter"}
+                    {isFormSubmitting || loading ? 'Submitting...' : 'Filter'}
                   </Button>
                 </div>
               </form>

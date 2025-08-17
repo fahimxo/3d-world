@@ -5,6 +5,7 @@ const api = axios.create({
   baseURL: "http://194.5.175.183:4444",
   headers: {
     "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("JWT")}`,
   },
 });
 

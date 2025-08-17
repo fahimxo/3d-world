@@ -1,16 +1,18 @@
 // src/App.tsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import WorldComponent, { WorldHandle } from "./ts/index";
-import "./app.css";
-import { Headers } from "./layouts/header/Header";
-import { Filters } from "./components/filters";
-import { Tooltip, ComboboxOption, ClubDetailsModal } from "./components";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import WorldComponent, { WorldHandle } from './ts/index';
+import './app.css';
+import { Headers } from './layouts/header/Header';
+import { Filters } from './components/filters';
+import { Tooltip, ComboboxOption, ClubDetailsModal } from './components';
 import {
   PublicClubFilter,
   usePublicClubs,
   PublicClubResult,
-} from "./lib/usePublicClubs";
-import { Loading } from "./components/loading";
+} from './lib/usePublicClubs';
+import { Loading } from './components/loading';
+import ClubsManagement from './components/ClubsManagement';
+import { Clubs } from './assets/icons/Locations';
 
 const App: React.FC = () => {
   const [detailsModal, setDetailsModal] = useState(false);
@@ -21,6 +23,7 @@ const App: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
+  const [locationsModalOpen, setLocationsModalOpen] = useState(false);
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -64,13 +67,13 @@ const App: React.FC = () => {
   const showCityModal = useCallback((name: string, data: string) => {
     try {
       const clubData = JSON.parse(data);
-      console.log("Clicked club data:", clubData);
+      console.log('Clicked club data:', clubData);
       if (clubData && clubData.id) {
         setSelectedClubData(clubData);
         setDetailsModal(true);
       }
     } catch (error) {
-      console.error("Error parsing club data:", error);
+      console.error('Error parsing club data:', error);
     }
   }, []);
 
@@ -80,10 +83,10 @@ const App: React.FC = () => {
   }, []);
 
   const handleWorldLoaded = useCallback(() => {
-    const loadingScreen = document.getElementById("loading");
+    const loadingScreen = document.getElementById('loading');
     if (loadingScreen) {
       // This class will trigger your fade-out animation
-      loadingScreen.classList.add("out");
+      loadingScreen.classList.add('out');
     }
     // Set loading to false after a short delay to allow the animation to play
     setTimeout(() => {
@@ -100,6 +103,7 @@ const App: React.FC = () => {
         ref={worldRef}
         cityList={cityOptions}
         onLoaded={handleWorldLoaded}
+        setFilterModalVisible={setFilterModalVisible}
       />
       <div className="fixed top-0 left-0 w-full z-50">
         <Headers
@@ -118,6 +122,12 @@ const App: React.FC = () => {
         filterModalVisible={filterModalVisible}
         setFilterModalVisible={setFilterModalVisible}
       />
+      <div className="fixed top-30 right-40 z-40">
+        <Clubs onClick={() => setLocationsModalOpen(true)} />
+      </div>
+      {locationsModalOpen && (
+        <ClubsManagement onClose={() => setLocationsModalOpen(false)} />
+      )}
       <Tooltip />
       <ClubDetailsModal
         isOpen={detailsModal}

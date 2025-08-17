@@ -2,6 +2,7 @@ import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Input from "./input";
+import { cn } from "../lib/utils";
 
 export interface ComboboxOption {
   value: string;
@@ -19,6 +20,9 @@ interface ComboboxProps {
   label?: string;
   name?: string;
   error?: string;
+  addClub?: string;
+  salt?: boolean;
+  addCc?: string;
 }
 
 const ComboboxMenu = ({
@@ -32,6 +36,8 @@ const ComboboxMenu = ({
   name,
   triggerRef,
   futuristicClipPath,
+  salt,
+  addClub,
 }) => {
   const [position, setPosition] = useState({});
   const menuRef = useRef<HTMLDivElement>(null);
@@ -83,11 +89,19 @@ const ComboboxMenu = ({
       style={{ ...position, ...futuristicClipPath }}
     >
       <div
-        className="absolute inset-0 bg-gradient-to-br from-cyan-400/50 to-blue-600/50 blur-[1px]"
+        className={cn(
+          "absolute inset-0 blur-[1px]",
+          addClub
+            ? "bg-[#415C52]"
+            : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+        )}
         style={futuristicClipPath}
       ></div>
       <div
-        className="relative bg-[#0A192F] text-cyan-200"
+        className={cn(
+          "relative text-cyan-200",
+          addClub ? "bg-[#001b11] border-2 border-[#415C52]" : "bg-[#0A192F]"
+        )}
         style={futuristicClipPath}
       >
         <div className="p-2">
@@ -96,6 +110,7 @@ const ComboboxMenu = ({
             icon={Search}
             value={searchValue}
             name={name}
+            addClub={addClub}
             onChange={(event) => {
               setSearchValue?.(event.target.value);
             }}
@@ -111,16 +126,33 @@ const ComboboxMenu = ({
                   setOpen(false);
                   setSearchValue("");
                 }}
-                className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none hover:bg-cyan-400/20"
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
+                  addClub
+                    ? "text-[#00FFA6] hover:bg-[#00FFA6]/10"
+                    : salt
+                    ? "hover:bg-red-400/20"
+                    : "hover:bg-cyan-400/20 text-cyan-200"
+                )}
               >
                 <span className="truncate flex-1">{option.label}</span>
                 {option.value === value && (
-                  <Check className="ml-auto h-4 w-4" />
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      addClub ? "text-[#00FFA6]" : "text-cyan-400"
+                    )}
+                  />
                 )}
               </div>
             ))
           ) : (
-            <p className="text-center text-sm text-cyan-400/60 py-2">
+            <p
+              className={cn(
+                "text-center text-sm ",
+                salt ? "text-[#415C52] py-2" : "text-cyan-400/60 py-2"
+              )}
+            >
               No results found.
             </p>
           )}
@@ -140,6 +172,8 @@ const Combobox: React.FC<ComboboxProps> = ({
   label,
   name,
   error,
+  addClub,
+  salt,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -162,26 +196,47 @@ const Combobox: React.FC<ComboboxProps> = ({
       {label && (
         <label
           htmlFor={name}
-          className="text-sm font-bold text-cyan-300/80 block tracking-wider mb-1"
+          className={cn(
+            "text-sm block tracking-wider mb-1",
+            addClub ? "text-[#00FFA6]" : "text-cyan-300/80 font-bold"
+          )}
         >
           {label}
         </label>
       )}
       <div className="relative w-full">
         <div className="p-[2px]" style={futuristicClipPath}>
+          <div
+            className={cn(
+              "absolute inset-0 blur-[1px]",
+              addClub
+                ? "bg-[#415C52]"
+                : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+            )}
+            style={futuristicClipPath}
+          ></div>
           <button
             type="button"
             ref={triggerRef}
             role="combobox"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-            className="relative flex h-12 w-full shadow-[var(--shadow-neon)] items-center justify-between bg-[#0A192F] px-3 py-2 text-base text-cyan-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className={cn(
+              "relative flex h-12 w-full items-center justify-between px-3 py-2 text-base focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              addClub
+                ? "bg-[#001b11] text-[#49675D]"
+                : "bg-[#0A192F] text-cyan-200"
+            )}
             style={futuristicClipPath}
           >
             {selectedOption ? (
               <span className="truncate">{selectedOption.label}</span>
             ) : (
-              <span className="text-cyan-400/50">{placeholder}</span>
+              <span
+                className={cn(addClub ? "text-[#49675D]" : "text-cyan-400/50")}
+              >
+                {placeholder}
+              </span>
             )}
             <div className="flex items-center">
               {/* 3. Conditionally render the clear button when a value is selected */}
@@ -211,6 +266,8 @@ const Combobox: React.FC<ComboboxProps> = ({
             name={name}
             triggerRef={triggerRef}
             futuristicClipPath={futuristicClipPath}
+            salt={salt}
+            addClub={addClub}
           />
         )}
         {typeof error === "string" && error && (

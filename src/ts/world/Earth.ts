@@ -59,6 +59,13 @@ export type punctuation = {
   };
 };
 
+export interface CityData {
+  city: string;
+  latitude: number;
+  longitude: number;
+  // ... هر فیلد دیگه‌ای که بعداً لازم داری
+}
+
 type options = {
   data: DataType[];
   cityList: ComboboxOption[];
