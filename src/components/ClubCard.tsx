@@ -84,20 +84,22 @@ const ClubCard = ({
         style={{
           clipPath: 'polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0)',
         }}
-        className={`grid grid-cols-8 px-8 cursor-pointer ${
+        className={`flex justify-between items-center px-8 cursor-pointer ${
           isOpen ? 'bg-[rgba(0,119,86,0.7)]' : 'bg-[rgba(0,119,86,0.25)]'
         } transition h-[81px] `}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-3 col-span-2">
+        <div className="flex items-center gap-3 ">
           <img
             src={`data:image/png;base64,${logoUrl}`}
             alt={originalClubName}
             className="w-[80px] h-auto "
           />
-          <div className="text-[16px] font-bold">{originalClubName}</div>
+          <div className="text-[16px] font-bold truncate">
+            {originalClubName}
+          </div>
         </div>
-        <div className="flex items-center gap-3 w-full justify-between px-15 col-span-5">
+        <div className="flex items-center gap-3 w-full justify-between px-5">
           <div className="flex flex-col items-center gap-2">
             <span className="text-[12px] font-[400] font-regular">
               Techno Sector
@@ -114,7 +116,7 @@ const ClubCard = ({
           </div>
         </div>
 
-        <div className="flex  flex-col  items-center gap-3 col-span-1 justify-center">
+        <div className="flex  flex-col  items-center gap-3 justify-center">
           <button className="cursor-pointer " onClick={editClub}>
             <svg
               width="14"
