@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import ClubPreview from './ClubPreview';
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/endpoint';
@@ -47,15 +47,15 @@ export interface ClubData {
 interface ClubCardProps {
   clubData: ClubData;
   getClubsData: () => void;
-  setClubDataForEdit: () => void;
-  setIsShowClubInfo: () => void;
+  setClubDataForEdit: Dispatch<SetStateAction<ClubData>>;
+  setIsShowClubInfo: Dispatch<SetStateAction<boolean>>;
 }
 const ClubCard = ({
   getClubsData = () => {
     return;
   },
-  setIsShowClubInfo = (data: boolean) => {},
-  setClubDataForEdit = (data: ClubData) => {},
+  setIsShowClubInfo,
+  setClubDataForEdit,
   ...props
 }: ClubCardProps) => {
   const [isOpen, setIsOpen] = useState(false);

@@ -75,29 +75,15 @@ type FilterFormValues = z.infer<typeof filterSchema>;
 const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    // coordinates: '',
-    // city: '',
-    // reimaginedName: '',
-    // country: '',
-    // countries: '',
-    // technoSectorOptions: '',
-    // originalClubName: '',
-    // clubAnthem: '',
-    // description: '',
-    // clubKitVideo: '',
-    // logoUrl: null,
+    logoUrl: null,
     lockClub: prevData?.lockClub === lockClub.lock ? true : false,
     hideClub: prevData?.status === hideClub.hide ? true : false,
   });
-  // const [isDragging, setIsDragging] = useState(false);
 
-  console.log('prevDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', prevData);
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
-  const [cityOptions, setCityOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
     ComboboxOption[]
   >([]);
-  const [countryOptions, setCountryOptions] = useState<ComboboxOption[]>([]);
   const [loadingStates, setLoadingStates] = useState({
     sports: false,
     technoSectors: false,
@@ -110,8 +96,8 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     control,
     handleSubmit,
     formState: { errors },
-    values,
     setValue,
+    trigger,
   } = useForm<FilterFormValues>({
     resolver: zodResolver(filterSchema),
     defaultValues: prevData
@@ -147,11 +133,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           symbolVideoUrl: '',
         },
   });
-
-  console.log(
-    values,
-    'valueeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-  );
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -281,7 +262,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
 
     if (coordinates.replace(/ /g, '').length > 0) {
       try {
-        const response = await api.post(
+        const response: any = await api.post(
           API_ENDPOINTS.WORLD_MAP.GET_COUNTRY_AND_CITY_NAME_WITH_COORDINATES,
           { coordinates }
         );
@@ -338,7 +319,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                       placeholder="Example: 50.510281, 4.719585"
                       addClub="true"
                       onChange={handleChange}
-                      rules={{}}
                     />
                   );
                 }}

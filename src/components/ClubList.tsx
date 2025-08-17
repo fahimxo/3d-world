@@ -3,7 +3,6 @@ import ClubCard, { ClubData } from './ClubCard';
 // import api from "src/config/axios";
 import { API_ENDPOINTS } from '../config/endpoint';
 import api from '../config/axios';
-import { set } from 'lodash';
 import ClubInfo from './ClubInfo';
 import { Button } from './button';
 
@@ -15,11 +14,11 @@ interface ClubListProps {
 const ClubList: FC<ClubListProps> = ({
   isShowVisibleClubs = false,
   isShowLockedClubs = false,
-  onClose = () => {},
+  onClose,
 }) => {
   const [clubsData, setClubData] = useState<ClubData[]>([]);
-  const [clubDataForEdit, setClubDataForEdit] = useState<boolean>({});
-  const [isShowClubInfo, setIsShowClubInfo] = useState<ClubData>(false);
+  const [clubDataForEdit, setClubDataForEdit] = useState<ClubData>({});
+  const [isShowClubInfo, setIsShowClubInfo] = useState<boolean>();
 
   const getClubsData = async () => {
     try {
@@ -63,7 +62,7 @@ const ClubList: FC<ClubListProps> = ({
         <ClubInfo
           onClose={() => {
             setIsShowClubInfo(false);
-            setClubDataForEdit({});
+            // setClubDataForEdit({});
           }}
           prevData={clubDataForEdit}
         />
