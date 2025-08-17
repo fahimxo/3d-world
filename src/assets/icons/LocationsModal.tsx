@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface LocationsModalProps {
   children: React.ReactNode;
@@ -10,13 +10,27 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
   className,
 }) => {
   return (
-    <div className={`relative top-32 w-full max-w-4xl ${className}`}>
+    <div
+      // style={{
+      //   clipPath:
+      //     'polygon(, 0% 0%, 0% 0%0% 0%, 97% 0%, 97% 0%, 97% 0%, 100% 3%, 100% 3%, 100% 100%, 80% 100%, 80% 100%, 76% 96%, 76% 96%, 76% 96%, 68% 97%, 68% 97%, 65% 100%, 2% 99%, 2% 99%, 0% 94%, 0% 94%, 0% 94%, 0% 31%, 0% 31%, 0% 31%, 4% 28%, 4% 28%, 4% 28%, 4% 21%, 4% 21%, 4% 21%, 0% 16%, 0% 16%, 0% 16%)',
+      // }}
+      className={`relative top-32 max-w-4xl ${className}  h-fit w-fit`}
+    >
       <svg
-        width="866"
-        height="762"
+        // width="866"
+        // height="762"
+        // viewBox="0 0 866 762"
+        // fill="none"
+        // xmlns="http://www.w3.org/2000/svg"
+
+        //  width="866"
+        // height="500"
         viewBox="0 0 866 762"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        className="inset-0 w-full  md:w-[866px] h-[762px] sm:w-[500px] "
+        preserveAspectRatio="none"
       >
         <g filter="url(#filter0_i_80_394)">
           <path
@@ -79,7 +93,8 @@ export const LocationsModal: React.FC<LocationsModalProps> = ({
           </radialGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 p-8 ">{children}</div>
+      {/* <div className={` bg-red-50 w-[600px] h-[500px]`}></div> */}
+      <div className="absolute inset-0 p-8 w-full ">{children}</div>
     </div>
   );
 };

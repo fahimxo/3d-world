@@ -5,14 +5,17 @@ import { API_ENDPOINTS } from '../config/endpoint';
 import api from '../config/axios';
 import { set } from 'lodash';
 import ClubInfo from './ClubInfo';
+import { Button } from './button';
 
 interface ClubListProps {
   isShowVisibleClubs?: boolean;
   isShowLockedClubs?: boolean;
+  onClose: () => void;
 }
 const ClubList: FC<ClubListProps> = ({
   isShowVisibleClubs = false,
   isShowLockedClubs = false,
+  onClose = () => {},
 }) => {
   const [clubsData, setClubData] = useState<ClubData[]>([]);
   const [clubDataForEdit, setClubDataForEdit] = useState<boolean>({});
@@ -40,17 +43,22 @@ const ClubList: FC<ClubListProps> = ({
   return (
     <div className="py-6 flex flex-col gap-3">
       {!isShowClubInfo &&
-        Array.isArray(clubsData) &&
-        clubsData.length > 0 &&
-        clubsData?.map((data) => (
-          <ClubCard
-            clubData={data}
-            getClubsData={getClubsData}
-            key={data.id}
-            setClubDataForEdit={setClubDataForEdit}
-            setIsShowClubInfo={setIsShowClubInfo}
-          />
+        (Array.isArray(clubsData) && clubsData.length > 0 ? (
+          clubsData?.map((data) => (
+            <ClubCard
+              clubData={data}
+              getClubsData={getClubsData}
+              key={data.id}
+              setClubDataForEdit={setClubDataForEdit}
+              setIsShowClubInfo={setIsShowClubInfo}
+            />
+          ))
+        ) : (
+          <div className="flex justify-center items-center">
+            there is no club!
+          </div>
         ))}
+
       {isShowClubInfo && (
         <ClubInfo
           onClose={() => {
@@ -60,27 +68,14 @@ const ClubList: FC<ClubListProps> = ({
           prevData={clubDataForEdit}
         />
       )}
-
-      {/* <ClubCard
-        name="Galactic Crown"
-        technoSector="Eurovia"
-        country="Spain"
-        city="Madrid"
-        logo="/src/assets/images/clubLogoTest.png"
-        id={5}
-        clubPreviewData={{
-          latetude: 50.510287,
-          longitude: 4.719585,
-          sportType: "Football",
-          currentName: "Real Madrid",
-          lore: "Born from Earth’s... ",
-          clubAnthem: "url",
-          logo: "/src/assets/images/clubLogoTest.png",
-
-          clubKitUrl: "url",
-          clubKitDescription: "url",
-        }} 
-      />*/}
+      <div className="flex gap-4 justify-end mt-7">
+        <Button
+          onClick={onClose}
+          className="relative flex items-center justify-center cursor-pointer"
+        >
+          Close
+        </Button>
+      </div>
     </div>
   );
 };

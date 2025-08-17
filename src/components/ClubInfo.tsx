@@ -209,7 +209,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
 
   const onSubmit = async (data: FilterFormValues) => {
     setIsLoading(true);
-    console.log(data, 'data  in submittttttttttttttttttttt');
+
     const coords = data.coordinates.split(',').map((c) => c.trim());
     const latitude = coords[0] || '';
     const longitude = coords[1] || '';
@@ -222,7 +222,10 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
         city: data.city,
         latitude: latitude,
         longitude: longitude,
-        logoUrl: formData.logoUrl,
+        logoUrl:
+          formData?.logoUrl.length > 0
+            ? formData?.logoUrl.replace('data:image/png;base64,', '')
+            : '',
         // videoUrl: '',
         status: formData.hideClub ? hideClub.hide : hideClub.show,
         lockStatus: formData.lockClub ? lockClub.lock : lockClub.unLock,
@@ -274,7 +277,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
 
   const getCountryAndCityNameWithCoordinates = async (data: string) => {
     setIsLoading(true);
-
     const coordinates = data.replace(/"/g, ' ').trim();
 
     if (coordinates.replace(/ /g, '').length > 0) {
@@ -284,16 +286,16 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           { coordinates }
         );
 
-        if (response.result && response.code === 0) {
+        if (response?.result && response?.code === 0) {
           setFormData((prev) => ({
             ...prev,
-            city: response.result.cityName,
-            country: response.result.countryName,
+            city: response.result?.cityName,
+            country: response.result?.countryName,
           }));
-          setValue('city', response.result.cityName);
-          setValue('country', response.result.countryName);
+          setValue('city', response.result?.cityName);
+          setValue('country', response.result?.countryName);
         } else {
-          alert('serer error: ' + (response.data?.message || 'Unknown error'));
+          alert('server error: ' + (response.data?.message || 'Unknown error'));
         }
       } catch (error) {
         console.error('API Error:', error);
@@ -326,8 +328,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                     timeoutRef.current = setTimeout(() => {
                       getCountryAndCityNameWithCoordinates(e.target.value);
                       trigger(['city', 'country']);
-
-                      // console.log('handleChange', e.target.value);
                     }, 1000);
                   };
 
@@ -337,6 +337,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                       {...field}
                       placeholder="Example: 50.510281, 4.719585"
                       addClub="true"
+                      onChange={handleChange}
                       rules={{}}
                     />
                   );
@@ -557,7 +558,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           control={control}
         />
 
-        <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20">
+        <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20 flex-wrap">
           <div className="flex gap-4">
             <Checkbox
               name="lockClub"

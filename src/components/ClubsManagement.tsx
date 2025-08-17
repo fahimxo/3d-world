@@ -24,7 +24,7 @@ const ClubsManagement = ({ onClose }) => {
     >
       <div onClick={(e) => e.stopPropagation()}>
         <LocationsModal>
-          <div className="flex flex-wrap justify-evenly items-center gap-20 mb-8 px-10 pt-8">
+          <div className="flex flex-wrap justify-evenly items-center gap-2 mb-8 px-10 pt-8">
             <Button
               onClick={() => changeTabs(tabs.add)}
               variant="tertiary"
@@ -45,7 +45,7 @@ const ClubsManagement = ({ onClose }) => {
               {currentTab === tabs.add ? (
                 <ClubInfo onClose={onClose} />
               ) : (
-                <ClubList />
+                <ClubList onClose={onClose} />
               )}
             </div>
           </CustomScrollPanel>

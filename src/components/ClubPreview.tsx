@@ -1,6 +1,6 @@
-import { FC } from "react";
-import { ClubData } from "./ClubCard";
-import Line from "./Line";
+import { FC } from 'react';
+import { ClubData } from './ClubCard';
+import Line from './Line';
 
 export interface ClubPreviewProps {
   latetude: number;
@@ -76,7 +76,7 @@ const ClubInfo: FC<ClubData> = ({
   return (
     <div
       style={{
-        clipPath: "polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0) ",
+        clipPath: 'polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0) ',
       }}
       className={`flex flex-col w-full p-[5px] bg-[rgba(0,119,86,0.2)] min-h-[106px] gap-[10px]`}
     >
@@ -132,15 +132,15 @@ const ClubInfo: FC<ClubData> = ({
 };
 
 const VideoCard: FC<VideoCardProps> = ({
-  title = "Galactic Crown",
-  url = "https://www.youtube.com/watch?v=AvnUdL32afE",
-  description = "",
+  title = 'Galactic Crown',
+  url = 'https://www.youtube.com/watch?v=AvnUdL32afE',
+  description = '',
 }) => {
   return (
     <div
       style={{
         clipPath:
-          "polygon(92% 0px, 100% 8%, 100% 100%, 8% 100%, 0px 92%, 0px 0px)",
+          'polygon(92% 0px, 100% 8%, 100% 100%, 8% 100%, 0px 92%, 0px 0px)',
       }}
       className="flex flex-col gap-3 w-full py-[5px] bg-[rgba(0,119,86,0.2)]  justify-center items-center h-fit"
     >
@@ -156,7 +156,10 @@ const VideoCard: FC<VideoCardProps> = ({
           <div className="text-[#7D7D7D] text-[12px] font-[400]">
             Description
           </div>
-          <div className="cursor-pointer" title={description}>
+          <div
+            className="cursor-pointer"
+            title={description ?? 'there is no description'}
+          >
             <svg
               width="24"
               height="24"
