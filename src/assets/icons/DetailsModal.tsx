@@ -83,14 +83,15 @@ const DetailsModal: React.FC<{
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
   return (
-    <div className="relative w-[812px] h-[534px] flex flex-col">
+    <div className="relative flex flex-col w-[95vw] max-w-[812px] h-[640px] md:h-[534px]">
       <svg
-        width="812"
-        height="534"
+        width="100%"
+        height="100%"
         viewBox="0 0 812 534"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="absolute inset-0 z-20"
+        preserveAspectRatio="none"
       >
         <g filter="url(#filter0_i_80_110)">
           <path

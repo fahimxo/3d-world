@@ -25,11 +25,11 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
   return (
     <Modal mode="center">
       <DetailsModal onClose={onClose}>
-        <div className="flex items-stretch gap-6 text-white h-[232px]">
+        <div className="flex flex-col lg:flex-row items-stretch gap-6 text-white lg:h-[232px]">
           <div className="w-[240px] h-full">
             <CardInfoModal data={clubData} className="h-full" />
           </div>
-          <div className="flex-1 h-full mt-0.5">
+          <div className="flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
             {clubData.videoUrl && (
               <ReactPlayer
                 src={clubData.videoUrl}
