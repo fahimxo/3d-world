@@ -6,7 +6,6 @@ import { ExpirationPlugin } from "workbox-expiration";
 /* eslint-env serviceworker */
 precacheAndRoute(self.__WB_MANIFEST);
 
-// کش کردن فایل‌های JavaScript
 // registerRoute(
 //   ({ request }) => request.destination === "script",
 //   new StaleWhileRevalidate({

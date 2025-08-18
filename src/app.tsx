@@ -28,13 +28,11 @@ const App: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // وقتی کامپوننت لود میشه مقدار localStorage رو بخون
     const admin = localStorage.getItem('isAdmin');
     console.log('admin', admin);
 
     setIsAdmin(admin === 'true');
 
-    // لیسنر بذار برای تغییرات localStorage (مثلاً وقتی لاگ‌اوت بشه)
     const handleStorageChange = () => {
       const updatedAdmin = localStorage.getItem('isAdmin');
       setIsAdmin(updatedAdmin === 'true');
@@ -63,12 +61,10 @@ const App: React.FC = () => {
   } = usePublicClubs();
 
   useEffect(() => {
-    // هوک fetchClubs را بدون هیچ فیلتری فراخوانی می‌کنیم تا همه باشگاه‌ها را بگیرد
     fetchClubs({});
   }, []);
 
   useEffect(() => {
-    // اگر بارگذاری اولیه تمام شده باشد و نتیجه فیلتر دقیقا یک باشگاه باشد
     if (
       !isInitialLoad &&
       clubData &&
