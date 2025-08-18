@@ -14,8 +14,8 @@ import tr from 'zod/v4/locales/tr.cjs';
 import { showToast } from '../config/toastService';
 
 enum hideClub {
-  hide = 1,
-  show = 2,
+  show = 1,
+  hide = 2,
 }
 enum lockClub {
   lock = 1,
@@ -145,7 +145,6 @@ const ClubInfo = ({
   onClose: any;
   prevData?: any;
 }) => {
- 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     logoUrl: getFileNameFromBase64(`${prevData?.logoUrl}`),
@@ -207,7 +206,6 @@ const ClubInfo = ({
           symbolVideoUrl: null,
         },
   });
- 
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -252,7 +250,7 @@ const ClubInfo = ({
     // }
     // setIsLoading(true);
     // trigger().then((isValid) => {
-    
+
     //   setIsLoading(false);
     // });
   }, []);
