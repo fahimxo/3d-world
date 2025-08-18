@@ -88,6 +88,7 @@ export const Filters: React.FC<FiltersProps> = ({
     control,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<FilterFormValues>({
     resolver: zodResolver(filterSchema),
     defaultValues: {
@@ -99,6 +100,11 @@ export const Filters: React.FC<FiltersProps> = ({
       currentName: '',
     },
   });
+
+  const watchedValues = watch();
+  const isAnyFieldFilled = Object.values(watchedValues).some(
+    (val) => val !== undefined && val !== null && val !== ''
+  );
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -270,7 +276,10 @@ export const Filters: React.FC<FiltersProps> = ({
                   <Button
                     type="submit"
                     disabled={
-                      areAnyComboboxesLoading || isFormSubmitting || loading
+                      !isAnyFieldFilled ||
+                      areAnyComboboxesLoading ||
+                      isFormSubmitting ||
+                      loading
                     }
                   >
                     {isFormSubmitting || loading ? 'Submitting...' : 'Filter'}
