@@ -147,10 +147,7 @@ const ClubInfo = ({
   onClose: any;
   prevData?: any;
 }) => {
-  console.log(
-    prevData,
-    'preeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeevvvvvvvvvvvvvvvvvvvvv'
-  );
+ 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     logoUrl: getFileNameFromBase64(`${prevData?.logoUrl}`),
@@ -213,14 +210,7 @@ const ClubInfo = ({
           symbolVideoUrl: null,
         },
   });
-  console.log(
-    formData,
-    'formDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    errors,
-    watch('sportType'),
-    watch('technoSector'),
-    watch('reImaginedName')
-  );
+ 
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -265,7 +255,7 @@ const ClubInfo = ({
     // }
     // setIsLoading(true);
     // trigger().then((isValid) => {
-    //   console.log('here in is valid', isValid, errors);
+    
     //   setIsLoading(false);
     // });
   }, []);
