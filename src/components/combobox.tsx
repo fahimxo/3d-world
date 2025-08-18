@@ -82,10 +82,11 @@ const ComboboxMenu = ({
     return null;
   }
 
+  console.log('isopennnnnnn',filteredOptions)
   return createPortal(
     <div
       ref={menuRef}
-      className="fixed z-50 p-[2px] animate-in fade-in-0 zoom-in-95"
+      className="fixed z-[55555555555] p-[2px] animate-in fade-in-0 zoom-in-95"
       style={{ ...position, ...futuristicClipPath }}
     >
       <div
@@ -127,7 +128,7 @@ const ComboboxMenu = ({
                   setSearchValue("");
                 }}
                 className={cn(
-                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
+                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none z-[5000000]",
                   addClub
                     ? "text-[#00FFA6] hover:bg-[#00FFA6]/10"
                     : salt
@@ -190,6 +191,7 @@ const Combobox: React.FC<ComboboxProps> = ({
     event.stopPropagation(); // This is crucial to prevent the dropdown from opening
     onChange(""); // Pass an empty string to clear the selection
   };
+              console.log('herrrrrrrrrrrrrrrrrrrinbutton',open)
 
   return (
     <div className="w-full space-y-3">
@@ -219,8 +221,10 @@ const Combobox: React.FC<ComboboxProps> = ({
             type="button"
             ref={triggerRef}
             role="combobox"
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
+            aria-expanded={true}
+            onClick={() => {
+              
+              setOpen(!open)}}
             className={cn(
               "relative flex h-12 w-full items-center justify-between px-3 py-2 text-base focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               addClub

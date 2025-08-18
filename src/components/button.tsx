@@ -25,7 +25,7 @@ export const Button = ({
     primary: 'bg-cyan-500 text-gray-900 hover:bg-cyan-400',
     secondary: 'bg-gray-800 text-cyan-300 hover:bg-gray-700',
     tertiary:
-      'text-[#00FFA6] hover:text-[#011231] bg-[rgba(0,255,166,0.10)] hov+er:bg-[#00FFA6]',
+      'text-[#00FFA6] hover:text-[#011231]  bg-[rgba(0,255,166,0.10)] hover:bg-[#00FFA6]',
   };
 
   const glowStyles = 'absolute inset-0 bg-cyan-400 blur-md opacity-80';

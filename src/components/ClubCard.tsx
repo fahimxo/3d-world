@@ -95,7 +95,7 @@ const ClubCard = ({
         } transition h-[81px] `}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-3 ">
+        <div className="flex items-center gap-3 min-w-[200px]">
           <img
             src={`data:image/png;base64,${logoUrl}`}
             alt={originalClubName}
@@ -110,15 +110,15 @@ const ClubCard = ({
             <span className="text-[12px] font-[400] font-regular">
               Techno Sector
             </span>
-            <span className="text-[12px] font-[700] ">{sectorName}</span>
+            <span className="text-[12px] font-[700] truncate">{sectorName}</span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[12px] font-[400] font-regular">Country</span>
-            <span className="text-[12px] font-[700] ">{countryName}</span>
+            <span className="text-[12px] font-[700] truncate">{countryName}</span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[12px] font-[400] font-regular">City</span>
-            <span className="text-[12px] font-[700] ">{city}</span>
+            <span className="text-[12px] font-[700] truncate">{city}</span>
           </div>
         </div>
 
