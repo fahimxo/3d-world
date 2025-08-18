@@ -31,6 +31,7 @@ const ClubList: FC<ClubListProps> = ({
           pageSize: 100,
         },
       });
+      console.log('in serviccccccccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeee')
       setClubData(data?.result);
     } catch (error) {
       console.error('Logout failed:', error);

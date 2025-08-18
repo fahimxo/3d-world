@@ -53,7 +53,7 @@ const getOptionsFor = async (
 //   technoSector: z.string().optional(),
 //   country: z.union([z.string(), z.number()]).optional().transform(String),
 //   city: z.union([z.string(), z.number()]).optional().transform(String),
-//   reimaginedName: z.string().optional(),
+//   reImaginedName: z.string().optional(),
 //   originalClubName: z.string().optional(),
 //   coordinates: z.string().optional(),
 //   clubAnthem: z.string().optional(),
@@ -73,7 +73,63 @@ const getOptionsFor = async (
 // });
 type FilterFormValues = any;
 
-const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
+const ClubInfo = ({
+  onClose,
+  prevData,
+}: //   ={
+//     "id": 26,
+//     "reImaginedName": "Barsaaa",
+//     "originalClubName": "string",
+//     "lore": "string",
+//     "city": "Barcelona",
+//     "latitude": "41.379153251657016",
+//     "longitude": "2.1199965261722316",
+//     "logoUrl": "",
+//     "videoUrl": "http://example.com",
+//     "status": 1,
+//     "lockStatus": 1,
+//     "isActive": true,
+//     "displayOrder": 0,
+//     "sportId": 1,
+//     "sportName": "FootBall",
+//     "sectorId": 1,
+//     "sectorName": "Eurovia",
+//     "sectorColorCode": "test",
+//     "countryId": 1,
+//     "countryName": "Spain",
+//     "anthemUrl": "http://example.com",
+//     "kitImageUrl": "http://example.com",
+//     "kitVideoUrl": "http://example.com",
+//     "kitDiscription": "string",
+//     "stadiumImageUrl": "http://example.com",
+//     "stadiumVideoUrl": "http://example.com",
+//     "staduimDiscription": "string",
+//     "bestPlayerImageUrl": "http://example.com",
+//     "bestPlayerVideoUrl": "http://example.com",
+//     "bestPlayerDiscription": "string",
+//     "coachImageUrl": "http://example.com",
+//     "coachVideoUrl": "http://example.com",
+//     "coachDiscription": "string",
+//     "vehicleImageUrl": "http://example.com",
+//     "vehicleVideoUrl": "http://example.com",
+//     "vehicleDiscription": "string",
+//     "symbolImageUrl": "http://example.com",
+//     "symbolVideoUrl": "http://example.com",
+//     "symbolDiscription": "string",
+//     "averageRating": 0,
+//     "totalRatings": 0,
+//     "created": "0001-01-01T00:00:00",
+//     "lastModified": null,
+//     "logoImage": null
+// }
+{
+  onClose: any;
+  prevData?: any;
+}) => {
+  console.log(
+    prevData,
+    'preeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeevvvvvvvvvvvvvvvvvvvvv'
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     logoUrl: null,
@@ -106,41 +162,43 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       ? {
           ...prevData,
           coordinates: `${prevData.latitude},${prevData.longitude}`,
-          sportType: prevData.sportId,
-          technoSector: prevData.sectorId,
-          country: prevData.countryId,
+          sportType: prevData.sportId.toString(),
+          technoSector: prevData.sectorId.toString(),
+          country: prevData.countryName,
           clubAnthem: prevData.anthemUrl,
+          reImaginedName: prevData.reImaginedName,
         }
       : {
-          sportType: '',
-          technoSector: '',
-          country: '',
-          city: '',
-          reimaginedName: '',
-          originalClubName: '',
-          coordinates: '',
-          clubAnthem: '',
-          lore: '',
-          kitVideoUrl: '',
-          kitDiscription: '',
-          stadiumVideoUrl: '',
-          staduimDiscription: '',
-          bestPlayerDiscription: '',
-          bestPlayerVideoUrl: '',
-          coachDiscription: '',
-          coachVideoUrl: '',
-          vehicleDiscription: '',
-          vehicleVideoUrl: '',
-          symbolDiscription: '',
-          symbolVideoUrl: '',
+          sportType: null,
+          technoSector: null,
+          country: null,
+          city: null,
+          reImaginedName: null,
+          originalClubName: null,
+          coordinates: null,
+          clubAnthem: null,
+          lore: null,
+          kitVideoUrl: null,
+          kitDiscription: null,
+          stadiumVideoUrl: null,
+          staduimDiscription: null,
+          bestPlayerDiscription: null,
+          bestPlayerVideoUrl: null,
+          coachDiscription: null,
+          coachVideoUrl: null,
+          vehicleDiscription: null,
+          vehicleVideoUrl: null,
+          symbolDiscription: null,
+          symbolVideoUrl: null,
         },
   });
   console.log(
     formData,
-    'formData',
+    'formDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     errors,
     watch('sportType'),
-    watch('technoSector')
+    watch('technoSector'),
+    watch('reImaginedName')
   );
 
   useEffect(() => {
@@ -184,11 +242,11 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     //     }
     //   );
     // }
-    setIsLoading(true);
-    trigger().then((isValid) => {
-      console.log('here in is valid', isValid, errors);
-      setIsLoading(false);
-    });
+    // setIsLoading(true);
+    // trigger().then((isValid) => {
+    //   console.log('here in is valid', isValid, errors);
+    //   setIsLoading(false);
+    // });
   }, []);
 
   const handleCheckboxChange = (checked, name) => {
@@ -199,20 +257,16 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     setFormData((prev) => ({ ...prev, logoUrl: file }));
   };
 
-  console.log(formData, 'formData');
-
   const onSubmit = async (data: FilterFormValues) => {
-    console.log('herrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeee', errors);
     setIsLoading(true);
 
     const coords = data.coordinates.split(',').map((c) => c.trim());
     const latitude = coords[0] || '';
     const longitude = coords[1] || '';
-    console.log('herrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeee2222', errors);
 
     const apiPayload = {
       createClub_VM: {
-        reImaginedName: data.reimaginedName,
+        reImaginedName: data.reImaginedName,
         originalClubName: data.originalClubName,
         lore: data.lore,
         city: data.city,
@@ -251,8 +305,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       },
     };
 
-    console.log('Payload to be sent:', JSON.stringify(apiPayload, null, 2));
-
     try {
       let response;
       if (prevData) {
@@ -264,10 +316,11 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
         onClose();
         showToast(response.data?.message, 'success');
       } else {
-        showToast(response.data?.message, 'failed');
+        showToast(response?.message, 'failed');
       }
     } catch (error) {
       console.error('API Error:', error);
+      showToast(`API Error: ${error}`, 'failed');
     } finally {
       setIsLoading(false);
     }
@@ -297,6 +350,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
         }
       } catch (error) {
         console.error('API Error:', error);
+        showToast(`API Error: ${error}`, 'failed');
       } finally {
         setIsLoading(false);
         console.log('API Error:');
@@ -462,13 +516,14 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
             />
 
             <Controller
-              name="reimaginedName"
+              name="reImaginedName"
               control={control}
               render={({ field }) => (
                 <Input
                   label="Reimagined Name"
-                  name="reimaginedName"
+                  name="reImaginedName"
                   {...field}
+                  value={field.value}
                   placeholder="Example: Galactic Crown"
                   addClub="true"
                 />
@@ -605,7 +660,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   handleSubmit(
                     (data) => {
                       onSubmit(data);
-                      setIsLoading(false);
+                      // setIsLoading(false);
                     },
                     (errors) => {
                       const errorArray = Object.entries(errors).map(
