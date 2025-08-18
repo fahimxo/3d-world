@@ -48,36 +48,30 @@ const getOptionsFor = async (
 };
 
 // Schema for form validation (City removed).
-const filterSchema = z.object({
-  sportType: z.string().optional(),
-  technoSector: z.string().optional(),
-  country: z.union([z.string(), z.number()]).optional().transform(String),
-  city: z.union([z.string(), z.number()]).optional().transform(String),
-  reimaginedName: z.string().optional(),
-  originalClubName: z.string().optional(),
-  coordinates: z.string().min(1, 'Coordinates field is required.'),
-  clubAnthem: z.string().url('Club anthem must be a URL.').optional(),
-  lore: z.string().optional(),
-  kitVideoUrl: z.string().url('Club Kit url must be a URL.').optional(),
-  kitDiscription: z.string().optional(),
-  stadiumVideoUrl: z.string().url('Club Stadium url must be a URL.').optional(),
-  staduimDiscription: z.string().optional(),
-  bestPlayerDiscription: z.string().optional(),
-  bestPlayerVideoUrl: z
-    .string()
-    .url('Club Best Player url must be a URL.')
-    .optional(),
-  coachDiscription: z.string().optional(),
-  coachVideoUrl: z.string().url('Club Manager url must be a URL.').optional(),
-  vehicleDiscription: z.string().optional(),
-  vehicleVideoUrl: z
-    .string()
-    .url('Club Transport url must be a URL.')
-    .optional(),
-  symbolDiscription: z.string().optional(),
-  symbolVideoUrl: z.string().url('Club Mascot url must be a URL.').optional(),
-});
-type FilterFormValues = z.infer<typeof filterSchema>;
+// const filterSchema = z.object({
+//   sportType: z.string().optional(),
+//   technoSector: z.string().optional(),
+//   country: z.union([z.string(), z.number()]).optional().transform(String),
+//   city: z.union([z.string(), z.number()]).optional().transform(String),
+//   reimaginedName: z.string().optional(),
+//   originalClubName: z.string().optional(),
+//   coordinates: z.string().optional(),
+//   clubAnthem: z.string().optional(),
+//   lore: z.string().optional(),
+//   kitVideoUrl: z.string().optional(),
+//   kitDiscription: z.string().optional(),
+//   stadiumVideoUrl: z.string().optional(),
+//   staduimDiscription: z.string().optional(),
+//   bestPlayerDiscription: z.string().optional(),
+//   bestPlayerVideoUrl: z.string().optional(),
+//   coachDiscription: z.string().optional(),
+//   coachVideoUrl: z.string().optional(),
+//   vehicleDiscription: z.string().optional(),
+//   vehicleVideoUrl: z.string().optional(),
+//   symbolDiscription: z.string().optional(),
+//   symbolVideoUrl: z.string().optional(),
+// });
+type FilterFormValues = any;
 
 const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -105,8 +99,9 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     setValue,
     trigger,
     watch,
+    getValues,
   } = useForm<FilterFormValues>({
-    resolver: zodResolver(filterSchema),
+    // resolver: zodResolver(filterSchema),
     defaultValues: prevData
       ? {
           ...prevData,
@@ -140,7 +135,13 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           symbolVideoUrl: '',
         },
   });
-  console.log(formData, 'formData', watch('sportType'), watch('technoSector'));
+  console.log(
+    formData,
+    'formData',
+    errors,
+    watch('sportType'),
+    watch('technoSector')
+  );
 
   useEffect(() => {
     if (sportOptions.length === 0) {
@@ -183,6 +184,11 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     //     }
     //   );
     // }
+    setIsLoading(true);
+    trigger().then((isValid) => {
+      console.log('here in is valid', isValid, errors);
+      setIsLoading(false);
+    });
   }, []);
 
   const handleCheckboxChange = (checked, name) => {
@@ -202,6 +208,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     const coords = data.coordinates.split(',').map((c) => c.trim());
     const latitude = coords[0] || '';
     const longitude = coords[1] || '';
+    console.log('herrrrrrrrrrrrrrrrrrrrrrrrreeeeeeeeeeeeeeeee2222', errors);
 
     const apiPayload = {
       createClub_VM: {
@@ -253,10 +260,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       } else {
         response = await api.post(API_ENDPOINTS.ADMIN.CREATE_CLUB, apiPayload);
       }
-      console.log(
-        'ressssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
-        response
-      );
+
       if (response.data && response.data.code === 0) {
         onClose();
         showToast(response.data?.message, 'success');
@@ -312,6 +316,9 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               <Controller
                 name="coordinates"
                 control={control}
+                rules={{
+                  required: 'Coordinates is required',
+                }}
                 render={({ field }) => {
                   const timeoutRef = useRef<any>(null);
 
@@ -436,6 +443,9 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   salt={true}
                 />
               )}
+              rules={{
+                required: 'Techno sector is required',
+              }}
             />
             <Controller
               name="sportType"
@@ -479,6 +489,9 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   addClub="true"
                 />
               )}
+              rules={{
+                required: 'Current Name is required',
+              }}
             />
             <Controller
               name="clubAnthem"
@@ -492,6 +505,12 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                   addClub="true"
                 />
               )}
+              rules={{
+                pattern: {
+                  value: /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
+                  message: 'Please enter a valid URL on club anthem field',
+                },
+              }}
             />
             <div className="col-span-2">
               <Controller
@@ -502,7 +521,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                     label="Club lore"
                     name="lore"
                     {...field}
-                    placeholder="Enter youtube link"
+                    placeholder="Example: Born from Earth’s last unified monarchic alliance during the Age of Collapse..."
                     addClub="true"
                     area="true"
                   />
@@ -579,35 +598,38 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
             </div>
             <div className="relative z-20 flex justify-center py-8 ">
               <Button
-                onClick={async () => {
+                onClick={() => {
                   setIsLoading(true);
-                  await trigger();
-                  setTimeout(() => {
-                    trigger().then((isValid) => {
-                      if (!isValid) {
-                        console.log(errors);
-                        const errorArray = Object.entries(errors).map(
-                          ([field, error]) => ({
-                            field,
-                            message: error.message,
-                            type: error.type,
-                          })
-                        );
 
-                        errorArray.map(({ message }) =>
-                          showToast(message, 'failed')
+                  handleSubmit(
+                    (data) => {
+                      onSubmit(data);
+                      setIsLoading(false);
+                    },
+                    (errors) => {
+                      const errorArray = Object.entries(errors).map(
+                        ([field, error]) => ({
+                          field,
+                          message: error?.message,
+                          type: error?.type,
+                        })
+                      );
+
+                      errorArray.forEach(({ message }) => {
+                        showToast(
+                          (message as unknown as string) ?? 'Form error',
+                          'failed'
                         );
-                        setIsLoading(true);
-                      } else {
-                        handleSubmit(onSubmit)();
-                      }
-                    });
-                  }, 500);
+                      });
+
+                      setIsLoading(false);
+                    }
+                  )();
                 }}
                 disabled={isLoading}
                 className="relative flex items-center justify-center cursor-pointer"
               >
-                {isLoading ? '...Loading' : prevData ? 'Save' : 'Add'}
+                {isLoading ? '... Loading' : prevData ? 'Save' : 'Add'}
               </Button>
             </div>
           </div>
@@ -632,6 +654,12 @@ const RepeatedItem = ({
         <Controller
           name={urlName}
           control={control}
+          rules={{
+            pattern: {
+              value: /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
+              message: `Please enter a valid URL on ${title} Video field`,
+            },
+          }}
           render={({ field }) => (
             <Input
               label="Video"
