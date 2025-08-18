@@ -23,23 +23,22 @@ enum lockClub {
 }
 
 function getFileNameFromBase64(base64String) {
-
-  if (base64String==null) return 'unknown'
+  if (base64String == null) return null;
   // Check if it's a data URL with filename
   const matches = base64String.match(/^data:.+\/(.+);base64,(.*)$/);
-  
+
   if (matches && matches.length === 3) {
     // Some implementations include filename in the content type
     const filenameMatch = base64String.match(/filename="(.+)"/);
     if (filenameMatch && filenameMatch[1]) {
       return filenameMatch[1];
     }
-    
+
     // Otherwise try to extract from the content type
-    return matches[1] || 'unknown';
+    return matches[1] || null;
   }
-  
-  return 'unknown'; // Default if no filename found
+
+  return null; // Default if no filename found
 }
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
@@ -95,8 +94,8 @@ type FilterFormValues = any;
 
 const ClubInfo = ({
   onClose,
-  prevData
-//   ={
+  prevData,
+}: //   ={
 //     "id": 26,
 //     "reImaginedName": "Barsaaa",
 //     "originalClubName": "string",
@@ -142,7 +141,6 @@ const ClubInfo = ({
 //     "lastModified": null,
 //     "logoImage": null
 // },
-}:  
 {
   onClose: any;
   prevData?: any;
@@ -167,7 +165,6 @@ const ClubInfo = ({
     technoSectors: false,
     countries: false,
     cities: false,
-    
   });
 
   const {
@@ -281,7 +278,9 @@ const ClubInfo = ({
   const onSubmit = async (data: FilterFormValues) => {
     setIsLoading(true);
 
-    const coords =data?.coordinates? data.coordinates.split(',').map((c) => c.trim()):[];
+    const coords = data?.coordinates
+      ? data.coordinates.split(',').map((c) => c.trim())
+      : [];
     const latitude = coords?.[0] || '';
     const longitude = coords?.[1] || '';
 
@@ -295,8 +294,8 @@ const ClubInfo = ({
         longitude: longitude,
         logoUrl:
           formData?.logoUrl && formData?.logoUrl?.length > 0
-            ? formData?.logoUrl.replace('data:image/png;base64,', '')
-            : '',
+            ? formData?.logoUrl?.split(';base64,')[1]
+            : null,
         // videoUrl: '',
         status: formData.hideClub ? hideClub.hide : hideClub.show,
         lockStatus: formData.lockClub ? lockClub.lock : lockClub.unLock,
@@ -335,7 +334,7 @@ const ClubInfo = ({
       }
       if (response?.code === 0) {
         onClose();
-        showToast(response.data?.message, 'success');
+        showToast(response?.message, 'success');
       } else {
         showToast(response?.message, 'failed');
       }

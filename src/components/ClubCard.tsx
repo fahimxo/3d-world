@@ -3,6 +3,7 @@ import ClubPreview from './ClubPreview';
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/endpoint';
 import { showToast } from '../config/toastService';
+import { getMimeType } from '../lib/utils';
 
 export interface ClubData {
   id: number;
@@ -84,6 +85,9 @@ const ClubCard = ({
     setIsShowClubInfo(true);
     setClubDataForEdit(props.clubData);
   };
+
+  const mimeType = getMimeType(logoUrl);
+
   return (
     <div className=" text-white w-full ">
       <div
@@ -96,11 +100,15 @@ const ClubCard = ({
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3 min-w-[200px]">
-          <img
-            src={`data:image/png;base64,${logoUrl}`}
-            alt={originalClubName}
-            className="w-[80px] h-auto "
-          />
+          {logoUrl ? (
+            <img
+              src={`data:${mimeType};base64,${logoUrl}`}
+              alt={originalClubName}
+              className="w-[80px] h-auto "
+            />
+          ) : (
+            'no image'
+          )}
           <div className="text-[16px] font-bold truncate">
             {originalClubName}
           </div>
@@ -110,11 +118,15 @@ const ClubCard = ({
             <span className="text-[12px] font-[400] font-regular">
               Techno Sector
             </span>
-            <span className="text-[12px] font-[700] truncate">{sectorName}</span>
+            <span className="text-[12px] font-[700] truncate">
+              {sectorName}
+            </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[12px] font-[400] font-regular">Country</span>
-            <span className="text-[12px] font-[700] truncate">{countryName}</span>
+            <span className="text-[12px] font-[700] truncate">
+              {countryName}
+            </span>
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[12px] font-[400] font-regular">City</span>

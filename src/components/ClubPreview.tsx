@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { ClubData } from './ClubCard';
 import Line from './Line';
+import { getMimeType } from '../lib/utils';
 
 export interface ClubPreviewProps {
   latetude: number;
@@ -73,6 +74,8 @@ const ClubInfo: FC<ClubData> = ({
   city,
   logoUrl,
 }) => {
+  const mimeType = getMimeType(logoUrl);
+
   return (
     <div
       style={{
@@ -119,11 +122,15 @@ const ClubInfo: FC<ClubData> = ({
             Club Logo
           </span>
           <span className="text-[12px] font-[400] ">
-            <img
-              src={`data:image/png;base64,${logoUrl}`}
-              alt={originalClubName}
-              className="w-[80px] h-auto "
-            />
+            {logoUrl ? (
+              <img
+                src={`data:${mimeType};base64,${logoUrl}`}
+                alt={originalClubName}
+                className="w-[80px] h-auto "
+              />
+            ) : (
+              'no image'
+            )}
           </span>
         </div>
       </div>
