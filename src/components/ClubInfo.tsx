@@ -291,7 +291,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     <div>
       <div className="grid grid-cols-1 h-full ">
         <Accordion title="Club Info">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+          <div className="grid md:grid-cols-3 gap-x-6 gap-y-6">
             <div className="col-span-2">
               <Controller
                 name="coordinates"
@@ -465,19 +465,21 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                 />
               )}
             />
-            <Controller
-              name="clubAnthem"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="Club anthem"
-                  name="clubAnthem"
-                  {...field}
-                  placeholder="Enter youtube link"
-                  addClub="true"
-                />
-              )}
-            />
+            <div className="col-span-2 md:col-span-1">
+              <Controller
+                name="clubAnthem"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Club anthem"
+                    name="clubAnthem"
+                    {...field}
+                    placeholder="Enter youtube link"
+                    addClub="true"
+                  />
+                )}
+              />
+            </div>
             <div className="col-span-2">
               <Controller
                 name="lore"
@@ -494,11 +496,13 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                 )}
               />
             </div>
-            <FileUpload
-              label="Club Logo"
-              name="logoUrl"
-              onChange={handleFileChange}
-            />
+            <div className="col-span-2 md:col-span-1">
+              <FileUpload
+                label="Club Logo"
+                name="logoUrl"
+                onChange={handleFileChange}
+              />
+            </div>
           </div>
         </Accordion>
         <RepeatedItem
@@ -538,7 +542,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           control={control}
         />
 
-        <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20 flex-wrap">
+        <div className="flex flex-col md:flex-row justify-center md:justify-between items-center gap-6 pt-6 mt-auto border-t border-cyan-400/20">
           <div className="flex gap-4">
             <Checkbox
               name="lockClub"
@@ -553,24 +557,12 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               onChange={handleCheckboxChange}
             />
           </div>
-          <div className="flex gap-4">
-            <div className="relative flex justify-center py-8 ">
-              <Button
-                onClick={onClose}
-                className="relative flex items-center justify-center cursor-pointer"
-              >
-                Close
-              </Button>
-            </div>
-            <div className="relative z-20 flex justify-center py-8 ">
-              <Button
-                onClick={handleSubmit(onSubmit)}
-                disabled={isLoading}
-                className="relative flex items-center justify-center cursor-pointer"
-              >
-                {prevData ? 'Save' : 'Add'}
-              </Button>
-            </div>
+
+          <div className="flex gap-4 mb-3">
+            <Button onClick={onClose}>Close</Button>
+            <Button onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+              {prevData ? 'Save' : 'Add'}
+            </Button>
           </div>
         </div>
       </div>

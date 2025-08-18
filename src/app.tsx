@@ -9,6 +9,7 @@ import { PublicClubFilter, usePublicClubs } from './lib/usePublicClubs';
 import { Loading } from './components/loading';
 import ClubsManagement from './components/ClubsManagement';
 import { Clubs } from './assets/icons/Locations';
+import ReactDOM from 'react-dom'; // اینو بالای فایل ایمپورت کن
 
 const App: React.FC = () => {
   const [modalData, setModalData] = useState({ name: '', data: '' });
@@ -18,6 +19,13 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [locationsModalOpen, setLocationsModalOpen] = useState(false);
+  console.log('App rendered. Is modal open?', locationsModalOpen);
+  const portalTarget = document.getElementById('portal-root');
+  if (!portalTarget) {
+    console.error(
+      "!!! CRITICAL: Portal target 'portal-root' not found in the DOM."
+    );
+  }
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -108,12 +116,14 @@ const App: React.FC = () => {
         filterModalVisible={filterModalVisible}
         setFilterModalVisible={setFilterModalVisible}
       />
-      <div className="fixed top-30 right-40 z-40">
+      <div className="fixed top-[175px] right-36 md:right-40 md:top-30 z-40">
         <Clubs onClick={() => setLocationsModalOpen(true)} />
       </div>
-      {locationsModalOpen && (
-        <ClubsManagement onClose={() => setLocationsModalOpen(false)} />
-      )}
+      {locationsModalOpen &&
+        ReactDOM.createPortal(
+          <ClubsManagement onClose={() => setLocationsModalOpen(false)} />,
+          document.getElementById('portal-root')
+        )}
       <Tooltip />
       {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}
