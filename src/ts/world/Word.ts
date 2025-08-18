@@ -10,23 +10,23 @@ import {
   Quaternion,
   Euler,
   MathUtils,
-} from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+} from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // interfaces
-import { IWord } from "../interfaces/IWord";
+import { IWord } from '../interfaces/IWord';
 
-import { Basic } from "./Basic";
-import Sizes from "../Utils/Sizes";
-import { Resources } from "./Resources";
+import { Basic } from './Basic';
+import Sizes from '../Utils/Sizes';
+import { Resources } from './Resources';
 
 // earth
-import Earth from "./Earth";
-import { lon2xyz } from "../Utils/common";
-import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import gsap from "gsap";
-import { ComboboxOption } from "src/components";
-import { DataType } from "src/lib/usePublicClubs";
+import Earth from './Earth';
+import { lon2xyz } from '../Utils/common';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import gsap from 'gsap';
+import { ComboboxOption } from 'src/components';
+import { DataType } from 'src/lib/usePublicClubs';
 
 export default class World {
   public basic: Basic;
@@ -85,18 +85,18 @@ export default class World {
       this.renderer.domElement.clientWidth,
       this.renderer.domElement.clientHeight
     );
-    this.labelRenderer.domElement.style.position = "absolute";
-    this.labelRenderer.domElement.style.top = "0px";
-    this.labelRenderer.domElement.style.pointerEvents = "none"; // Let clicks pass through to the canvas
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0px';
+    this.labelRenderer.domElement.style.pointerEvents = 'none'; // Let clicks pass through to the canvas
     this.option.dom.appendChild(this.labelRenderer.domElement);
 
-    this.tooltipElement = document.getElementById("tooltip");
+    this.tooltipElement = document.getElementById('tooltip');
     // Add the event listener for mouse movement
-    window.addEventListener("mousemove", this.onMarkerHover.bind(this));
+    window.addEventListener('mousemove', this.onMarkerHover.bind(this));
 
     this.sizes = new Sizes({ dom: option.dom });
 
-    this.sizes.$on("resize", () => {
+    this.sizes.$on('resize', () => {
       const width = Number(this.sizes.viewport.width);
       const height = Number(this.sizes.viewport.height);
 
@@ -119,7 +119,7 @@ export default class World {
       this.detailedTexture = this.resources.textures.earthDetailed; // The name you just added
 
       // Add the event listener for zoom changes
-      this.controls.addEventListener("change", this.handleZoom.bind(this));
+      this.controls.addEventListener('change', this.handleZoom.bind(this));
 
       if (this.cachedData) {
         // If so, use the cached data to create the markers immediately.
@@ -143,7 +143,7 @@ export default class World {
     // ✨ SETUP RAYCASTER
     this.raycaster = new Raycaster();
     this.mouse = new Vector2();
-    window.addEventListener("click", this.onPointClick.bind(this)); // Use 'window' for global clicks
+    window.addEventListener('click', this.onPointClick.bind(this)); // Use 'window' for global clicks
   }
 
   // --- ADD THIS NEW METHOD TO CLEAR MARKERS ---
@@ -187,7 +187,34 @@ export default class World {
     const showContinents = distance > this.continentThreshold;
     const showCountries =
       distance <= this.continentThreshold && distance > this.cityThreshold;
-    const showCities = distance <= this.cityThreshold;
+    const cameraDistance = this.camera.position.length();
+    const showCities = cameraDistance < this.cityThreshold;
+
+    const cameraDirection = new Vector3();
+    this.camera.getWorldDirection(cameraDirection);
+
+    this.earth.cityLabels.forEach((label) => {
+      // موقعیت لیبل روی کره
+      const labelPosition = new Vector3();
+      labelPosition.setFromMatrixPosition(label.matrixWorld);
+
+      // بردار از مرکز کره به لیبل
+      const normal = labelPosition.clone().normalize();
+
+      // بردار از لیبل به دوربین
+      const toCamera = this.camera.position
+        .clone()
+        .sub(labelPosition)
+        .normalize();
+
+      // ضرب داخلی -> اگه منفی باشه یعنی پشت کره‌ست
+      const isInFront = normal.dot(toCamera) > 0;
+
+      const isVisible = showCities && isInFront;
+
+      label.visible = isVisible;
+      label.element.style.display = isVisible ? 'block' : 'none';
+    });
 
     this.earth.continentLabels.forEach(
       (label) => (label.visible = showContinents)
@@ -195,10 +222,6 @@ export default class World {
     this.earth.countryLabels.forEach(
       (label) => (label.visible = showCountries)
     );
-    this.earth.cityLabels.forEach((label) => {
-      label.visible = showCities;
-      label.element.style.display = showCities ? "block" : "none";
-    });
 
     // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
     const shouldBeZoomedIn = showCountries || showCities;
@@ -228,7 +251,7 @@ export default class World {
 
     // Apply the new scale to all markers
     this.earth.markupPoint.children.forEach((child) => {
-      if (child.name === "city_marker") {
+      if (child.name === 'city_marker') {
         // Find markers by the name we set in Step 1
         child.scale.set(newScale, newScale, newScale);
       }
@@ -263,18 +286,18 @@ export default class World {
         obj &&
         obj.parent &&
         !(
-          obj.userData?.type === "Club" ||
-          obj.name === "club_pillar" ||
-          obj.name === "light_pillar"
+          obj.userData?.type === 'Club' ||
+          obj.name === 'club_pillar' ||
+          obj.name === 'light_pillar'
         )
       ) {
         obj = obj.parent;
       }
 
       if (
-        obj.userData?.type === "Club" ||
-        obj.name === "club_pillar" ||
-        obj.name === "light_pillar"
+        obj.userData?.type === 'Club' ||
+        obj.name === 'club_pillar' ||
+        obj.name === 'light_pillar'
       ) {
         hit = obj;
       }
@@ -293,17 +316,17 @@ export default class World {
           </div>
           `;
         } else {
-          const labelText = hit.userData?.data?.reImaginedName || "Club";
+          const labelText = hit.userData?.data?.reImaginedName || 'Club';
           this.tooltipElement.textContent = labelText;
         }
 
-        this.tooltipElement.classList.remove("hidden");
+        this.tooltipElement.classList.remove('hidden');
       }
       this.tooltipElement.style.left = `${event.clientX}px`;
       this.tooltipElement.style.top = `${event.clientY - 60}px`;
     } else {
       if (this.currentlyHovered) {
-        this.tooltipElement.classList.add("hidden");
+        this.tooltipElement.classList.add('hidden');
         this.currentlyHovered = null;
       }
     }
@@ -361,7 +384,7 @@ export default class World {
       phi: clampPhi(phiPoint + pitchTilt), // دوربین را به عرض جغرافیایی نقطه می‌بریم
       d: 80, // فاصله دلخواه
       duration: 2.0,
-      ease: "power3.inOut",
+      ease: 'power3.inOut',
       onUpdate: () => {
         this.earth.earthGroup.rotation.y = state.y;
         // آزیماس دوربین را ثابت نگه می‌داریم، فقط φ و فاصله را انیمیت می‌کنیم
@@ -408,22 +431,22 @@ export default class World {
         this.option.onPointClick(data);
       } else {
         // Fallback: Vanilla JS modal trigger
-        const modal = document.getElementById("cityModal") as HTMLElement;
-        const cityName = document.getElementById("cityName") as HTMLElement;
-        const cityData = document.getElementById("cityData") as HTMLElement;
+        const modal = document.getElementById('cityModal') as HTMLElement;
+        const cityName = document.getElementById('cityName') as HTMLElement;
+        const cityData = document.getElementById('cityData') as HTMLElement;
 
         cityName.innerText = city;
         cityData.innerText = JSON.stringify(data, null, 2);
 
-        modal.style.display = "block";
+        modal.style.display = 'block';
 
-        const closeBtn = modal.querySelector(".close-button") as HTMLElement;
-        closeBtn.onclick = () => (modal.style.display = "none");
+        const closeBtn = modal.querySelector('.close-button') as HTMLElement;
+        closeBtn.onclick = () => (modal.style.display = 'none');
 
         // Close when clicking outside modal
         window.onclick = (event: MouseEvent) => {
           if (event.target === modal) {
-            modal.style.display = "none";
+            modal.style.display = 'none';
           }
         };
       }
