@@ -82,7 +82,6 @@ const ComboboxMenu = ({
     return null;
   }
 
-  console.log('isopennnnnnn',filteredOptions)
   return createPortal(
     <div
       ref={menuRef}
@@ -191,7 +190,6 @@ const Combobox: React.FC<ComboboxProps> = ({
     event.stopPropagation(); // This is crucial to prevent the dropdown from opening
     onChange(""); // Pass an empty string to clear the selection
   };
-              console.log('herrrrrrrrrrrrrrrrrrrinbutton',open)
 
   return (
     <div className="w-full space-y-3">

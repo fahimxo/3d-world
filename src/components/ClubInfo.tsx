@@ -155,8 +155,8 @@ const ClubInfo = ({ onClose, prevData
       ? {
           ...prevData,
           coordinates: `${prevData.latitude},${prevData.longitude}`,
-          sportType: prevData.sportId,
-          technoSector: prevData.sectorName,
+          sportType: prevData.sportId.toString(),
+          technoSector: prevData.sectorId.toString(),
           country: prevData.countryName,
           clubAnthem: prevData.anthemUrl,
           reImaginedName:prevData.reImaginedName
@@ -187,7 +187,7 @@ const ClubInfo = ({ onClose, prevData
   });
   console.log(
     formData,
-    'formData',
+    'formDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     errors,
     watch('sportType'),
     watch('technoSector'),
@@ -250,10 +250,8 @@ const ClubInfo = ({ onClose, prevData
     setFormData((prev) => ({ ...prev, logoUrl: file }));
   };
 
-  console.log(formData, 'formData');
 
   const onSubmit = async (data: FilterFormValues) => {
-    console.log('submittttttttttttttttttttttttttttttttttttttt', errors,data, data.reImaginedName);
     setIsLoading(true);
 
     const coords = data.coordinates.split(',').map((c) => c.trim());
@@ -301,7 +299,6 @@ const ClubInfo = ({ onClose, prevData
       },
     };
 
-    console.log('Payload to be sent:', JSON.stringify(apiPayload, null, 2));
 
     try {
       let response;
@@ -319,6 +316,7 @@ const ClubInfo = ({ onClose, prevData
       }
     } catch (error) {
       console.error('API Error:', error);
+       showToast(`API Error: ${error}`, 'failed');
     } finally {
       setIsLoading(false);
     }
@@ -349,6 +347,8 @@ const ClubInfo = ({ onClose, prevData
         }
       } catch (error) {
         console.error('API Error:', error);
+               showToast(`API Error: ${error}`, 'failed');
+
       } finally {
         setIsLoading(false);
         console.log('API Error:');
