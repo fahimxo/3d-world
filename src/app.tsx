@@ -29,7 +29,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const admin = localStorage.getItem('isAdmin');
-    console.log('admin', admin);
 
     setIsAdmin(admin === 'true');
 
@@ -44,7 +43,6 @@ const App: React.FC = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
-  console.log('App rendered. Is modal open?', locationsModalOpen);
   const portalTarget = document.getElementById('portal-root');
   if (!portalTarget) {
     console.error(
@@ -92,7 +90,6 @@ const App: React.FC = () => {
   const showCityModal = useCallback((name: string, data: string) => {
     try {
       const clubData = JSON.parse(data);
-      console.log('Clicked club data:', clubData);
       if (clubData && clubData.id) {
         setSelectedClubData(clubData);
         setDetailsModal(true);
