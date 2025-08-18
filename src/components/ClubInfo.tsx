@@ -21,6 +21,26 @@ enum lockClub {
   lock = 1,
   unLock = 2,
 }
+
+function getFileNameFromBase64(base64String) {
+
+  if (base64String==null) return 'unknown'
+  // Check if it's a data URL with filename
+  const matches = base64String.match(/^data:.+\/(.+);base64,(.*)$/);
+  
+  if (matches && matches.length === 3) {
+    // Some implementations include filename in the content type
+    const filenameMatch = base64String.match(/filename="(.+)"/);
+    if (filenameMatch && filenameMatch[1]) {
+      return filenameMatch[1];
+    }
+    
+    // Otherwise try to extract from the content type
+    return matches[1] || 'unknown';
+  }
+  
+  return 'unknown'; // Default if no filename found
+}
 // The getOptionsFor function remains unchanged.
 const getOptionsFor = async (
   endpoint: string,
@@ -75,8 +95,8 @@ type FilterFormValues = any;
 
 const ClubInfo = ({
   onClose,
-  prevData,
-}: //   ={
+  prevData
+//   ={
 //     "id": 26,
 //     "reImaginedName": "Barsaaa",
 //     "originalClubName": "string",
@@ -121,7 +141,8 @@ const ClubInfo = ({
 //     "created": "0001-01-01T00:00:00",
 //     "lastModified": null,
 //     "logoImage": null
-// }
+// },
+}:  
 {
   onClose: any;
   prevData?: any;
@@ -132,8 +153,8 @@ const ClubInfo = ({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    logoUrl: null,
-    lockClub: prevData?.lockClub === lockClub.lock ? true : false,
+    logoUrl: getFileNameFromBase64(`${prevData?.logoUrl}`),
+    lockClub: prevData?.lockStatus === lockClub.lock ? true : false,
     hideClub: prevData?.status === hideClub.hide ? true : false,
   });
 
@@ -146,6 +167,7 @@ const ClubInfo = ({
     technoSectors: false,
     countries: false,
     cities: false,
+    
   });
 
   const {
@@ -155,7 +177,6 @@ const ClubInfo = ({
     setValue,
     trigger,
     watch,
-    getValues,
   } = useForm<FilterFormValues>({
     // resolver: zodResolver(filterSchema),
     defaultValues: prevData
@@ -260,9 +281,9 @@ const ClubInfo = ({
   const onSubmit = async (data: FilterFormValues) => {
     setIsLoading(true);
 
-    const coords = data.coordinates.split(',').map((c) => c.trim());
-    const latitude = coords[0] || '';
-    const longitude = coords[1] || '';
+    const coords =data?.coordinates? data.coordinates.split(',').map((c) => c.trim()):[];
+    const latitude = coords?.[0] || '';
+    const longitude = coords?.[1] || '';
 
     const apiPayload = {
       createClub_VM: {
@@ -489,7 +510,7 @@ const ClubInfo = ({
                     loadingStates.technoSectors ? 'Loading...' : 'Select'
                   }
                   label="Techno Sector"
-                  error={errors.technoSector?.message}
+                  // error={errors.technoSector?.message}
                   addClub="true"
                   salt={true}
                 />
@@ -508,7 +529,7 @@ const ClubInfo = ({
                   onChange={field.onChange}
                   placeholder={loadingStates.sports ? 'Loading...' : 'Select'}
                   label="Sport Type"
-                  error={errors.sportType?.message}
+                  // error={errors.sportType?.message}
                   addClub="true"
                   salt={true}
                 />
