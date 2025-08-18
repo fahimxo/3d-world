@@ -5,7 +5,7 @@ const CardInfoModal = ({
   // state,
   // city,
   data,
-  className = "",
+  className = '',
 }: {
   // logoUrl: string;
   // title: string;
@@ -45,7 +45,7 @@ const CardInfoModal = ({
           />
         </div>
         <h3 className="text-base font-black tracking-widest text-center">
-          {data?.originalClubName}
+          {data?.reImaginedName}
         </h3>
         <p className="text-xs text-gray-300 text-center mt-2.5 tracking-widest">
           {data?.sectorName} | {data?.countryName} | {data?.city}
