@@ -92,14 +92,9 @@ export const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
           {title}
         </span>
       </div>
-
-      <div
-        className={`p-4 border-t border-[#00FFA6]/30 ${
-          isOpen ? 'block' : 'hidden'
-        }`}
-      >
-        {children}
-      </div>
+      {isOpen && (
+        <div className="px-1 border-t border-[#00FFA6]/30">{children}</div>
+      )}
     </div>
   );
 };

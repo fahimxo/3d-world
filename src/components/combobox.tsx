@@ -1,8 +1,8 @@
-import { Check, ChevronsUpDown, Search, X } from "lucide-react";
-import { useState, useRef, useLayoutEffect, useEffect } from "react";
-import { createPortal } from "react-dom";
-import Input from "./input";
-import { cn } from "../lib/utils";
+import { Check, ChevronsUpDown, Search, X } from 'lucide-react';
+import { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import Input from './input';
+import { cn } from '../lib/utils';
 
 export interface ComboboxOption {
   value: string;
@@ -64,9 +64,9 @@ const ComboboxMenu = ({
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [setOpen, triggerRef]);
 
@@ -74,33 +74,25 @@ const ComboboxMenu = ({
     option.label.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const portalContainer = document.getElementById("portal-root");
-  if (!portalContainer) {
-    console.error(
-      "The element with id 'portal-root' was not found. Please add <div id='portal-root'></div> to your index.html"
-    );
-    return null;
-  }
-
-  return createPortal(
+  return (
     <div
       ref={menuRef}
-      className="fixed z-50 p-[2px] animate-in fade-in-0 zoom-in-95"
-      style={{ ...position, ...futuristicClipPath }}
+      className="absolute w-full mt-2 z-[10000] p-[2px] animate-in fade-in-0 zoom-in-95"
+      style={{ ...futuristicClipPath }}
     >
       <div
         className={cn(
-          "absolute inset-0 blur-[1px]",
+          'absolute inset-0 blur-[1px]',
           addClub
-            ? "bg-[#415C52]"
-            : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+            ? 'bg-[#415C52]'
+            : 'bg-gradient-to-br from-cyan-400/50 to-blue-600/50'
         )}
         style={futuristicClipPath}
       ></div>
       <div
         className={cn(
-          "relative text-cyan-200",
-          addClub ? "bg-[#001b11] border-2 border-[#415C52]" : "bg-[#0A192F]"
+          'relative text-cyan-200',
+          addClub ? 'bg-[#001b11] border-2 border-[#415C52]' : 'bg-[#0A192F]'
         )}
         style={futuristicClipPath}
       >
@@ -124,23 +116,23 @@ const ComboboxMenu = ({
                 onClick={() => {
                   onChange(option.value);
                   setOpen(false);
-                  setSearchValue("");
+                  setSearchValue('');
                 }}
                 className={cn(
-                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none",
+                  'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-2 mx-1 mb-1 text-base outline-none',
                   addClub
-                    ? "text-[#00FFA6] hover:bg-[#00FFA6]/10"
+                    ? 'text-[#00FFA6] hover:bg-[#00FFA6]/10'
                     : salt
-                    ? "hover:bg-red-400/20"
-                    : "hover:bg-cyan-400/20 text-cyan-200"
+                    ? 'hover:bg-red-400/20'
+                    : 'hover:bg-cyan-400/20 text-cyan-200'
                 )}
               >
                 <span className="truncate flex-1">{option.label}</span>
                 {option.value === value && (
                   <Check
                     className={cn(
-                      "ml-auto h-4 w-4",
-                      addClub ? "text-[#00FFA6]" : "text-cyan-400"
+                      'ml-auto h-4 w-4',
+                      addClub ? 'text-[#00FFA6]' : 'text-cyan-400'
                     )}
                   />
                 )}
@@ -149,8 +141,8 @@ const ComboboxMenu = ({
           ) : (
             <p
               className={cn(
-                "text-center text-sm ",
-                salt ? "text-[#415C52] py-2" : "text-cyan-400/60 py-2"
+                'text-center text-sm ',
+                salt ? 'text-[#415C52] py-2' : 'text-cyan-400/60 py-2'
               )}
             >
               No results found.
@@ -158,8 +150,7 @@ const ComboboxMenu = ({
           )}
         </div>
       </div>
-    </div>,
-    portalContainer
+    </div>
   );
 };
 
@@ -176,19 +167,19 @@ const Combobox: React.FC<ComboboxProps> = ({
   salt,
 }) => {
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const selectedOption = options.find((option) => option.value === value);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const futuristicClipPath = {
     clipPath:
-      "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+      'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))',
   };
 
   const handleClear = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation(); // This is crucial to prevent the dropdown from opening
-    onChange(""); // Pass an empty string to clear the selection
+    onChange(''); // Pass an empty string to clear the selection
   };
 
   return (
@@ -197,8 +188,8 @@ const Combobox: React.FC<ComboboxProps> = ({
         <label
           htmlFor={name}
           className={cn(
-            "text-sm block tracking-wider mb-1",
-            addClub ? "text-[#00FFA6]" : "text-cyan-300/80 font-bold"
+            'text-sm block tracking-wider mb-1',
+            addClub ? 'text-[#00FFA6]' : 'text-cyan-300/80 font-bold'
           )}
         >
           {label}
@@ -208,10 +199,10 @@ const Combobox: React.FC<ComboboxProps> = ({
         <div className="p-[2px]" style={futuristicClipPath}>
           <div
             className={cn(
-              "absolute inset-0 blur-[1px]",
+              'absolute inset-0 blur-[1px]',
               addClub
-                ? "bg-[#415C52]"
-                : "bg-gradient-to-br from-cyan-400/50 to-blue-600/50"
+                ? 'bg-[#415C52]'
+                : 'bg-gradient-to-br from-cyan-400/50 to-blue-600/50'
             )}
             style={futuristicClipPath}
           ></div>
@@ -222,10 +213,10 @@ const Combobox: React.FC<ComboboxProps> = ({
             aria-expanded={open}
             onClick={() => setOpen(!open)}
             className={cn(
-              "relative flex h-12 w-full items-center justify-between px-3 py-2 text-base focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              'relative flex h-12 w-full items-center justify-between px-3 py-2 text-base focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
               addClub
-                ? "bg-[#001b11] text-[#49675D]"
-                : "bg-[#0A192F] text-cyan-200"
+                ? 'bg-[#001b11] text-[#49675D]'
+                : 'bg-[#0A192F] text-cyan-200'
             )}
             style={futuristicClipPath}
           >
@@ -233,7 +224,7 @@ const Combobox: React.FC<ComboboxProps> = ({
               <span className="truncate">{selectedOption.label}</span>
             ) : (
               <span
-                className={cn(addClub ? "text-[#49675D]" : "text-cyan-400/50")}
+                className={cn(addClub ? 'text-[#49675D]' : 'text-cyan-400/50')}
               >
                 {placeholder}
               </span>
@@ -270,7 +261,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             addClub={addClub}
           />
         )}
-        {typeof error === "string" && error && (
+        {typeof error === 'string' && error && (
           <div className="text-red-400 text-xs mt-1">{error}</div>
         )}
       </div>

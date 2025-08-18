@@ -260,12 +260,10 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
       } else {
         response = await api.post(API_ENDPOINTS.ADMIN.CREATE_CLUB, apiPayload);
       }
-
-      if (response.data && response.data.code === 0) {
+      if (response?.code === 0) {
         onClose();
         showToast(response.data?.message, 'success');
       } else {
-        alert('serer error: ' + (response.data?.message || 'Unknown error'));
         showToast(response.data?.message, 'failed');
       }
     } catch (error) {
@@ -296,7 +294,6 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           setValue('country', response.result?.countryName);
         } else {
           showToast(response?.message, 'failed');
-          // alert('server error: ' + (response.data?.message || 'Unknown error'));
         }
       } catch (error) {
         console.error('API Error:', error);
@@ -311,7 +308,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
     <div>
       <div className="grid grid-cols-1 h-full ">
         <Accordion title="Club Info">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+          <div className="grid md:grid-cols-3 gap-x-6 gap-y-6">
             <div className="col-span-2">
               <Controller
                 name="coordinates"
@@ -493,25 +490,27 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                 required: 'Current Name is required',
               }}
             />
-            <Controller
-              name="clubAnthem"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="Club anthem"
-                  name="clubAnthem"
-                  {...field}
-                  placeholder="Enter youtube link"
-                  addClub="true"
-                />
-              )}
-              rules={{
-                pattern: {
-                  value: /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
-                  message: 'Please enter a valid URL on club anthem field',
-                },
-              }}
-            />
+            <div className="col-span-2 md:col-span-1">
+              <Controller
+                name="clubAnthem"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Club anthem"
+                    name="clubAnthem"
+                    {...field}
+                    placeholder="Enter youtube link"
+                    addClub="true"
+                  />
+                )}
+                rules={{
+                  pattern: {
+                    value: /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/,
+                    message: 'Please enter a valid URL on club anthem field',
+                  },
+                }}
+              />
+            </div>
             <div className="col-span-2">
               <Controller
                 name="lore"
@@ -528,11 +527,13 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
                 )}
               />
             </div>
-            <FileUpload
-              label="Club Logo"
-              name="logoUrl"
-              onChange={handleFileChange}
-            />
+            <div className="col-span-2 md:col-span-1">
+              <FileUpload
+                label="Club Logo"
+                name="logoUrl"
+                onChange={handleFileChange}
+              />
+            </div>
           </div>
         </Accordion>
         <RepeatedItem
@@ -572,7 +573,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
           control={control}
         />
 
-        <div className="flex justify-between items-center pt-6 border-t border-cyan-400/20 flex-wrap">
+        <div className="flex flex-col md:flex-row justify-center md:justify-between items-center gap-6 pt-6 mt-auto border-t border-cyan-400/20">
           <div className="flex gap-4">
             <Checkbox
               name="lockClub"
@@ -587,7 +588,7 @@ const ClubInfo = ({ onClose, prevData }: { onClose: any; prevData?: any }) => {
               onChange={handleCheckboxChange}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 mb-3">
             <div className="relative flex justify-center py-8 ">
               <Button
                 onClick={onClose}

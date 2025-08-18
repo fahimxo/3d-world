@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { LocationsModal } from '../assets/icons/LocationsModal';
 import { Button } from './button';
 import ClubInfo from './ClubInfo';
 import ClubList from './ClubList';
 import CustomScrollPanel from '../assets/icons/CustomScrollPanel';
+import { LocationsModal } from '../assets/icons/LocationsModal';
 
 enum tabs {
   add = 1,
@@ -19,29 +18,34 @@ const ClubsManagement = ({ onClose }) => {
 
   return (
     <div
-      className="inset-0 relative z-[9999] flex items-center justify-center backdrop-blur-sm p-4 h-screen"
+      className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm p-4 md:p-0"
       onClick={onClose}
     >
-      <div onClick={(e) => e.stopPropagation()}>
+      <div onClick={(e) => e.stopPropagation()} className="bg-[#00120C]">
         <LocationsModal>
-          <div className="flex flex-wrap justify-evenly items-center gap-2 mb-8 px-10 pt-8">
-            <Button
-              onClick={() => changeTabs(tabs.add)}
-              variant="tertiary"
-              isActive={currentTab === tabs.add}
-            >
-              Add New Club
-            </Button>
-            <Button
-              onClick={() => changeTabs(tabs.edit)}
-              variant="tertiary"
-              isActive={currentTab === tabs.edit}
-            >
-              Edit Club
-            </Button>
+          <div className="relative z-10 flex-shrink-0 px-4 pt-8 mb-2 md:mb-8">
+            <div className="flex justify-center items-center gap-4">
+              <Button
+                className="min-w-36 text-center"
+                onClick={() => changeTabs(tabs.add)}
+                variant="tertiary"
+                isActive={currentTab === tabs.add}
+              >
+                Add New Club
+              </Button>
+              <Button
+                className="min-w-36 text-center"
+                onClick={() => changeTabs(tabs.edit)}
+                variant="tertiary"
+                isActive={currentTab === tabs.edit}
+              >
+                Edit Club
+              </Button>
+            </div>
           </div>
-          <CustomScrollPanel>
-            <div className="px-10 pb-8">
+
+          <CustomScrollPanel className="relative z-10 flex-1 min-h-0 mt-8">
+            <div>
               {currentTab === tabs.add ? (
                 <ClubInfo onClose={onClose} />
               ) : (
