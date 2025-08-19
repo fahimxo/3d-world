@@ -23,12 +23,26 @@ interface VideoCardProps {
 }
 
 const ClubPreview: FC<ClubData> = ({ ...props }) => {
-  const { kitDiscription, kitVideoUrl, stadiumVideoUrl, bestPlayerVideoUrl } =
-    props;
+  const {
+    kitDiscription,
+    kitVideoUrl,
+    stadiumVideoUrl,
+    bestPlayerVideoUrl,
+    managerDescription,
+    transportDescription,
+    mascotDescription,
+    coachVideoUrl,
+    symbolVideoUrl,
+    vehicleVideoUrl,
+  } = props;
+
   return (
-    <div className="flex flex-col items-center gap-3 ">
+    <div className="flex flex-col items-center gap-4 w-full">
       <ClubInfo {...props} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full ">
+
+      {/* تغییر اصلی اینجاست */}
+      {/* چیدمان رو به ۲ ستون در موبایل و ۳ ستون در دسکتاپ تغییر دادم */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
         <VideoCard
           title="Club Kit"
           description={kitDiscription}
@@ -36,31 +50,31 @@ const ClubPreview: FC<ClubData> = ({ ...props }) => {
         />
         <VideoCard
           title="Club Stadium"
-          description={stadiumVideoUrl} //
+          description={stadiumVideoUrl} // این احتمالا باید stadiumDescription باشه
           url={stadiumVideoUrl}
         />
         <VideoCard
           title="Club Best Player"
-          description={bestPlayerVideoUrl} //
+          description={bestPlayerVideoUrl} // اینم باید bestPlayerDescription باشه
           url={bestPlayerVideoUrl}
         />
         <VideoCard
           title="Club Manager"
-          description={kitDiscription} //
-          url={kitVideoUrl} //
+          description={managerDescription}
+          url={coachVideoUrl}
         />
         <VideoCard
           title="Club Transport"
-          description={kitDiscription} //
-          url={kitVideoUrl} //
+          description={transportDescription}
+          url={vehicleVideoUrl}
         />
         <VideoCard
           title="Club Mascot"
-          description={kitDiscription} //
-          url={kitVideoUrl} //
+          description={mascotDescription}
+          url={symbolVideoUrl}
         />
-        <Line />
       </div>
+      <Line />
     </div>
   );
 };
@@ -69,9 +83,11 @@ export default ClubPreview;
 
 const ClubInfo: FC<ClubData> = ({
   originalClubName,
-  sectorName,
-  countryName,
-  city,
+  sportName,
+  lore,
+  latitude,
+  longitude,
+  anthemUrl,
   logoUrl,
 }) => {
   const mimeType = getMimeType(logoUrl);
@@ -81,57 +97,57 @@ const ClubInfo: FC<ClubData> = ({
       style={{
         clipPath: 'polygon(98% 0, 100% 16%, 100% 100%, 2% 100%, 0 84%, 0 0) ',
       }}
-      className={`flex flex-col w-full p-[5px] bg-[rgba(0,119,86,0.2)] min-h-[106px] gap-[10px]`}
+      className={`flex flex-col w-full p-4 bg-[rgba(0,119,86,0.2)] gap-4`}
     >
-      <div className="text-[rgba(0,255,166,1)] text-[12px] text-left h-full">
+      <div className="text-[rgba(0,255,166,1)] text-sm text-left font-bold">
         Club Info
       </div>
-      <div className="flex justify-between items-top gap-3 h-fit">
-        <div className="flex flex-col items-center gap-2 justify-between h-full stretch">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Coordinates
-          </span>
-          <span className="text-[12px] font-[400] ">{sectorName}</span>
+
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-x-4 gap-y-5 text-xs w-full">
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Coordinates</span>
+          <span className="font-normal text-white truncate w-full block">{`${latitude}, ${longitude}`}</span>
         </div>
-        <div className="flex flex-col items-center gap-2 justify-between h-full">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Sport Type
+
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Sport Type</span>
+          <span className="font-normal text-white truncate w-full block">
+            {sportName}
           </span>
-          <span className="text-[12px] font-[400] ">{countryName}</span>
         </div>
-        <div className="flex flex-col items-center gap-2 justify-between h-full">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Current Name
+
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Current Name</span>
+          <span className="font-normal text-white truncate w-full block">
+            {originalClubName}
           </span>
-          <span className="text-[12px] font-[400] ">{city}</span>
         </div>
-        <div className="flex flex-col items-center gap-2 justify-between h-full">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Club Lore
+
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Club Lore</span>
+          <span className="font-normal text-white truncate w-full block">
+            {lore}
           </span>
-          <span className="text-[12px] font-[400] ">{city}</span>
         </div>
-        <div className="flex flex-col items-center gap-2 justify-between h-full">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Club Anthem
+
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Club Anthem</span>
+          <span className="font-normal text-white truncate w-full block">
+            Anthem
           </span>
-          <span className="text-[12px] font-[400] ">{city}</span>
         </div>
-        <div className="flex flex-col items-center gap-2 justify-between h-full">
-          <span className="text-[12px] font-[400] font-regular text-[#7D7D7D]">
-            Club Logo
-          </span>
-          <span className="text-[12px] font-[400] ">
-            {logoUrl ? (
-              <img
-                src={`data:${mimeType};base64,${logoUrl}`}
-                alt={originalClubName}
-                className="w-[80px] h-auto "
-              />
-            ) : (
-              'no image'
-            )}
-          </span>
+
+        <div className="flex flex-col items-start text-left min-w-0 w-full">
+          <span className="font-regular text-[#7D7D7D] mb-1">Club Logo</span>
+          {logoUrl ? (
+            <img
+              src={`data:${mimeType};base64,${logoUrl}`}
+              alt={originalClubName}
+              className="w-[30px] h-auto mt-1"
+            />
+          ) : (
+            <span className="font-normal text-white">no image</span>
+          )}
         </div>
       </div>
     </div>
@@ -149,9 +165,11 @@ const VideoCard: FC<VideoCardProps> = ({
         clipPath:
           'polygon(92% 0px, 100% 8%, 100% 100%, 8% 100%, 0px 92%, 0px 0px)',
       }}
-      className="flex flex-col gap-3 w-full py-[5px] bg-[rgba(0,119,86,0.2)]  justify-center items-center h-fit"
+      className="flex flex-col gap-3 w-full py-[5px] bg-[rgba(0,119,86,0.2)]  justify-center items-center h-fit"
     >
-      <div className="text-[#00FFA6] font-[700] text-[12px]">{title}</div>
+      <div className="text-[#00FFA6] font-[700] text-[12px] truncate ">
+        {title}
+      </div>
       <div className="flex gap-3 h-fit">
         <div className="h-[80px] flex flex-col gap-3 justify-start items-center">
           <div className="text-[#7D7D7D] text-[12px] font-[400]">Video</div>
