@@ -34,6 +34,7 @@ const ClubPreview: FC<ClubData> = ({ ...props }) => {
     coachVideoUrl,
     symbolVideoUrl,
     vehicleVideoUrl,
+    clubAnthem,
   } = props;
 
   return (
@@ -133,7 +134,7 @@ const ClubInfo: FC<ClubData> = ({
         <div className="flex flex-col items-start text-left min-w-0 w-full">
           <span className="font-regular text-[#7D7D7D] mb-1">Club Anthem</span>
           <span className="font-normal text-white truncate w-full block">
-            Anthem
+            <YouTubeThumbnail url={anthemUrl} />
           </span>
         </div>
 
