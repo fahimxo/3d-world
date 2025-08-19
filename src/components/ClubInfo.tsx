@@ -147,7 +147,7 @@ const ClubInfo = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    logoUrl: getFileNameFromBase64(`${prevData?.logoUrl}`),
+    logoUrl: `;base64,${prevData?.logoUrl}`,
     lockClub: prevData?.lockStatus === lockClub.lock ? true : false,
     hideClub: prevData?.status === hideClub.hide ? true : false,
   });
