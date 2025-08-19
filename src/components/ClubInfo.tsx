@@ -317,12 +317,9 @@ const ClubInfo = ({
       if (response?.code === 0) {
         onClose();
         showToast(response?.message, 'success');
-      } else {
-        showToast(response?.message, 'failed');
       }
     } catch (error) {
       console.error('API Error:', error);
-      showToast(`API Error: ${error}`, 'failed');
     } finally {
       setIsLoading(false);
     }
@@ -347,12 +344,9 @@ const ClubInfo = ({
           }));
           setValue('city', response.result?.cityName);
           setValue('country', response.result?.countryName);
-        } else {
-          showToast(response?.message, 'failed');
         }
       } catch (error) {
         console.error('API Error:', error);
-        showToast(`API Error: ${error}`, 'failed');
       } finally {
         setIsLoading(false);
         console.log('API Error:');

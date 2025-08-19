@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { Modal } from "./modal";
-import DetailsModal from "../assets/icons/DetailsModal";
-import CardInfoModal from "../assets/icons/CardInfoModal";
-import ReactPlayer from "react-player";
-import FanbasePower from "./fanBase";
-import { PublicClubResult } from "../lib/usePublicClubs";
-import InfoSection from "./clubKit";
-import { useTooltip } from "./tooltipContext";
+import React, { useEffect } from 'react';
+import { Modal } from './modal';
+import DetailsModal from '../assets/icons/DetailsModal';
+import CardInfoModal from '../assets/icons/CardInfoModal';
+import ReactPlayer from 'react-player';
+import FanbasePower from './fanBase';
+import { PublicClubResult } from '../lib/usePublicClubs';
+import InfoSection from './clubKit';
+import { useTooltip } from './tooltipContext';
 
 interface ClubDetailsModalProps {
   isOpen: boolean;
@@ -30,6 +30,7 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
       setTooltipVisibility(true);
     };
   }, [isOpen, setTooltipVisibility]);
+
   return (
     <Modal mode="center">
       <DetailsModal onClose={onClose}>
@@ -38,9 +39,9 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
             <CardInfoModal data={clubData} className="h-full" />
           </div>
           <div className="lg:flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
-            {clubData.videoUrl && (
+            {clubData?.videoUrl && (
               <ReactPlayer
-                src={clubData.videoUrl}
+                src={clubData?.videoUrl}
                 width="100%"
                 height="100%"
                 controls={true}
@@ -48,6 +49,7 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
             )}
           </div>
         </div>
+        <p className="text-sm/6 mt-8 font-normal">{clubData?.description}</p>
         <FanbasePower power={100} />
 
         {(clubData?.kitDiscription || clubData?.kitVideoUrl) && (

@@ -73,8 +73,6 @@ const ClubCard = ({
       if (result?.result) {
         getClubsData();
         showToast(result?.message, 'success');
-      } else {
-        showToast(result?.message, 'failed');
       }
     } catch (error) {
       console.error('Logout failed:', error);

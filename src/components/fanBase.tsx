@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 interface FanbasePowerProps {
   power: number;
@@ -11,17 +11,17 @@ const FanbasePower: React.FC<FanbasePowerProps> = ({ power }) => {
   const [segmentColors, setSegmentColors] = useState<string[]>([]);
 
   useEffect(() => {
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = totalBars;
     canvas.height = 1;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext('2d')!;
 
     const gradient = ctx.createLinearGradient(0, 0, totalBars, 0);
-    gradient.addColorStop(0, "#00C9FF");
-    gradient.addColorStop(0.25, "#00FF00");
-    gradient.addColorStop(0.5, "#FFFF00");
-    gradient.addColorStop(0.75, "#FFA500");
-    gradient.addColorStop(1, "#FF0000");
+    gradient.addColorStop(0, '#00C9FF');
+    gradient.addColorStop(0.25, '#00FF00');
+    gradient.addColorStop(0.5, '#FFFF00');
+    gradient.addColorStop(0.75, '#FFA500');
+    gradient.addColorStop(1, '#FF0000');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, totalBars, 1);
@@ -37,8 +37,8 @@ const FanbasePower: React.FC<FanbasePowerProps> = ({ power }) => {
   }, []);
 
   return (
-    <div className="mt-4">
-      <div className="mt-4.5 h-px bg-white w-full opacity-50" />
+    <div className="mt-4.5">
+      <div className="h-px bg-white w-full opacity-50" />
       <h3 className="text-white text-lg font-bold my-4">Fanbase Power</h3>
       <div className="flex items-center gap-4 rounded-lg bg-black bg-opacity-30 md:w-[490px] m-auto p-[19px]">
         <div className="w-16 h-12 flex items-center justify-center bg-cyan-400 rounded-md">
@@ -54,7 +54,7 @@ const FanbasePower: React.FC<FanbasePowerProps> = ({ power }) => {
                 backgroundColor:
                   i < filledBars && segmentColors.length > 0
                     ? segmentColors[i]
-                    : "#4A4A4A",
+                    : '#4A4A4A',
               }}
             />
           ))}
