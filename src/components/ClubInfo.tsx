@@ -163,49 +163,43 @@ const ClubInfo = ({
     cities: false,
   });
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    trigger,
-    watch,
-  } = useForm<FilterFormValues>({
-    // resolver: zodResolver(filterSchema),
-    defaultValues: prevData
-      ? {
-          ...prevData,
-          coordinates: `${prevData.latitude},${prevData.longitude}`,
-          sportType: prevData.sportId.toString(),
-          technoSector: prevData.sectorId.toString(),
-          country: prevData.countryName,
-          clubAnthem: prevData.anthemUrl,
-          reImaginedName: prevData.reImaginedName,
-        }
-      : {
-          sportType: null,
-          technoSector: null,
-          country: null,
-          city: null,
-          reImaginedName: null,
-          originalClubName: null,
-          coordinates: null,
-          clubAnthem: null,
-          lore: null,
-          kitVideoUrl: null,
-          kitDiscription: null,
-          stadiumVideoUrl: null,
-          staduimDiscription: null,
-          bestPlayerDiscription: null,
-          bestPlayerVideoUrl: null,
-          coachDiscription: null,
-          coachVideoUrl: null,
-          vehicleDiscription: null,
-          vehicleVideoUrl: null,
-          symbolDiscription: null,
-          symbolVideoUrl: null,
-        },
-  });
+  const { control, handleSubmit, setValue, trigger } =
+    useForm<FilterFormValues>({
+      // resolver: zodResolver(filterSchema),
+      defaultValues: prevData
+        ? {
+            ...prevData,
+            coordinates: `${prevData.latitude},${prevData.longitude}`,
+            sportType: prevData.sportId.toString(),
+            technoSector: prevData.sectorId.toString(),
+            country: prevData.countryName,
+            clubAnthem: prevData.anthemUrl,
+            reImaginedName: prevData.reImaginedName,
+          }
+        : {
+            sportType: null,
+            technoSector: null,
+            country: null,
+            city: null,
+            reImaginedName: null,
+            originalClubName: null,
+            coordinates: null,
+            clubAnthem: null,
+            lore: null,
+            kitVideoUrl: null,
+            kitDiscription: null,
+            stadiumVideoUrl: null,
+            staduimDiscription: null,
+            bestPlayerDiscription: null,
+            bestPlayerVideoUrl: null,
+            coachDiscription: null,
+            coachVideoUrl: null,
+            vehicleDiscription: null,
+            vehicleVideoUrl: null,
+            symbolDiscription: null,
+            symbolVideoUrl: null,
+          },
+    });
 
   useEffect(() => {
     if (sportOptions.length === 0) {
