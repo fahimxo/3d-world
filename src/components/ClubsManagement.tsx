@@ -24,9 +24,9 @@ const ClubsManagement = ({ onClose }) => {
       <div onClick={(e) => e.stopPropagation()} className="bg-[#00120C]">
         <LocationsModal>
           <div className="relative z-10 flex-shrink-0 px-4 pt-8 mb-2 md:mb-8">
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex flex-row justify-center items-center p-6 py-7 md:gap-28 gap-3">
               <Button
-                className="min-w-36 text-center"
+                className="flex-1 sm:flex-none sm:min-w-32 text-center text-sm md:text-base"
                 onClick={() => changeTabs(tabs.add)}
                 variant="tertiary"
                 isActive={currentTab === tabs.add}
@@ -34,7 +34,7 @@ const ClubsManagement = ({ onClose }) => {
                 Add New Club
               </Button>
               <Button
-                className="min-w-36 text-center"
+                className="flex-1 sm:flex-none sm:min-w-32 text-center"
                 onClick={() => changeTabs(tabs.edit)}
                 variant="tertiary"
                 isActive={currentTab === tabs.edit}
