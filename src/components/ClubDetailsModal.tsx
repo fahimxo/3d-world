@@ -49,7 +49,9 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
             )}
           </div>
         </div>
-        <p className="text-sm/6 mt-8 font-normal">{clubData?.description}</p>
+        <p className="text-sm/6 mt-8 font-normal">
+          {clubData?.detaileDescription}
+        </p>
         <FanbasePower power={100} />
 
         {(clubData?.kitDiscription || clubData?.kitVideoUrl) && (
