@@ -493,17 +493,40 @@ export default class earth {
     this.clubGroup.clear();
     this.clickablePoints.length = 0;
 
+    // --- ✨ بخش جدید برای جلوگیری از تداخل ---
+    const cityClubCounts: { [cityName: string]: number } = {};
+    const baseOffsetAngle = 0.5; // زاویه اولیه برای جابجایی (بر حسب درجه)
+    // ------------------------------------
+
     await Promise.all(
       clubs.map(async (item) => {
-        const lon = +item.longitude;
-        const lat = +item.latitude;
+        let lon = +item.longitude;
+        let lat = +item.latitude;
         const color =
           item?.lockStatus === lockClub.unLock ? 0xffa500 : 0x525354;
+
+        // --- ✨ منطق جابجایی (Offsetting Logic) ---
+        const cityName = item.city;
+        if (cityClubCounts[cityName]) {
+          const clubIndex = cityClubCounts[cityName];
+          // برای هر باشگاه اضافه در یک شهر، آن را در یک زاویه متفاوت قرار بده
+          const angle = clubIndex * 45 * (Math.PI / 180); // هر باشگاه ۴۵ درجه بچرخد
+          const offsetLat = baseOffsetAngle * Math.sin(angle);
+          const offsetLon = baseOffsetAngle * Math.cos(angle);
+
+          lat += offsetLat;
+          lon += offsetLon;
+
+          cityClubCounts[cityName]++;
+        } else {
+          cityClubCounts[cityName] = 1;
+        }
+        // ------------------------------------------
 
         // خود ستون نور
         const pillar = createLightPillar({
           radius,
-          lon,
+          lon, // از lon و lat تغییر یافته استفاده کن
           lat,
           color,
           index: 0,
@@ -521,7 +544,7 @@ export default class earth {
           new SphereGeometry(0.8, 10, 10),
           new MeshBasicMaterial({ visible: false })
         );
-        const pickPos = lon2xyz(radius + 0.2, lon, lat);
+        const pickPos = lon2xyz(radius + 0.2, lon, lat); // از مختصات جدید استفاده کن
         pick.position.set(pickPos.x, pickPos.y, pickPos.z);
         pick.userData = pillar.userData; // همان دیتا
         pick.name = 'club_pick'; // صرفاً جهت دیباگ
