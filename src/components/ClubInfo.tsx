@@ -17,7 +17,7 @@ enum hideClub {
   show = 1,
   hide = 2,
 }
-enum lockClub {
+export enum lockClub {
   lock = 1,
   unLock = 2,
 }

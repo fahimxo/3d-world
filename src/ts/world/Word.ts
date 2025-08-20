@@ -27,6 +27,7 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import gsap from 'gsap';
 import { ComboboxOption } from 'src/components';
 import { DataType } from 'src/lib/usePublicClubs';
+import { lockClub } from '../../components/ClubInfo';
 
 export default class World {
   public basic: Basic;
@@ -308,7 +309,7 @@ export default class World {
         this.currentlyHovered = hit;
 
         // اگر باشگاه قفل باشه، عکس نشون بده
-        if (hit.userData?.data?.isActive === false) {
+        if (hit.userData?.data?.lockStatus === lockClub.lock) {
           this.tooltipElement.innerHTML = `
           <div class="flex flex-col gap-1 items-center justify-center">
           <img src="/static/images/lock-club.png" alt="Locked" class="w-10 h-10 object-cover rounded-full" />

@@ -25,6 +25,7 @@ export type DataType = {
   videoUrl: string;
   status: number;
   isActive: boolean;
+  lockStatus: number;
   displayOrder: number;
   sportId: number;
   sportName: string;

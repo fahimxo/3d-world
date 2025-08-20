@@ -3,10 +3,11 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
-} from "react";
-import World from "./world/Word"; // Corrected import from 'Word' to 'World'
-import { ComboboxOption } from "src/components";
-import { DataType } from "src/lib/usePublicClubs";
+} from 'react';
+import World from './world/Word'; // Corrected import from 'Word' to 'World'
+import { ComboboxOption } from 'src/components';
+import { DataType } from 'src/lib/usePublicClubs';
+import { lockClub } from '../components/ClubInfo';
 
 // Define the props for the component
 interface WorldComponentProps {
@@ -46,7 +47,7 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           // Pass the callback function to your World class
           // You will need to update your IWord interface and World constructor to accept this
           onPointClick: (data) => {
-            if (data?.isActive === true) {
+            if (data?.lockStatus === lockClub.unLock) {
               // بستن مودال فیلتر وقتی روی کلاب کلیک می‌شود
               setFilterModalVisible(false);
               onCityClick(data.city, JSON.stringify(data));
