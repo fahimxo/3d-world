@@ -26,13 +26,13 @@ import {
   ExtrudeGeometry,
   MeshStandardMaterial,
   PerspectiveCamera,
-} from "three";
+} from 'three';
 
-import html2canvas from "html2canvas";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import html2canvas from 'html2canvas';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-import earthVertex from "../../shaders/earth/vertex.vs";
-import earthFragment from "../../shaders/earth/fragment.fs";
+import earthVertex from '../../shaders/earth/vertex.vs';
+import earthFragment from '../../shaders/earth/fragment.fs';
 import {
   createAnimateLine,
   createLightPillar,
@@ -41,15 +41,15 @@ import {
   createWaveMesh,
   getCirclePoints,
   lon2xyz,
-} from "../Utils/common";
-import gsap from "gsap";
-import { flyArc } from "../Utils/arc";
+} from '../Utils/common';
+import gsap from 'gsap';
+import { flyArc } from '../Utils/arc';
 import {
   CSS2DRenderer,
   CSS2DObject,
-} from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import { ComboboxOption } from "src/components";
-import { DataType } from "src/lib/usePublicClubs";
+} from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { ComboboxOption } from 'src/components';
+import { DataType } from 'src/lib/usePublicClubs';
 
 export type punctuation = {
   circleColor: number;
@@ -137,22 +137,22 @@ export default class earth {
     this.cityList = options.cityList;
 
     this.group = new Group();
-    this.group.name = "group";
+    this.group.name = 'group';
     this.group.scale.set(0, 0, 0);
     this.earthGroup = new Group();
     this.group.add(this.earthGroup);
-    this.earthGroup.name = "EarthGroup";
+    this.earthGroup.name = 'EarthGroup';
 
     // 标注点效果
     this.markupPoint = new Group();
-    this.markupPoint.name = "markupPoint";
+    this.markupPoint.name = 'markupPoint';
     this.waveMeshArr = [];
 
     this.cityGroup = new Group();
-    this.cityGroup.name = "city_group";
+    this.cityGroup.name = 'city_group';
 
     this.clubGroup = new Group();
-    this.clubGroup.name = "club_group";
+    this.clubGroup.name = 'club_group';
 
     this.earthGroup.add(this.cityGroup);
     this.earthGroup.add(this.clubGroup);
@@ -173,19 +173,19 @@ export default class earth {
         value: new Color(0x0cd1eb),
       },
       scale: {
-        type: "f",
+        type: 'f',
         value: -1.0,
       },
       bias: {
-        type: "f",
+        type: 'f',
         value: 1.0,
       },
       power: {
-        type: "f",
+        type: 'f',
         value: 3.3,
       },
       time: {
-        type: "f",
+        type: 'f',
         value: this.timeValue,
       },
       isHover: {
@@ -215,10 +215,10 @@ export default class earth {
   }
 
   private createHTMLLabel(text: string): CSS2DObject {
-    const div = document.createElement("div");
+    const div = document.createElement('div');
     // Style the div using Tailwind CSS classes
     div.className =
-      "text-primary-200 text-xs font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none";
+      'text-primary-200 text-xs font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none';
     div.textContent = text;
 
     const label = new CSS2DObject(div);
@@ -261,7 +261,7 @@ export default class earth {
 
     earth_material.needsUpdate = true;
     this.earth = new Mesh(earth_geometry, earth_material);
-    this.earth.name = "earth";
+    this.earth.name = 'earth';
     this.earthGroup.add(this.earth);
   }
 
@@ -280,11 +280,11 @@ export default class earth {
     // 星空效果
     this.around = new BufferGeometry();
     this.around.setAttribute(
-      "position",
+      'position',
       new BufferAttribute(new Float32Array(vertices), 3)
     );
     this.around.setAttribute(
-      "color",
+      'color',
       new BufferAttribute(new Float32Array(colors), 3)
     );
 
@@ -298,7 +298,7 @@ export default class earth {
     });
 
     this.aroundPoints = new Points(this.around, aroundMaterial);
-    this.aroundPoints.name = "星空";
+    this.aroundPoints.name = '星空';
     this.aroundPoints.scale.set(1, 1, 1);
     this.group.add(this.aroundPoints);
   }
@@ -326,52 +326,52 @@ export default class earth {
 
   createEarthAperture() {
     const vertexShader = [
-      "varying vec3	vVertexWorldPosition;",
-      "varying vec3	vVertexNormal;",
-      "varying vec4	vFragColor;",
-      "void main(){",
-      "	vVertexNormal	= normalize(normalMatrix * normal);", //将法线转换到视图坐标系中
-      "	vVertexWorldPosition	= (modelMatrix * vec4(position, 1.0)).xyz;", //将顶点转换到世界坐标系中
-      "	// set gl_Position",
-      "	gl_Position	= projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
-      "}",
-    ].join("\n");
+      'varying vec3	vVertexWorldPosition;',
+      'varying vec3	vVertexNormal;',
+      'varying vec4	vFragColor;',
+      'void main(){',
+      '	vVertexNormal	= normalize(normalMatrix * normal);', //将法线转换到视图坐标系中
+      '	vVertexWorldPosition	= (modelMatrix * vec4(position, 1.0)).xyz;', //将顶点转换到世界坐标系中
+      '	// set gl_Position',
+      '	gl_Position	= projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+      '}',
+    ].join('\n');
 
     //大气层效果
     const AeroSphere = {
       uniforms: {
         coeficient: {
-          type: "f",
+          type: 'f',
           value: 1.0,
         },
         power: {
-          type: "f",
+          type: 'f',
           value: 3,
         },
         glowColor: {
-          type: "c",
+          type: 'c',
           value: new Color(0x4390d1),
         },
       },
       vertexShader: vertexShader,
       fragmentShader: [
-        "uniform vec3	glowColor;",
-        "uniform float	coeficient;",
-        "uniform float	power;",
+        'uniform vec3	glowColor;',
+        'uniform float	coeficient;',
+        'uniform float	power;',
 
-        "varying vec3	vVertexNormal;",
-        "varying vec3	vVertexWorldPosition;",
+        'varying vec3	vVertexNormal;',
+        'varying vec3	vVertexWorldPosition;',
 
-        "varying vec4	vFragColor;",
+        'varying vec4	vFragColor;',
 
-        "void main(){",
-        "	vec3 worldCameraToVertex = vVertexWorldPosition - cameraPosition;", //世界坐标系中从相机位置到顶点位置的距离
-        "	vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;", //视图坐标系中从相机位置到顶点位置的距离
-        "	viewCameraToVertex= normalize(viewCameraToVertex);", //规一化
-        "	float intensity	= pow(coeficient + dot(vVertexNormal, viewCameraToVertex), power);",
-        "	gl_FragColor = vec4(glowColor, intensity);",
-        "}",
-      ].join("\n"),
+        'void main(){',
+        '	vec3 worldCameraToVertex = vVertexWorldPosition - cameraPosition;', //世界坐标系中从相机位置到顶点位置的距离
+        '	vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;', //视图坐标系中从相机位置到顶点位置的距离
+        '	viewCameraToVertex= normalize(viewCameraToVertex);', //规一化
+        '	float intensity	= pow(coeficient + dot(vVertexNormal, viewCameraToVertex), power);',
+        '	gl_FragColor = vec4(glowColor, intensity);',
+        '}',
+      ].join('\n'),
     };
     //球体 辉光 大气层
     const material1 = new ShaderMaterial({
@@ -492,16 +492,39 @@ export default class earth {
     this.clubGroup.clear();
     this.clickablePoints.length = 0;
 
+    // --- ✨ بخش جدید برای جلوگیری از تداخل ---
+    const cityClubCounts: { [cityName: string]: number } = {};
+    const baseOffsetAngle = 0.5; // زاویه اولیه برای جابجایی (بر حسب درجه)
+    // ------------------------------------
+
     await Promise.all(
       clubs.map(async (item) => {
-        const lon = +item.longitude;
-        const lat = +item.latitude;
+        let lon = +item.longitude;
+        let lat = +item.latitude;
         const color = item?.isActive ? 0xffa500 : 0x525354;
+
+        // --- ✨ منطق جابجایی (Offsetting Logic) ---
+        const cityName = item.city;
+        if (cityClubCounts[cityName]) {
+          const clubIndex = cityClubCounts[cityName];
+          // برای هر باشگاه اضافه در یک شهر، آن را در یک زاویه متفاوت قرار بده
+          const angle = clubIndex * 45 * (Math.PI / 180); // هر باشگاه ۴۵ درجه بچرخد
+          const offsetLat = baseOffsetAngle * Math.sin(angle);
+          const offsetLon = baseOffsetAngle * Math.cos(angle);
+
+          lat += offsetLat;
+          lon += offsetLon;
+
+          cityClubCounts[cityName]++;
+        } else {
+          cityClubCounts[cityName] = 1;
+        }
+        // ------------------------------------------
 
         // خود ستون نور
         const pillar = createLightPillar({
           radius,
-          lon,
+          lon, // از lon و lat تغییر یافته استفاده کن
           lat,
           color,
           index: 0,
@@ -509,8 +532,8 @@ export default class earth {
           punctuation: this.options.punctuation,
           data: item,
         });
-        pillar.name = "club_pillar";
-        pillar.userData = { type: "Club", city: item.city, data: item };
+        pillar.name = 'club_pillar';
+        pillar.userData = { type: 'Club', city: item.city, data: item };
 
         this.clubGroup.add(pillar);
 
@@ -519,10 +542,10 @@ export default class earth {
           new SphereGeometry(0.8, 10, 10),
           new MeshBasicMaterial({ visible: false })
         );
-        const pickPos = lon2xyz(radius + 0.2, lon, lat);
+        const pickPos = lon2xyz(radius + 0.2, lon, lat); // از مختصات جدید استفاده کن
         pick.position.set(pickPos.x, pickPos.y, pickPos.z);
         pick.userData = pillar.userData; // همان دیتا
-        pick.name = "club_pick"; // صرفاً جهت دیباگ
+        pick.name = 'club_pick'; // صرفاً جهت دیباگ
         this.clubGroup.add(pick);
         this.clickablePoints.push(pick);
       })
@@ -710,21 +733,21 @@ export default class earth {
 
   public createSpriteLabel() {
     const continents = [
-      { name: "Amerika Prime", E: -100, N: 45 },
-      { name: "Latina Terra", E: -60, N: -15 },
-      { name: "Afrika Nova", E: 20, N: 2 },
-      { name: "Eurovia", E: 15, N: 50 },
-      { name: "Rusino", E: 86, N: 52 },
-      { name: "Oceastria", E: 135, N: -25 },
-      { name: "Balkara", E: 22, N: 43 },
-      { name: "Nordika", E: 13, N: 65 },
-      { name: "Indora", E: 77, N: 23 },
-      { name: "Sinora", E: 138, N: 37 },
-      { name: "Araka", E: 27, N: 26 },
+      { name: 'Amerika Prime', E: -100, N: 45 },
+      { name: 'Latina Terra', E: -60, N: -15 },
+      { name: 'Afrika Nova', E: 20, N: 2 },
+      { name: 'Eurovia', E: 15, N: 50 },
+      { name: 'Rusino', E: 86, N: 52 },
+      { name: 'Oceastria', E: 135, N: -25 },
+      { name: 'Balkara', E: 22, N: 43 },
+      { name: 'Nordika', E: 13, N: 65 },
+      { name: 'Indora', E: 77, N: 23 },
+      { name: 'Sinora', E: 138, N: 37 },
+      { name: 'Araka', E: 27, N: 26 },
     ];
 
     const fontSize = 40; // Larger font for continents
-    const color = "#FFFFFF"; // White color for continents
+    const color = '#FFFFFF'; // White color for continents
     const scalingFactor = 0.06;
 
     continents.forEach((continent) => {
@@ -754,23 +777,23 @@ export default class earth {
 
   public createCountryLabels() {
     const countries = [
-      { name: "United States", E: -100, N: 39 },
-      { name: "Canada", E: -95, N: 56 },
-      { name: "Brazil", E: -55, N: -10 },
-      { name: "Germany", E: 10, N: 51 },
-      { name: "Spain", E: -4, N: 40 },
-      { name: "United Kingdom", E: -2, N: 54 },
-      { name: "Russia", E: 90, N: 60 },
-      { name: "China", E: 104, N: 35 },
-      { name: "India", E: 78, N: 20 },
-      { name: "Japan", E: 138, N: 36 },
-      { name: "Egypt", E: 30, N: 27 },
-      { name: "South Africa", E: 24, N: -29 },
+      { name: 'United States', E: -100, N: 39 },
+      { name: 'Canada', E: -95, N: 56 },
+      { name: 'Brazil', E: -55, N: -10 },
+      { name: 'Germany', E: 10, N: 51 },
+      { name: 'Spain', E: -4, N: 40 },
+      { name: 'United Kingdom', E: -2, N: 54 },
+      { name: 'Russia', E: 90, N: 60 },
+      { name: 'China', E: 104, N: 35 },
+      { name: 'India', E: 78, N: 20 },
+      { name: 'Japan', E: 138, N: 36 },
+      { name: 'Egypt', E: 30, N: 27 },
+      { name: 'South Africa', E: 24, N: -29 },
     ];
 
     // استایل فونت برای کشورها (کمی بزرگتر از شهرها)
     const fontSize = 17;
-    const color = "#FFFFFF";
+    const color = '#FFFFFF';
     // const fontSize = 192;
     const scalingFactor = 0.05; // ضریب مقیاس مشابه
     countries.forEach((country) => {
@@ -796,9 +819,9 @@ export default class earth {
     color: string,
     scalingFactor: number
   ): Sprite {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    const fontFamily = "Arial";
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const fontFamily = 'Arial';
 
     context.font = `bolder ${fontSize}px ${fontFamily}`;
     const metrics = context.measureText(text);
@@ -807,8 +830,8 @@ export default class earth {
 
     context.font = `bolder ${fontSize}px ${fontFamily}`;
     context.fillStyle = color;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
     context.fillText(text, canvas.width / 2, canvas.height / 2);
 
     const texture = new CanvasTexture(canvas);
@@ -829,10 +852,10 @@ export default class earth {
   }
 
   private createCityLabel(text: string): Sprite {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
     const fontSize = 10;
-    const fontFamily = "Orbitron";
+    const fontFamily = 'Orbitron';
 
     // To get a crisp texture, we'll set the font on the context BEFORE measuring the text
     context.font = `bolder ${fontSize}px ${fontFamily}`;
@@ -844,9 +867,9 @@ export default class earth {
 
     // Re-apply the font as context is reset when canvas dimensions change
     context.font = `bolder ${fontSize}px ${fontFamily}`;
-    context.fillStyle = "#FFC900"; // A nice golden yellow color
-    context.textAlign = "center";
-    context.textBaseline = "middle";
+    context.fillStyle = '#FFC900'; // A nice golden yellow color
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
     context.fillText(text, canvas.width / 2, canvas.height / 2);
 
     const texture = new CanvasTexture(canvas);
@@ -877,7 +900,7 @@ export default class earth {
       closed: true, // 闭合
     });
     const mat = new MeshBasicMaterial({
-      color: "#0c3172",
+      color: '#0c3172',
       transparent: true,
       opacity: 0.4,
       side: DoubleSide,
@@ -991,12 +1014,12 @@ export default class earth {
       y: 1,
       z: 1,
       duration: 2,
-      ease: "Quadratic",
+      ease: 'Quadratic',
     });
   }
 
   render(camera: PerspectiveCamera) {
-    this.flyLineArcGroup?.userData["flyLineArray"]?.forEach((fly) => {
+    this.flyLineArcGroup?.userData['flyLineArray']?.forEach((fly) => {
       // fly.rotation.z += this.options.flyLine.speed; // 调节飞线速度
       if (fly.rotation.z >= fly.flyEndAngle) fly.rotation.z = 0;
     });
@@ -1016,23 +1039,23 @@ export default class earth {
 
     if (this.waveMeshArr.length) {
       this.waveMeshArr.forEach((mesh: Mesh) => {
-        mesh.userData["scale"] += 0.007;
+        mesh.userData['scale'] += 0.007;
         mesh.scale.set(
-          mesh.userData["size"] * mesh.userData["scale"],
-          mesh.userData["size"] * mesh.userData["scale"],
-          mesh.userData["size"] * mesh.userData["scale"]
+          mesh.userData['size'] * mesh.userData['scale'],
+          mesh.userData['size'] * mesh.userData['scale'],
+          mesh.userData['size'] * mesh.userData['scale']
         );
-        if (mesh.userData["scale"] <= 1.5) {
+        if (mesh.userData['scale'] <= 1.5) {
           (mesh.material as Material).opacity =
-            (mesh.userData["scale"] - 1) * 2; //2等于1/(1.5-1.0)，保证透明度在0~1之间变化
+            (mesh.userData['scale'] - 1) * 2; //2等于1/(1.5-1.0)，保证透明度在0~1之间变化
         } else if (
-          mesh.userData["scale"] > 1.5 &&
-          mesh.userData["scale"] <= 2
+          mesh.userData['scale'] > 1.5 &&
+          mesh.userData['scale'] <= 2
         ) {
           (mesh.material as Material).opacity =
-            1 - (mesh.userData["scale"] - 1.5) * 2; //2等于1/(2.0-1.5) mesh缩放2倍对应0 缩放1.5被对应1
+            1 - (mesh.userData['scale'] - 1.5) * 2; //2等于1/(2.0-1.5) mesh缩放2倍对应0 缩放1.5被对应1
         } else {
-          mesh.userData["scale"] = 1;
+          mesh.userData['scale'] = 1;
         }
       });
     }
@@ -1046,7 +1069,7 @@ export default class earth {
     allLabels.forEach((label) => {
       // This logic only runs for labels that are currently supposed to be visible based on zoom level.
       if (!label.visible) {
-        label.element.style.display = "none"; // 👈 اضافه کن
+        label.element.style.display = 'none'; // 👈 اضافه کن
         return;
       }
       const labelPosition = new Vector3();
@@ -1060,9 +1083,9 @@ export default class earth {
       const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
 
       if (dotProduct < 0.1) {
-        label.element.style.display = "none";
+        label.element.style.display = 'none';
       } else {
-        label.element.style.display = "block";
+        label.element.style.display = 'block';
       }
     });
   }
