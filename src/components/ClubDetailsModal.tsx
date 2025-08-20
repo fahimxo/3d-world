@@ -50,7 +50,7 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
           </div>
         </div>
         <p className="text-sm/6 mt-8 font-normal">
-          {clubData?.detaileDescription}
+          {clubData?.detileDiscription}
         </p>
         <FanbasePower power={100} />
 
