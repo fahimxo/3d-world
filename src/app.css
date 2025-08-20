@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 html,
 body,
 #root {
@@ -19,8 +19,8 @@ body {
 }
 
 .hide-scrollbar {
-  scrollbar-width: none;  
-  -ms-overflow-style: none;  
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 h1,
 h2 {
@@ -131,7 +131,7 @@ h2 a {
 }
 
 .sk-chase-dot::before {
-  content: "";
+  content: '';
   display: block;
   width: 20%;
   height: 20%;
@@ -238,15 +238,37 @@ h2 a {
 }
 
 .orbitron-font {
-  font-family: "Orbitron", sans-serif;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .orbitron-font {
-  font-family: "Orbitron", sans-serif;
+  font-family: 'Orbitron', sans-serif;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #00ffff;
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #0d2a27 inset !important;
+  box-shadow: 0 0 0 30px #0d2a27 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .hide-scrollbar {

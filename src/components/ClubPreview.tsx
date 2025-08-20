@@ -144,7 +144,7 @@ const ClubInfo: FC<ClubData> = ({
             <img
               src={`data:${mimeType};base64,${logoUrl}`}
               alt={originalClubName}
-              className="w-[30px] h-auto mt-1"
+              className="w-[58px] h-auto mt-1"
             />
           ) : (
             <span className="font-normal text-white">no image</span>

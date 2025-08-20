@@ -12,6 +12,7 @@ import z, { url } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import tr from 'zod/v4/locales/tr.cjs';
 import { showToast } from '../config/toastService';
+import { Loading } from '../assets/icons/Loading';
 
 enum hideClub {
   show = 1,
@@ -153,6 +154,7 @@ const ClubInfo = ({
   });
 
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
+  const [isCoordinatesLoading, setIsCoordinatesLoading] = useState(false);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
     ComboboxOption[]
   >([]);
@@ -332,6 +334,7 @@ const ClubInfo = ({
     const coordinates = data.replace(/"/g, ' ').trim();
 
     if (coordinates.replace(/ /g, '').length > 0) {
+      setIsCoordinatesLoading(true);
       try {
         const response: any = await api.post(
           API_ENDPOINTS.WORLD_MAP.GET_COUNTRY_AND_CITY_NAME_WITH_COORDINATES,
@@ -350,6 +353,7 @@ const ClubInfo = ({
       } catch (error) {
         console.error('API Error:', error);
       } finally {
+        setIsCoordinatesLoading(false);
         setIsLoading(false);
         console.log('API Error:');
       }
@@ -381,17 +385,26 @@ const ClubInfo = ({
                     timeoutRef.current = setTimeout(() => {
                       getCountryAndCityNameWithCoordinates(e.target.value);
                       trigger(['city', 'country']);
-                    }, 1000);
+                    }, 150);
                   };
 
                   return (
-                    <Input
-                      label="Coordinates"
-                      {...field}
-                      placeholder="Example: 50.510281, 4.719585"
-                      addClub="true"
-                      onChange={handleChange}
-                    />
+                    <div className="relative">
+                      <Input
+                        label="Coordinates"
+                        {...field}
+                        placeholder="Example: 50.510281, 4.719585"
+                        addClub="true"
+                        onChange={handleChange}
+                      />
+                      {isCoordinatesLoading && (
+                        <div className="absolute inset-y-0 right-0 top-6 flex items-center pr-3 pointer-events-none">
+                          <>
+                            <Loading />
+                          </>
+                        </div>
+                      )}
+                    </div>
                   );
                 }}
               />

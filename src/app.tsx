@@ -145,7 +145,7 @@ const App: React.FC = () => {
         filterModalVisible={filterModalVisible}
         setFilterModalVisible={setFilterModalVisible}
       />
-      <div className="fixed top-[175px] right-36 md:right-40 md:top-30 z-40">
+      <div className="fixed md:top-36 top-[200px] right-36 md:right-48  z-40">
         {isAdmin && (
           <Clubs
             onClick={() => {

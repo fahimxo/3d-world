@@ -85,7 +85,7 @@ export const Headers = ({
           className="block md:hidden"
           filterModalVisible={filterModalVisible}
         />
-        <img src={SiteLogo} alt="Site Logo" className="h-12 w-auto" />
+        <img src={SiteLogo} alt="Site Logo" className="h-24 w-auto" />
         <div className="relative w-[443px] h-[44px] hidden md:block">
           <Search />
           <div className="relative w-full h-full">
@@ -140,7 +140,7 @@ export const Headers = ({
         </div>
       </div>
 
-      <div className="mt-6 h-[1px] bg-cyan-500/30 w-full" />
+      <div className="h-[1px] bg-cyan-500/30 w-full" />
 
       <div className="relative w-full h-[44px] block md:hidden mt-4">
         <Search />

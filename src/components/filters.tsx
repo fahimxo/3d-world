@@ -172,7 +172,7 @@ export const Filters: React.FC<FiltersProps> = ({
   const areAnyComboboxesLoading = Object.values(loadingStates).some(Boolean);
 
   return (
-    <div className="absolute top-44 md:top-30 left-5 md:left-10 max-w-sm space-y-8 z-40">
+    <div className="absolute top-36 left-5 md:left-10 max-w-sm space-y-8 z-40">
       <FilterButton
         onClick={() => setFilterModalVisible((prev) => !prev)}
         className="hidden md:block mb-2"
