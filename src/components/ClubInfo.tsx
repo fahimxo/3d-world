@@ -266,8 +266,10 @@ const ClubInfo = ({
     const latitude = coords?.[0] || '';
     const longitude = coords?.[1] || '';
 
+    const inputClass = prevData ? 'updateClub_VM' : 'createClub_VM';
+
     const apiPayload = {
-      createClub_VM: {
+      [inputClass]: {
         reImaginedName: data.reImaginedName,
         originalClubName: data.originalClubName,
         lore: data.lore,
@@ -285,25 +287,25 @@ const ClubInfo = ({
         sectorId: parseInt(data.technoSector, 10) || 0,
         countryId: parseInt(data.country, 10) || 0,
         // displayOrder: 0, //
-        anthemUrl: data.clubAnthem,
+        anthemUrl: data.clubAnthem || null,
         // kitImageUrl: '',
-        kitVideoUrl: data.kitVideoUrl,
-        kitDiscription: data.kitDiscription,
+        kitVideoUrl: data.kitVideoUrl || null,
+        kitDiscription: data.kitDiscription || null,
         // stadiumImageUrl: '',
-        stadiumVideoUrl: data.stadiumVideoUrl,
-        staduimDiscription: data.staduimDiscription,
+        stadiumVideoUrl: data.stadiumVideoUrl || null,
+        staduimDiscription: data.staduimDiscription || null,
         // bestPlayerImageUrl: '',
-        bestPlayerVideoUrl: data.bestPlayerVideoUrl,
-        bestPlayerDiscription: data.bestPlayerDiscription,
+        bestPlayerVideoUrl: data.bestPlayerVideoUrl || null,
+        bestPlayerDiscription: data.bestPlayerDiscription || null,
         // coachImageUrl: '',
-        coachVideoUrl: data.coachVideoUrl,
-        coachDiscription: data.coachDiscription,
+        coachVideoUrl: data.coachVideoUrl || null,
+        coachDiscription: data.coachDiscription || null,
         // vehicleImageUrl: '',
-        vehicleVideoUrl: data.vehicleVideoUrl,
-        vehicleDiscription: data.vehicleDiscription,
+        vehicleVideoUrl: data.vehicleVideoUrl || null,
+        vehicleDiscription: data.vehicleDiscription || null,
         // symbolImageUrl: '',
-        symbolVideoUrl: data.symbolVideoUrl,
-        symbolDiscription: data.symbolDiscription,
+        symbolVideoUrl: data.symbolVideoUrl || null,
+        symbolDiscription: data.symbolDiscription || null,
       },
     };
 
