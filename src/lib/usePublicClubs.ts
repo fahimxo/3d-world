@@ -1,6 +1,6 @@
-import { useState } from "react";
-import api from "../config/axios";
-import { API_ENDPOINTS } from "../config/endpoint";
+import { useState } from 'react';
+import api from '../config/axios';
+import { API_ENDPOINTS } from '../config/endpoint';
 
 export interface PublicClubFilter {
   id?: number;
@@ -10,6 +10,7 @@ export interface PublicClubFilter {
   city?: string;
   reimaginedName?: string;
   currentName?: string;
+  searchItem?: string;
 }
 
 export type DataType = {
@@ -74,10 +75,10 @@ export function usePublicClubs() {
         setData(response?.result || []);
       } else {
         setData([]);
-        setError("No data found");
+        setError('No data found');
       }
     } catch (err: any) {
-      setError(err.message || "Unknown error");
+      setError(err.message || 'Unknown error');
       setData([]);
     } finally {
       setLoading(false);

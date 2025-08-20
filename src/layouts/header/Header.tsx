@@ -42,7 +42,7 @@ export const Headers = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchValue.trim()) {
-      fetchClubs({ city: searchValue.trim(), currentName: searchValue.trim() });
+      fetchClubs({ searchItem: searchValue.trim() });
     }
   };
 
