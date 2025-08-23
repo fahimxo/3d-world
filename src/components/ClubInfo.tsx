@@ -148,7 +148,7 @@ const ClubInfo = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    logoUrl: `;base64,${prevData?.logoUrl}`,
+    logoUrl: `;base64,${prevData?.logoUrl || ''}`,
     lockClub: prevData?.lockStatus === lockClub.lock ? true : false,
     hideClub: prevData?.status === hideClub.hide ? true : false,
   });
@@ -279,7 +279,9 @@ const ClubInfo = ({
         latitude: latitude,
         longitude: longitude,
         logoUrl:
-          formData?.logoUrl && formData?.logoUrl?.length > 0
+          formData?.logoUrl &&
+          formData?.logoUrl?.length > 0 &&
+          formData?.logoUrl?.split(';base64,')[1]
             ? formData?.logoUrl?.split(';base64,')[1]
             : null,
         // videoUrl: '',
