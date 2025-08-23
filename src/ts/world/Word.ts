@@ -28,6 +28,7 @@ import gsap from 'gsap';
 import { ComboboxOption } from 'src/components';
 import { DataType } from 'src/lib/usePublicClubs';
 import { lockClub } from '../../components/ClubInfo';
+import lockClubImage from '../../../static/images/lock-club.png';
 
 export default class World {
   public basic: Basic;
@@ -312,7 +313,7 @@ export default class World {
         if (hit.userData?.data?.lockStatus === lockClub.lock) {
           this.tooltipElement.innerHTML = `
           <div class="flex flex-col gap-1 items-center justify-center">
-          <img src="/static/images/lock-club.png" alt="Locked" class="w-10 h-10 object-cover rounded-full" />
+          <img src="${lockClubImage}" alt="Locked" class="w-10 h-10 object-cover rounded-full" />
           <span>Locked</span>
           </div>
           `;
