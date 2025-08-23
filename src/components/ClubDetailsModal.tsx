@@ -39,9 +39,9 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
             <CardInfoModal data={clubData} className="h-full" />
           </div>
           <div className="lg:flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
-            {clubData?.videoUrl && (
+            {clubData?.anthemUrl && (
               <ReactPlayer
-                src={clubData?.videoUrl}
+                src={clubData?.anthemUrl}
                 width="100%"
                 height="100%"
                 controls={true}
