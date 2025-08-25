@@ -96,6 +96,7 @@ type FilterFormValues = any;
 const ClubInfo = ({
   onClose,
   prevData,
+  onClubCreated,
 }: //   ={
 //     "id": 26,
 //     "reImaginedName": "Barsaaa",
@@ -145,6 +146,7 @@ const ClubInfo = ({
 {
   onClose: any;
   prevData?: any;
+  onClubCreated?: () => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -321,8 +323,12 @@ const ClubInfo = ({
         response = await api.post(API_ENDPOINTS.ADMIN.CREATE_CLUB, apiPayload);
       }
       if (response?.code === 0) {
-        onClose();
         showToast(response?.message, 'success');
+        if (onClubCreated) {
+          onClubCreated();
+        } else {
+          onClose();
+        }
       }
     } catch (error) {
       console.error('API Error:', error);

@@ -10,7 +10,7 @@ enum tabs {
   edit = 2,
 }
 
-const ClubsManagement = ({ onClose }) => {
+const ClubsManagement = ({ onClose, onDataChange }) => {
   const [currentTab, setCurrentTab] = useState(tabs.add);
   const changeTabs = (tab) => {
     setCurrentTab(tab);
@@ -47,9 +47,9 @@ const ClubsManagement = ({ onClose }) => {
           <CustomScrollPanel className="relative z-10 flex-1 min-h-0 mt-8">
             <div>
               {currentTab === tabs.add ? (
-                <ClubInfo onClose={onClose} />
+                <ClubInfo onClose={onClose} onClubCreated={onDataChange} />
               ) : (
-                <ClubList onClose={onClose} />
+                <ClubList onClose={onClose} onDataChange={onDataChange} />
               )}
             </div>
           </CustomScrollPanel>

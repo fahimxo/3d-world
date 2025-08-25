@@ -19,6 +19,7 @@ const getOptionsFor = async (
   try {
     const response = await api.post(endpoint, {
       filter: { searchTerm: '' },
+      _cacheBust: Date.now(),
     });
     const responseData = response.data ? response.data : response;
     if (
@@ -107,44 +108,38 @@ export const Filters: React.FC<FiltersProps> = ({
   );
 
   useEffect(() => {
-    if (sportOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, sports: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, 'Sports').then(
-        (data) => {
-          setSportOptions(data);
-          setLoadingStates((prev) => ({ ...prev, sports: false }));
-        }
-      );
-    }
-    if (technoSectorOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
-      getOptionsFor(
-        API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
-        'Techno Sectors'
-      ).then((data) => {
-        setTechnoSectorOptions(data);
-        setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
-      });
-    }
-    if (countryOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, countries: true }));
-      getOptionsFor(
-        API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST,
-        'Countries'
-      ).then((data) => {
+    setLoadingStates((prev) => ({ ...prev, sports: true }));
+    getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_SPORTS_LIST, 'Sports').then(
+      (data) => {
+        setSportOptions(data);
+        setLoadingStates((prev) => ({ ...prev, sports: false }));
+      }
+    );
+
+    setLoadingStates((prev) => ({ ...prev, technoSectors: true }));
+    getOptionsFor(
+      API_ENDPOINTS.WORLD_MAP.GET_TECHNO_SECTORS_LIST,
+      'Techno Sectors'
+    ).then((data) => {
+      setTechnoSectorOptions(data);
+      setLoadingStates((prev) => ({ ...prev, technoSectors: false }));
+    });
+
+    setLoadingStates((prev) => ({ ...prev, countries: true }));
+    getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_COUNTRIES_LIST, 'Countries').then(
+      (data) => {
         setCountryOptions(data);
         setLoadingStates((prev) => ({ ...prev, countries: false }));
-      });
-    }
-    if (cityOptions.length === 0) {
-      setLoadingStates((prev) => ({ ...prev, cities: true }));
-      getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, 'Cities').then(
-        (data) => {
-          setCityOptions(data);
-          setLoadingStates((prev) => ({ ...prev, cities: false }));
-        }
-      );
-    }
+      }
+    );
+
+    setLoadingStates((prev) => ({ ...prev, cities: true }));
+    getOptionsFor(API_ENDPOINTS.WORLD_MAP.GET_CITIES_LIST, 'Cities').then(
+      (data) => {
+        setCityOptions(data);
+        setLoadingStates((prev) => ({ ...prev, cities: false }));
+      }
+    );
   }, []);
 
   const onSubmit: SubmitHandler<FilterFormValues> = async (data) => {

@@ -26,6 +26,7 @@ const App: React.FC = () => {
   const [filterModalVisible, setFilterModalVisible] = useState<boolean>(false);
   const [locationsModalOpen, setLocationsModalOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [filterRefreshKey, setFilterRefreshKey] = useState(0);
 
   useEffect(() => {
     const admin = localStorage.getItem('isAdmin');
@@ -49,6 +50,12 @@ const App: React.FC = () => {
       "!!! CRITICAL: Portal target 'portal-root' not found in the DOM."
     );
   }
+
+  const handleDataChange = () => {
+    fetchClubs({});
+    setFilterRefreshKey((prevKey) => prevKey + 1);
+    setLocationsModalOpen(false);
+  };
 
   const worldRef = useRef<WorldHandle>(null);
 
@@ -138,6 +145,7 @@ const App: React.FC = () => {
         />
       </div>
       <Filters
+        key={filterRefreshKey}
         onFilterSubmit={handleFilterSubmit}
         loading={clubsLoading}
         cityOptions={cityOptions}
@@ -157,7 +165,10 @@ const App: React.FC = () => {
       </div>
       {locationsModalOpen &&
         ReactDOM.createPortal(
-          <ClubsManagement onClose={() => setLocationsModalOpen(false)} />,
+          <ClubsManagement
+            onClose={() => setLocationsModalOpen(false)}
+            onDataChange={handleDataChange}
+          />,
           document.getElementById('portal-root')
         )}
       <Tooltip />
