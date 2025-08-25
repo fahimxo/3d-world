@@ -35,19 +35,23 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
     <Modal mode="center">
       <DetailsModal onClose={onClose}>
         <div className="flex flex-col lg:flex-row items-stretch gap-6 text-white lg:h-[232px]">
-          <div className="lg:w-[240px] w-full h-full">
+          <div
+            className={` w-full h-full ${
+              clubData?.anthemUrl ? 'lg:w-[240px]' : ''
+            }`}
+          >
             <CardInfoModal data={clubData} className="h-full" />
           </div>
-          <div className="lg:flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
-            {clubData?.anthemUrl && (
+          {clubData?.anthemUrl && (
+            <div className="lg:flex-1 w-full h-[232px] lg:h-full mt-4 lg:mt-0.5">
               <ReactPlayer
                 src={clubData?.anthemUrl}
                 width="100%"
                 height="100%"
                 controls={true}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
         <p className="text-sm/6 mt-8 font-normal">
           {clubData?.detileDiscription}

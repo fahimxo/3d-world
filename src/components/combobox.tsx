@@ -90,6 +90,7 @@ const ComboboxMenu = ({
             value={searchValue}
             name={name}
             addClub={addClub}
+            className="pl-9"
             onChange={(event) => {
               setSearchValue?.(event.target.value);
             }}

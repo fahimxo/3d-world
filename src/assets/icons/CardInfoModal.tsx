@@ -21,7 +21,7 @@ const CardInfoModal = ({
 
   return (
     <div
-      className={`relative lg:w-[240px] w-full flex items-center justify-center ${className}`}
+      className={`relative lg:min-w-[240px] w-full flex items-center justify-center ${className}`}
     >
       <svg
         width="100%"
