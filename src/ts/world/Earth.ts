@@ -747,6 +747,7 @@ export default class earth {
       { name: 'Indora', E: 77, N: 23 },
       { name: 'Sinora', E: 138, N: 37 },
       { name: 'Araka', E: 27, N: 26 },
+      { name: 'NeoBritannia', E:-4 , N:54 },
     ];
 
     const fontSize = 40; // Larger font for continents
