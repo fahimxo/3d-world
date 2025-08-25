@@ -45,9 +45,11 @@ export default class World {
   public mouse: Vector2; // 👈 Add mouse vector property
   public data: DataType[];
   public cityList: ComboboxOption[];
+  public countryList: ComboboxOption[];
   private cachedData: {
     clubList: DataType[];
     cityList: ComboboxOption[];
+    countryList: ComboboxOption[];
   } | null = null;
   public labelRenderer: CSS2DRenderer;
   private tooltipElement: HTMLElement | null;
@@ -81,6 +83,7 @@ export default class World {
     this.camera = this.basic.camera;
     this.data = option.data;
     this.cityList = option.cityList;
+    this.countryList = option.countryList;
 
     this.labelRenderer = new CSS2DRenderer();
     this.labelRenderer.setSize(
@@ -129,6 +132,7 @@ export default class World {
           this.cachedData?.clubList,
           this.cachedData?.cityList
         );
+        this.earth.createCountryLabels(this.cachedData?.countryList);
         // Clear the cache so it's not used again.
         this.cachedData = null;
       }
@@ -159,6 +163,7 @@ export default class World {
   public async updateData(newData: {
     clubList: DataType[];
     cityList: ComboboxOption[];
+    countryList: ComboboxOption[];
   }) {
     if (this.earth) {
       // Re-create the markup points with the new data
@@ -166,6 +171,7 @@ export default class World {
         newData?.clubList,
         newData?.cityList
       );
+      this.earth.createCountryLabels(newData?.countryList);
       this.handleZoom();
     } else {
       this.cachedData = newData;
@@ -463,6 +469,7 @@ export default class World {
       // data: Data,
       data: this.data,
       cityList: this.cityList,
+      countryList: this.countryList,
       dom: this.option.dom,
       textures: this.resources.textures,
       earth: {

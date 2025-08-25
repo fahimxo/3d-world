@@ -70,6 +70,7 @@ export interface CityData {
 type options = {
   data: DataType[];
   cityList: ComboboxOption[];
+  countryList: ComboboxOption[];
   dom: HTMLElement;
   textures: Record<string, Texture>; // 贴图
   earth: {
@@ -125,6 +126,7 @@ export default class earth {
   public clickablePoints: THREE.Mesh[] = [];
   public data: DataType[];
   public cityList: ComboboxOption[];
+  public countryList: ComboboxOption[];
   public cityLabels: CSS2DObject[] = [];
   public continentLabels: Sprite[] = [];
   public countryLabels: Sprite[] = [];
@@ -136,6 +138,7 @@ export default class earth {
     this.options = options;
     this.data = options.data;
     this.cityList = options.cityList;
+    this.countryList = options.countryList;
 
     this.group = new Group();
     this.group.name = 'group';
@@ -206,7 +209,7 @@ export default class earth {
       this.createEarthAperture(); // 创建地球的大气层
       await this.createMarkupPointsAndLabels(this.data, this.cityList); // 创建柱状点位
       this.createSpriteLabel(); // 创建标签
-      this.createCountryLabels();
+      this.createCountryLabels(this.countryList);
       // this.createAnimateCircle(); // 创建环绕卫星
       // this.createFlyLine(); // 创建飞线
 
@@ -747,7 +750,7 @@ export default class earth {
       { name: 'Indora', E: 77, N: 23 },
       { name: 'Sinora', E: 138, N: 37 },
       { name: 'Araka', E: 27, N: 26 },
-      { name: 'NeoBritannia', E:-4 , N:54 },
+      { name: 'NeoBritannia', E: -4, N: 54 },
     ];
 
     const fontSize = 40; // Larger font for continents
@@ -779,35 +782,39 @@ export default class earth {
     });
   }
 
-  public createCountryLabels() {
-    const countries = [
-      { name: 'United States', E: -100, N: 39 },
-      { name: 'Canada', E: -95, N: 56 },
-      { name: 'Brazil', E: -55, N: -10 },
-      { name: 'Germany', E: 10, N: 51 },
-      { name: 'Spain', E: -4, N: 40 },
-      { name: 'United Kingdom', E: -2, N: 54 },
-      { name: 'Russia', E: 90, N: 60 },
-      { name: 'China', E: 104, N: 35 },
-      { name: 'India', E: 78, N: 20 },
-      { name: 'Japan', E: 138, N: 36 },
-      { name: 'Egypt', E: 30, N: 27 },
-      { name: 'South Africa', E: 24, N: -29 },
-    ];
+  public createCountryLabels(countryList: ComboboxOption[]) {
+    // const countries = [
+    //   { name: 'United States', E: -100, N: 39 },
+    //   { name: 'Canada', E: -95, N: 56 },
+    //   { name: 'Brazil', E: -55, N: -10 },
+    //   { name: 'Germany', E: 10, N: 51 },
+    //   { name: 'Spain', E: -4, N: 40 },
+    //   { name: 'United Kingdom', E: -2, N: 54 },
+    //   { name: 'Russia', E: 90, N: 60 },
+    //   { name: 'China', E: 104, N: 35 },
+    //   { name: 'India', E: 78, N: 20 },
+    //   { name: 'Japan', E: 138, N: 36 },
+    //   { name: 'Egypt', E: 30, N: 27 },
+    //   { name: 'South Africa', E: 24, N: -29 },
+    // ];
 
     // استایل فونت برای کشورها (کمی بزرگتر از شهرها)
     const fontSize = 17;
     const color = '#FFFFFF';
     // const fontSize = 192;
     const scalingFactor = 0.05; // ضریب مقیاس مشابه
-    countries.forEach((country) => {
+    countryList?.forEach((country) => {
       const sprite = this.createTextSprite(
-        country.name,
+        country?.label,
         fontSize,
         color,
         scalingFactor
       );
-      const pos = lon2xyz(this.options.earth.radius + 3, country.E, country.N);
+      const pos = lon2xyz(
+        this.options.earth.radius + 3,
+        country.longitude,
+        country.latitude
+      );
       sprite.position.set(pos.x, pos.y, pos.z);
       sprite.visible = false; // در ابتدا مخفی باشد
       this.earthGroup.add(sprite);

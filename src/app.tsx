@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const [locationsModalOpen, setLocationsModalOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [filterRefreshKey, setFilterRefreshKey] = useState(0);
+  const [countryOptions, setCountryOptions] = useState<ComboboxOption[]>([]);
 
   useEffect(() => {
     const admin = localStorage.getItem('isAdmin');
@@ -132,6 +133,7 @@ const App: React.FC = () => {
         data={clubData}
         ref={worldRef}
         cityList={cityOptions}
+        countryList={countryOptions}
         onLoaded={handleWorldLoaded}
         setFilterModalVisible={setFilterModalVisible}
       />
@@ -152,6 +154,8 @@ const App: React.FC = () => {
         setCityOptions={setCityOptions}
         filterModalVisible={filterModalVisible}
         setFilterModalVisible={setFilterModalVisible}
+        countryOptions={countryOptions}
+        setCountryOptions={setCountryOptions}
       />
       <div className="fixed md:top-36 top-[200px] right-36 md:right-48  z-40">
         {isAdmin && (

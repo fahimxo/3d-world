@@ -14,6 +14,7 @@ interface WorldComponentProps {
   onCityClick: (name: string, data: string) => void;
   data: DataType[];
   cityList: ComboboxOption[];
+  countryList: ComboboxOption[];
   onLoaded: () => void;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -23,7 +24,17 @@ export interface WorldHandle {
 }
 
 const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
-  ({ onCityClick, data, cityList, onLoaded, setFilterModalVisible }, ref) => {
+  (
+    {
+      onCityClick,
+      data,
+      cityList,
+      onLoaded,
+      setFilterModalVisible,
+      countryList,
+    },
+    ref
+  ) => {
     const mountRef = useRef<HTMLDivElement>(null);
     const worldInstance = useRef<World | null>(null);
 
@@ -55,6 +66,7 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
           },
           data: [],
           cityList: [],
+          countryList: [],
           onLoaded: onLoaded,
         });
       }
@@ -76,7 +88,11 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
     useEffect(() => {
       // When the 'data' prop changes and is not empty, update the world
       if (worldInstance.current && data && data.length > 0) {
-        worldInstance.current.updateData({ clubList: data, cityList });
+        worldInstance.current.updateData({
+          clubList: data,
+          cityList,
+          countryList,
+        });
       }
     }, [data]); // This effect runs whenever the 'data' prop changes
     // This div is the container where your Three.js canvas will be placed.

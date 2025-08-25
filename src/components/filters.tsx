@@ -58,6 +58,8 @@ interface FiltersProps {
   onFilterSubmit: (payload: object) => void;
   loading: boolean;
   cityOptions: ComboboxOption[];
+  countryOptions: ComboboxOption[];
+  setCountryOptions: React.Dispatch<React.SetStateAction<ComboboxOption[]>>;
   setCityOptions: React.Dispatch<React.SetStateAction<ComboboxOption[]>>;
   filterModalVisible: boolean;
   setFilterModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -70,12 +72,13 @@ export const Filters: React.FC<FiltersProps> = ({
   setCityOptions,
   filterModalVisible,
   setFilterModalVisible,
+  countryOptions,
+  setCountryOptions,
 }) => {
   const [sportOptions, setSportOptions] = useState<ComboboxOption[]>([]);
   const [technoSectorOptions, setTechnoSectorOptions] = useState<
     ComboboxOption[]
   >([]);
-  const [countryOptions, setCountryOptions] = useState<ComboboxOption[]>([]);
 
   const [loadingStates, setLoadingStates] = useState({
     sports: false,

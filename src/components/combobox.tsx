@@ -9,6 +9,7 @@ export interface ComboboxOption {
   label: string;
   latitude?: number;
   longitude?: number;
+  name?: string;
 }
 
 interface ComboboxProps {
