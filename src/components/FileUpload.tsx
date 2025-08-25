@@ -74,8 +74,20 @@
 //     </div>
 //   );
 // };
-// src/components/FileUpload.tsx
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+
+const useWindowSize = () => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const updateSize = () => {
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+};
 
 interface FileUploadProps {
   label: string;
@@ -86,7 +98,7 @@ interface FileUploadProps {
 const UploadIcon = () => (
   <svg
     className="w-8 h-8 text-[#415C52]"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="http://www.w.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
@@ -108,6 +120,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const [fileName, setFileName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -115,7 +130,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string; // includes data:image/...;base64,
+        const base64String = reader.result as string;
         onChange(base64String, file);
       };
       reader.readAsDataURL(file);
@@ -129,15 +144,25 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     inputRef.current?.click();
   };
 
+  const getDisplayName = () => {
+    if (!fileName) {
+      return 'Upload club logo';
+    }
+    if (isMobile && fileName.length > 10) {
+      return fileName.substring(0, 10) + '...';
+    }
+    return fileName;
+  };
+
   return (
     <div className="w-full space-y-3">
       <label className="text-sm text-[#00FFA6] block tracking-wider mb-1">
         {label}
       </label>
       <div
-        className="relative flex flex-col items-center justify-center w-full h-23 
-        border-2 border-dashed border-[#415C52] rounded-lg 
-        cursor-pointer hover:bg-cyan-500/10 transition-colors"
+        className="relative flex flex-col items-center justify-center w-full h-23
+        border-2 border-dashed border-[#415C52] rounded-lg
+        cursor-pointer hover:bg-cyan-500/10 transition-colors overflow-hidden"
         onClick={handleClick}
       >
         <input
@@ -149,8 +174,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           accept="image/*"
         />
         <UploadIcon />
-        <p className="text-xs text-[#415C52]">
-          {fileName || 'Upload club logo'}
+        <p className="w-full px-4 mt-1 text-xs text-[#415C52] flex justify-center overflow-hidden">
+          <span className="truncate">{getDisplayName()}</span>
         </p>
       </div>
     </div>

@@ -10,11 +10,13 @@ interface ClubListProps {
   isShowVisibleClubs?: boolean;
   isShowLockedClubs?: boolean;
   onClose: () => void;
+  onDataChange: () => void;
 }
 const ClubList: FC<ClubListProps> = ({
   isShowVisibleClubs = false,
   isShowLockedClubs = false,
   onClose,
+  onDataChange,
 }) => {
   const [clubsData, setClubData] = useState<ClubData[]>([]);
   const [clubDataForEdit, setClubDataForEdit] = useState<ClubData>({});
@@ -50,7 +52,7 @@ const ClubList: FC<ClubListProps> = ({
           clubsData?.map((data) => (
             <ClubCard
               clubData={data}
-              getClubsData={getClubsData}
+              getClubsData={onDataChange}
               key={data.id}
               setClubDataForEdit={setClubDataForEdit}
               setIsShowClubInfo={setIsShowClubInfo}
@@ -69,6 +71,7 @@ const ClubList: FC<ClubListProps> = ({
             // setClubDataForEdit({});
           }}
           prevData={clubDataForEdit}
+          onClubCreated={onDataChange}
         />
       )}
       {!isShowClubInfo && (
