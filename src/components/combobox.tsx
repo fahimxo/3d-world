@@ -24,7 +24,6 @@ interface ComboboxProps {
   salt?: boolean;
   addCc?: string;
 }
-
 const ComboboxMenu = ({
   options,
   value,
@@ -39,27 +38,15 @@ const ComboboxMenu = ({
   salt,
   addClub,
 }) => {
-  const [position, setPosition] = useState({});
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + window.scrollY + 8,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-  }, [triggerRef]);
-
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event) => {
       if (
         menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
+        !menuRef.current.contains(event.target) &&
         triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
+        !triggerRef.current.contains(event.target)
       ) {
         setOpen(false);
       }
@@ -77,8 +64,8 @@ const ComboboxMenu = ({
   return (
     <div
       ref={menuRef}
-      className="fixed z-[55555555555] p-[2px] animate-in fade-in-0 zoom-in-95"
-      style={{ ...position, ...futuristicClipPath }}
+      className="absolute top-full left-0 w-full mt-2 z-[55555555555] p-[2px] animate-in fade-in-0 zoom-in-95"
+      style={futuristicClipPath}
     >
       <div
         className={cn(
@@ -195,6 +182,7 @@ const Combobox: React.FC<ComboboxProps> = ({
           {label}
         </label>
       )}
+      {/* این div با کلاس relative والد اصلی منو میشه و باعث میشه absolute کار کنه */}
       <div className="relative w-full">
         <div className="p-[2px]" style={futuristicClipPath}>
           <div
