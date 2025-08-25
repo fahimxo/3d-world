@@ -8,9 +8,9 @@ import {
   Texture,
   TubeGeometry,
   Vector3,
-} from "three";
-import { punctuation } from "../world/Earth";
-import { DataType } from "src/lib/usePublicClubs";
+} from 'three';
+import { punctuation } from '../world/Earth';
+import { DataType } from 'src/lib/usePublicClubs';
 
 /**
  * 经纬度坐标转球面坐标
@@ -58,8 +58,8 @@ export const createWaveMesh = (options: {
   const coord = lon2xyz(options.radius * 1.001, options.lon, options.lat);
   const size = options.radius * 0.12; //矩形平面Mesh的尺寸
   mesh.scale.set(size, size, size); //设置mesh大小
-  mesh.userData["size"] = size; //自顶一个属性，表示mesh静态大小
-  mesh.userData["scale"] = Math.random() * 1.0; //自定义属性._s表示mesh在原始大小基础上放大倍数  光圈在原来mesh.size基础上1~2倍之间变化
+  mesh.userData['size'] = size; //自顶一个属性，表示mesh静态大小
+  mesh.userData['scale'] = Math.random() * 1.0; //自定义属性._s表示mesh在原始大小基础上放大倍数  光圈在原来mesh.size基础上1~2倍之间变化
   mesh.position.set(coord.x, coord.y, coord.z);
   const coordVec3 = new Vector3(coord.x, coord.y, coord.z).normalize();
   const meshNormal = new Vector3(0, 0, 1);
@@ -75,7 +75,7 @@ export const createLightPillar = (options: {
   index: number;
   textures: Record<string, Texture>;
   punctuation: punctuation;
-  color: number;
+  color: number | string;
   data: DataType;
 }) => {
   const height = options.radius * 0.1;
@@ -94,7 +94,7 @@ export const createLightPillar = (options: {
   // 两个光柱交叉叠加
   group.add(mesh, mesh.clone().rotateZ(Math.PI / 2)); //几何体绕x轴旋转了，所以mesh旋转轴变为z
   // 经纬度转球面坐标
-  group.name = "light_pillar"; // Assign a unique name
+  group.name = 'light_pillar'; // Assign a unique name
   const SphereCoord = lon2xyz(options.radius, options.lon, options.lat); //SphereCoord球面坐标
   group.position.set(SphereCoord.x, SphereCoord.y, SphereCoord.z); //设置mesh位置
   const coordVec3 = new Vector3(

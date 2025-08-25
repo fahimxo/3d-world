@@ -502,8 +502,9 @@ export default class earth {
       clubs.map(async (item) => {
         let lon = +item.longitude;
         let lat = +item.latitude;
+
         const color =
-          item?.lockStatus === lockClub.unLock ? 0xffa500 : 0x525354;
+          item?.lockStatus === lockClub.unLock ? item?.pinColor : 0x525354;
 
         // --- ✨ منطق جابجایی (Offsetting Logic) ---
         const cityName = item.city;

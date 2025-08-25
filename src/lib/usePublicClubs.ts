@@ -51,6 +51,7 @@ export type DataType = {
   totalRatings: number;
   created: string;
   lastModified: string;
+  pinColor: string;
 };
 
 export interface PublicClubResult {
