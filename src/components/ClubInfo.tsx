@@ -366,7 +366,7 @@ const ClubInfo = ({
     <div>
       <div className="grid grid-cols-1 h-full ">
         <Accordion title="Club Info">
-          <div className="grid md:grid-cols-3 gap-x-6 gap-y-6">
+          <div className="grid md:grid-cols-3 gap-x-6 gap-y-6 my-2.5">
             <div className="col-span-2">
               <Controller
                 name="coordinates"
@@ -719,7 +719,7 @@ const RepeatedItem = ({
 }) => {
   return (
     <Accordion title={title}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 my-2">
         <Controller
           name={urlName}
           control={control}
