@@ -231,6 +231,13 @@ export default class World {
       (label) => (label.visible = showCountries)
     );
 
+    this.earth.cityGroup.children.forEach((child) => {
+      if (child.name.startsWith('leader_line_')) {
+        // پیدا کردن بر اساس نام
+        child.visible = showCities; // فقط وقتی showCities true باشه نمایش بده
+      }
+    });
+
     // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
     const shouldBeZoomedIn = showCountries || showCities;
 

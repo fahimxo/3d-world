@@ -26,6 +26,8 @@ import {
   ExtrudeGeometry,
   MeshStandardMaterial,
   PerspectiveCamera,
+  LineBasicMaterial,
+  Line,
 } from 'three';
 
 import html2canvas from 'html2canvas';
@@ -558,15 +560,83 @@ export default class earth {
     );
   }
 
+  // تغییر جدید: تابع کمکی برای محاسبه فاصله جغرافیایی (Haversine formula)
+  private haversine(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number {
+    const R = 6371; // شعاع زمین در کیلومتر
+    const dlat = ((lat2 - lat1) * Math.PI) / 180;
+    const dlon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dlat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dlon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // فاصله در کیلومتر
+  }
+
   // 2) ساخت Point Mesh برای شهرها
   public async createCityPoints(cities: ComboboxOption[] = []) {
     const radius = this.options.earth.radius;
+    const closeThreshold = 170; // آستانه فاصله نزدیک (کیلومتر)، تنظیم کنید
+
+    // تغییر جدید: پیش‌پردازش برای پیدا کردن گروه‌های شهرهای نزدیک
+    const cityGroups: { [key: string]: ComboboxOption[] } = {}; // گروه‌بندی بر اساس نزدیکی
+    cities.forEach((city) => {
+      let grouped = false;
+      for (const groupKey in cityGroups) {
+        const group = cityGroups[groupKey];
+        const dist = this.haversine(
+          +city.latitude,
+          +city.longitude,
+          +group[0].latitude,
+          +group[0].longitude
+        );
+        if (dist < closeThreshold) {
+          group.push(city);
+          grouped = true;
+          break;
+        }
+      }
+      if (!grouped) {
+        cityGroups[city.label || city.value] = [city]; // گروه جدید
+      }
+    });
 
     await Promise.all(
       cities.map(async (item) => {
         const lon = +item.longitude;
         const lat = +item.latitude;
         const color = 0xffa500;
+
+        // تغییر جدید: پیدا کردن گروه این شهر و اعمال offset اگر گروه بزرگ باشه
+        let offsetLon = 0;
+        let offsetLat = 0;
+        for (const groupKey in cityGroups) {
+          const group = cityGroups[groupKey];
+          if (group.includes(item) && group.length > 1) {
+            // اگر گروه بیشتر از 1 شهر داره، offset اعمال کن
+            const index = group.indexOf(item);
+            const angle = (index / group.length) * 2 * Math.PI; // توزیع دایره‌ای
+            let offsetDistance = 1 + (group.length - 1) * 0.5; // درجه offset، بسته به تعداد
+            offsetDistance = Math.min(offsetDistance, 1.5); // حداکثر ۳ درجه
+            offsetLon = offsetDistance * Math.cos(angle);
+            offsetLat = offsetDistance * Math.sin(angle);
+            break;
+          }
+        }
+
+        // موقعیت اصلی نقطه شهر (بدون offset)
+        const originalPos = lon2xyz(radius, lon, lat);
+
+        // موقعیت جابجا شده برای لیبل
+        const labelLon = lon + offsetLon;
+        const labelLat = lat + offsetLat;
+        const labelPos = lon2xyz(radius + 1, labelLon, labelLat);
 
         const pointMaterial = new MeshBasicMaterial({
           color,
@@ -578,22 +648,35 @@ export default class earth {
         const cityPoint = createPointMesh({
           radius,
           lon,
-          lat,
+          lat, // نقطه شهر بدون offset
           material: pointMaterial,
         });
 
         this.cityGroup.add(cityPoint);
         this.clickablePoints.push(cityPoint);
 
-        // لیبل HTML (اختیاری)
+        // لیبل HTML
         const label = this.createHTMLLabel(item.value);
-        label.visible = false;
-
-        const labelPos = lon2xyz(radius + 1, lon, lat);
+        label.visible = false; // همیشه可见، چون ثابت است
         label.position.set(labelPos.x, labelPos.y, labelPos.z);
 
         this.cityGroup.add(label);
         this.cityLabels.push(label);
+
+        // تغییر جدید: اگر offset اعمال شده، leader line اضافه کن
+        if (offsetLon !== 0 || offsetLat !== 0) {
+          const lineGeometry = new BufferGeometry().setFromPoints([
+            new Vector3(originalPos.x, originalPos.y, originalPos.z), // موقعیت اصلی شهر
+            new Vector3(labelPos.x, labelPos.y, labelPos.z), // موقعیت لیبل
+          ]);
+          const lineMaterial = new LineBasicMaterial({
+            color: 0xffffff,
+            linewidth: 7,
+          }); // خط سفید نازک
+          const leaderLine = new Line(lineGeometry, lineMaterial);
+          leaderLine.name = `leader_line_${item.value}`;
+          this.cityGroup.add(leaderLine);
+        }
       })
     );
   }
@@ -1078,21 +1161,16 @@ export default class earth {
     const allLabels = [...this.cityLabels];
 
     allLabels.forEach((label) => {
-      // This logic only runs for labels that are currently supposed to be visible based on zoom level.
       if (!label.visible) {
-        label.element.style.display = 'none'; // 👈 اضافه کن
+        label.element.style.display = 'none';
         return;
       }
       const labelPosition = new Vector3();
       label.getWorldPosition(labelPosition);
-
       const labelNormal = labelPosition.clone().normalize();
-
       const cameraPosition = new Vector3();
       camera.getWorldPosition(cameraPosition);
-
       const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
-
       if (dotProduct < 0.1) {
         label.element.style.display = 'none';
       } else {
