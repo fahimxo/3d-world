@@ -53,6 +53,7 @@ const ClubDetailsModal: React.FC<ClubDetailsModalProps> = ({
             </div>
           )}
         </div>
+        {clubData?.lore && <p className="mt-6">{clubData?.lore}</p>}
         <p className="text-sm/6 mt-8 font-normal">
           {clubData?.detileDiscription}
         </p>
