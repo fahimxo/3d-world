@@ -19,7 +19,6 @@ const getOptionsFor = async (
   try {
     const response = await api.post(endpoint, {
       filter: { searchTerm: '' },
-      _cacheBust: Date.now(),
     });
     const responseData = response.data ? response.data : response;
     if (

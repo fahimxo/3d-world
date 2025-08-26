@@ -270,10 +270,13 @@ const ClubInfo = ({
     const latitude = coords?.[0] || '';
     const longitude = coords?.[1] || '';
 
+    console.log('data', data);
+
     const inputClass = prevData ? 'updateClub_VM' : 'createClub_VM';
 
     const apiPayload = {
       [inputClass]: {
+        id: prevData?.id || undefined,
         reImaginedName: data.reImaginedName,
         originalClubName: data.originalClubName,
         lore: data.lore,
@@ -291,7 +294,7 @@ const ClubInfo = ({
         lockStatus: formData.lockClub ? lockClub.lock : lockClub.unLock,
         sportId: parseInt(data.sportType, 10) || 0,
         sectorId: parseInt(data.technoSector, 10) || 0,
-        countryId: parseInt(data.country, 10) || 0,
+        countryId: parseInt(data.countryId, 10) || 0,
         // displayOrder: 0, //
         anthemUrl: data.clubAnthem || null,
         // kitImageUrl: '',

@@ -561,6 +561,7 @@ export default class earth {
   // 2) ساخت Point Mesh برای شهرها
   public async createCityPoints(cities: ComboboxOption[] = []) {
     const radius = this.options.earth.radius;
+    console.log(cities, 'cities');
 
     await Promise.all(
       cities.map(async (item) => {
