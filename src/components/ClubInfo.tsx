@@ -270,8 +270,6 @@ const ClubInfo = ({
     const latitude = coords?.[0] || '';
     const longitude = coords?.[1] || '';
 
-    console.log('data', data);
-
     const inputClass = prevData ? 'updateClub_VM' : 'createClub_VM';
 
     const apiPayload = {
