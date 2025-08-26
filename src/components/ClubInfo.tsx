@@ -319,7 +319,7 @@ const ClubInfo = ({
     try {
       let response;
       if (prevData) {
-        response = await api.put(API_ENDPOINTS.ADMIN.UPDATE_CLUB, apiPayload);
+        response = await api.post(API_ENDPOINTS.ADMIN.UPDATE_CLUB, apiPayload);
       } else {
         response = await api.post(API_ENDPOINTS.ADMIN.CREATE_CLUB, apiPayload);
       }
