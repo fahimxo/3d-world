@@ -2,8 +2,8 @@ import axios from 'axios';
 import { showToast } from './toastService';
 
 const api = axios.create({
-  baseURL: 'http://194.5.175.183:4444',
-  // baseURL: 'http://174.138.185.18/plesk-site-preview/services.anthem3000.com',
+  // baseURL: 'http://194.5.175.183:4444',
+  baseURL: 'http://174.138.185.18/plesk-site-preview/services.anthem3000.com',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${localStorage.getItem('JWT')}`,
