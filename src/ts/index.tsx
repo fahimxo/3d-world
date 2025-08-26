@@ -95,6 +95,17 @@ const WorldComponent = forwardRef<WorldHandle, WorldComponentProps>(
         });
       }
     }, [data]); // This effect runs whenever the 'data' prop changes
+
+    // Ensure city and country labels update immediately when their lists change
+    useEffect(() => {
+      if (worldInstance.current) {
+        worldInstance.current.updateData({
+          clubList: data ?? [],
+          cityList,
+          countryList,
+        });
+      }
+    }, [cityList, countryList]);
     // This div is the container where your Three.js canvas will be placed.
     // It will be styled to be in the background.
     return <div id="earth-canvas" ref={mountRef} />;
