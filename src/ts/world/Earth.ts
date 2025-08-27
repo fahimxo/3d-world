@@ -498,42 +498,84 @@ export default class earth {
     this.clubGroup.clear();
     this.clickablePoints.length = 0;
 
-    // --- ✨ بخش جدید برای جلوگیری از تداخل ---
-    const cityClubCounts: { [cityName: string]: number } = {};
-    const baseOffsetAngle = 0.5; // زاویه اولیه برای جابجایی (بر حسب درجه)
-    // ------------------------------------
+    // --- ✨ گروه‌بندی کلاب‌ها بر اساس شهر ---
+    const cityClubs: { [cityName: string]: DataType[] } = {};
+    clubs.forEach((item) => {
+      const cityName = item.city;
+      if (!cityClubs[cityName]) {
+        cityClubs[cityName] = [];
+      }
+      cityClubs[cityName].push(item);
+    });
 
-    await Promise.all(
-      clubs.map(async (item) => {
-        let lon = +item.longitude;
-        let lat = +item.latitude;
+    // ✨ تابع برای offset پایه بین‌شهری (قابل تنظیم با interCityDistance)
+    const interCityDistance = 0.2; // فاصله پایه بین شهرها (درجه) - اینجا تنظیم کن! مثلاً 0.5 برای بیشتر، 0.1 برای کمتر
+    const getCityBaseOffset = (
+      cityName: string
+    ): { offsetLat: number; offsetLon: number } => {
+      let hash = 0;
+      for (let i = 0; i < cityName.length; i++) {
+        hash = (hash << 5) - hash + cityName.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      const baseAngle = (hash % 360) * (Math.PI / 180); // زاویه پایه بر اساس hash (deterministic)
+      return {
+        offsetLat: interCityDistance * Math.sin(baseAngle),
+        offsetLon: interCityDistance * Math.cos(baseAngle),
+      };
+    };
+
+    const baseOffsetAngle = 0.8; // offset داخل‌شهری (ثابت، اما می‌تونی تنظیم کنی)
+
+    // --- ✨ پردازش sequential برای هر شهر ---
+    for (const [cityName, cityClubList] of Object.entries(cityClubs)) {
+      // ✨ محاسبه مرکز شهر: میانگین lat/lon همه کلاب‌های شهر
+      let avgLat = 0,
+        avgLon = 0;
+      cityClubList.forEach((item) => {
+        avgLat += +item.latitude;
+        avgLon += +item.longitude;
+      });
+      avgLat /= cityClubList.length;
+      avgLon /= cityClubList.length;
+
+      // offset پایه بین‌شهری برای کل شهر
+      const { offsetLat: baseCityOffsetLat, offsetLon: baseCityOffsetLon } =
+        getCityBaseOffset(cityName);
+      const cityCenterLat = avgLat + baseCityOffsetLat; // مرکز شهر با offset بین‌شهری
+      const cityCenterLon = avgLon + baseCityOffsetLon;
+
+      // حالا برای هر کلاب در شهر
+      cityClubList.forEach((item, index) => {
+        // index از 0 شروع
+        // let lon = +item.longitude;
+        // let lat = +item.latitude;
 
         const color =
           item?.lockStatus === lockClub.unLock ? item?.pinColor : 0x525354;
 
         // --- ✨ منطق جابجایی (Offsetting Logic) ---
-        const cityName = item.city;
-        if (cityClubCounts[cityName]) {
-          const clubIndex = cityClubCounts[cityName];
-          // برای هر باشگاه اضافه در یک شهر، آن را در یک زاویه متفاوت قرار بده
-          const angle = clubIndex * 45 * (Math.PI / 180); // هر باشگاه ۴۵ درجه بچرخد
-          const offsetLat = baseOffsetAngle * Math.sin(angle);
-          const offsetLon = baseOffsetAngle * Math.cos(angle);
+        let finalLat = cityCenterLat;
+        let finalLon = cityCenterLon;
 
-          lat += offsetLat;
-          lon += offsetLon;
+        if (index > 0) {
+          // فقط برای کلاب‌های بعدی (نه اولین)
+          // offset داخل‌شهری بر اساس index
+          const angle = index * 80 * (Math.PI / 180); // 30 درجه برای توزیع دایره‌ای
+          const intraOffsetLat = baseOffsetAngle * Math.sin(angle);
+          const intraOffsetLon = baseOffsetAngle * Math.cos(angle);
 
-          cityClubCounts[cityName]++;
-        } else {
-          cityClubCounts[cityName] = 1;
+          finalLat += intraOffsetLat;
+          finalLon += intraOffsetLon;
         }
+        // برای اولین کلاب (index 0): دقیقاً در مرکز شهر (با offset بین‌شهری)
         // ------------------------------------------
 
         // خود ستون نور
         const pillar = createLightPillar({
           radius,
-          lon, // از lon و lat تغییر یافته استفاده کن
-          lat,
+          lon: finalLon, // از موقعیت نهایی استفاده کن
+          lat: finalLat,
           color,
           index: 0,
           textures: this.options.textures,
@@ -550,14 +592,14 @@ export default class earth {
           new SphereGeometry(0.8, 10, 10),
           new MeshBasicMaterial({ visible: false })
         );
-        const pickPos = lon2xyz(radius + 0.2, lon, lat); // از مختصات جدید استفاده کن
+        const pickPos = lon2xyz(radius + 0.2, finalLon, finalLat); // از موقعیت نهایی استفاده کن
         pick.position.set(pickPos.x, pickPos.y, pickPos.z);
         pick.userData = pillar.userData; // همان دیتا
         pick.name = 'club_pick'; // صرفاً جهت دیباگ
         this.clubGroup.add(pick);
         this.clickablePoints.push(pick);
-      })
-    );
+      });
+    }
   }
 
   // تغییر جدید: تابع کمکی برای محاسبه فاصله جغرافیایی (Haversine formula)
