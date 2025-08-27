@@ -26,7 +26,7 @@ module.exports = {
     // 打包后文件的文件
     filename: 'bundle.js',
     // This helps prevent issues with mixed content and ensures assets are loaded correctly.
-    publicPath: '/plesk-site-preview/anthem3000.com/',
+    // publicPath: '/plesk-site-preview/anthem3000.com/',
     // 告诉webpack不使用箭头
     // 默认打包后是一个立即执行的箭头函数，在IE 11中也是无法执行的！
     // 加上下面的配置，可以在webpack打包时，最外层不再是箭头函数
