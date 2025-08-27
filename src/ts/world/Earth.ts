@@ -26,6 +26,8 @@ import {
   ExtrudeGeometry,
   MeshStandardMaterial,
   PerspectiveCamera,
+  LineBasicMaterial,
+  Line,
 } from 'three';
 
 import html2canvas from 'html2canvas';
@@ -496,42 +498,84 @@ export default class earth {
     this.clubGroup.clear();
     this.clickablePoints.length = 0;
 
-    // --- ✨ بخش جدید برای جلوگیری از تداخل ---
-    const cityClubCounts: { [cityName: string]: number } = {};
-    const baseOffsetAngle = 0.5; // زاویه اولیه برای جابجایی (بر حسب درجه)
-    // ------------------------------------
+    // --- ✨ گروه‌بندی کلاب‌ها بر اساس شهر ---
+    const cityClubs: { [cityName: string]: DataType[] } = {};
+    clubs.forEach((item) => {
+      const cityName = item.city;
+      if (!cityClubs[cityName]) {
+        cityClubs[cityName] = [];
+      }
+      cityClubs[cityName].push(item);
+    });
 
-    await Promise.all(
-      clubs.map(async (item) => {
-        let lon = +item.longitude;
-        let lat = +item.latitude;
+    // ✨ تابع برای offset پایه بین‌شهری (قابل تنظیم با interCityDistance)
+    const interCityDistance = 0.2; // فاصله پایه بین شهرها (درجه) - اینجا تنظیم کن! مثلاً 0.5 برای بیشتر، 0.1 برای کمتر
+    const getCityBaseOffset = (
+      cityName: string
+    ): { offsetLat: number; offsetLon: number } => {
+      let hash = 0;
+      for (let i = 0; i < cityName.length; i++) {
+        hash = (hash << 5) - hash + cityName.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      const baseAngle = (hash % 360) * (Math.PI / 180); // زاویه پایه بر اساس hash (deterministic)
+      return {
+        offsetLat: interCityDistance * Math.sin(baseAngle),
+        offsetLon: interCityDistance * Math.cos(baseAngle),
+      };
+    };
+
+    const baseOffsetAngle = 0.8; // offset داخل‌شهری (ثابت، اما می‌تونی تنظیم کنی)
+
+    // --- ✨ پردازش sequential برای هر شهر ---
+    for (const [cityName, cityClubList] of Object.entries(cityClubs)) {
+      // ✨ محاسبه مرکز شهر: میانگین lat/lon همه کلاب‌های شهر
+      let avgLat = 0,
+        avgLon = 0;
+      cityClubList.forEach((item) => {
+        avgLat += +item.latitude;
+        avgLon += +item.longitude;
+      });
+      avgLat /= cityClubList.length;
+      avgLon /= cityClubList.length;
+
+      // offset پایه بین‌شهری برای کل شهر
+      const { offsetLat: baseCityOffsetLat, offsetLon: baseCityOffsetLon } =
+        getCityBaseOffset(cityName);
+      const cityCenterLat = avgLat + baseCityOffsetLat; // مرکز شهر با offset بین‌شهری
+      const cityCenterLon = avgLon + baseCityOffsetLon;
+
+      // حالا برای هر کلاب در شهر
+      cityClubList.forEach((item, index) => {
+        // index از 0 شروع
+        // let lon = +item.longitude;
+        // let lat = +item.latitude;
 
         const color =
           item?.lockStatus === lockClub.unLock ? item?.pinColor : 0x525354;
 
         // --- ✨ منطق جابجایی (Offsetting Logic) ---
-        const cityName = item.city;
-        if (cityClubCounts[cityName]) {
-          const clubIndex = cityClubCounts[cityName];
-          // برای هر باشگاه اضافه در یک شهر، آن را در یک زاویه متفاوت قرار بده
-          const angle = clubIndex * 45 * (Math.PI / 180); // هر باشگاه ۴۵ درجه بچرخد
-          const offsetLat = baseOffsetAngle * Math.sin(angle);
-          const offsetLon = baseOffsetAngle * Math.cos(angle);
+        let finalLat = cityCenterLat;
+        let finalLon = cityCenterLon;
 
-          lat += offsetLat;
-          lon += offsetLon;
+        if (index > 0) {
+          // فقط برای کلاب‌های بعدی (نه اولین)
+          // offset داخل‌شهری بر اساس index
+          const angle = index * 80 * (Math.PI / 180); // 30 درجه برای توزیع دایره‌ای
+          const intraOffsetLat = baseOffsetAngle * Math.sin(angle);
+          const intraOffsetLon = baseOffsetAngle * Math.cos(angle);
 
-          cityClubCounts[cityName]++;
-        } else {
-          cityClubCounts[cityName] = 1;
+          finalLat += intraOffsetLat;
+          finalLon += intraOffsetLon;
         }
+        // برای اولین کلاب (index 0): دقیقاً در مرکز شهر (با offset بین‌شهری)
         // ------------------------------------------
 
         // خود ستون نور
         const pillar = createLightPillar({
           radius,
-          lon, // از lon و lat تغییر یافته استفاده کن
-          lat,
+          lon: finalLon, // از موقعیت نهایی استفاده کن
+          lat: finalLat,
           color,
           index: 0,
           textures: this.options.textures,
@@ -548,25 +592,93 @@ export default class earth {
           new SphereGeometry(0.8, 10, 10),
           new MeshBasicMaterial({ visible: false })
         );
-        const pickPos = lon2xyz(radius + 0.2, lon, lat); // از مختصات جدید استفاده کن
+        const pickPos = lon2xyz(radius + 0.2, finalLon, finalLat); // از موقعیت نهایی استفاده کن
         pick.position.set(pickPos.x, pickPos.y, pickPos.z);
         pick.userData = pillar.userData; // همان دیتا
         pick.name = 'club_pick'; // صرفاً جهت دیباگ
         this.clubGroup.add(pick);
         this.clickablePoints.push(pick);
-      })
-    );
+      });
+    }
+  }
+
+  // تغییر جدید: تابع کمکی برای محاسبه فاصله جغرافیایی (Haversine formula)
+  private haversine(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number {
+    const R = 6371; // شعاع زمین در کیلومتر
+    const dlat = ((lat2 - lat1) * Math.PI) / 180;
+    const dlon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dlat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dlon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // فاصله در کیلومتر
   }
 
   // 2) ساخت Point Mesh برای شهرها
   public async createCityPoints(cities: ComboboxOption[] = []) {
     const radius = this.options.earth.radius;
+    const closeThreshold = 170; // آستانه فاصله نزدیک (کیلومتر)، تنظیم کنید
+
+    // تغییر جدید: پیش‌پردازش برای پیدا کردن گروه‌های شهرهای نزدیک
+    const cityGroups: { [key: string]: ComboboxOption[] } = {}; // گروه‌بندی بر اساس نزدیکی
+    cities.forEach((city) => {
+      let grouped = false;
+      for (const groupKey in cityGroups) {
+        const group = cityGroups[groupKey];
+        const dist = this.haversine(
+          +city.latitude,
+          +city.longitude,
+          +group[0].latitude,
+          +group[0].longitude
+        );
+        if (dist < closeThreshold) {
+          group.push(city);
+          grouped = true;
+          break;
+        }
+      }
+      if (!grouped) {
+        cityGroups[city.label || city.value] = [city]; // گروه جدید
+      }
+    });
 
     await Promise.all(
       cities.map(async (item) => {
         const lon = +item.longitude;
         const lat = +item.latitude;
         const color = 0xffa500;
+
+        // تغییر جدید: پیدا کردن گروه این شهر و اعمال offset اگر گروه بزرگ باشه
+        let offsetLon = 0;
+        let offsetLat = 0;
+        for (const groupKey in cityGroups) {
+          const group = cityGroups[groupKey];
+          if (group.includes(item) && group.length > 1) {
+            // اگر گروه بیشتر از 1 شهر داره، offset اعمال کن
+            const index = group.indexOf(item);
+            const angle = (index / group.length) * 2 * Math.PI; // توزیع دایره‌ای
+            let offsetDistance = 1 + (group.length - 1) * 0.5; // درجه offset، بسته به تعداد
+            offsetDistance = Math.min(offsetDistance, 1.5); // حداکثر ۳ درجه
+            offsetLon = offsetDistance * Math.cos(angle);
+            offsetLat = offsetDistance * Math.sin(angle);
+            break;
+          }
+        }
+
+        // موقعیت اصلی نقطه شهر (بدون offset)
+        const originalPos = lon2xyz(radius, lon, lat);
+
+        // موقعیت جابجا شده برای لیبل
+        const labelLon = lon + offsetLon;
+        const labelLat = lat + offsetLat;
+        const labelPos = lon2xyz(radius + 1, labelLon, labelLat);
 
         const pointMaterial = new MeshBasicMaterial({
           color,
@@ -578,22 +690,35 @@ export default class earth {
         const cityPoint = createPointMesh({
           radius,
           lon,
-          lat,
+          lat, // نقطه شهر بدون offset
           material: pointMaterial,
         });
 
         this.cityGroup.add(cityPoint);
         this.clickablePoints.push(cityPoint);
 
-        // لیبل HTML (اختیاری)
+        // لیبل HTML
         const label = this.createHTMLLabel(item.value);
-        label.visible = false;
-
-        const labelPos = lon2xyz(radius + 1, lon, lat);
+        label.visible = false; // همیشه可见، چون ثابت است
         label.position.set(labelPos.x, labelPos.y, labelPos.z);
 
         this.cityGroup.add(label);
         this.cityLabels.push(label);
+
+        // تغییر جدید: اگر offset اعمال شده، leader line اضافه کن
+        if (offsetLon !== 0 || offsetLat !== 0) {
+          const lineGeometry = new BufferGeometry().setFromPoints([
+            new Vector3(originalPos.x, originalPos.y, originalPos.z), // موقعیت اصلی شهر
+            new Vector3(labelPos.x, labelPos.y, labelPos.z), // موقعیت لیبل
+          ]);
+          const lineMaterial = new LineBasicMaterial({
+            color: 0xffffff,
+            linewidth: 7,
+          }); // خط سفید نازک
+          const leaderLine = new Line(lineGeometry, lineMaterial);
+          leaderLine.name = `leader_line_${item.value}`;
+          this.cityGroup.add(leaderLine);
+        }
       })
     );
   }
@@ -1078,21 +1203,16 @@ export default class earth {
     const allLabels = [...this.cityLabels];
 
     allLabels.forEach((label) => {
-      // This logic only runs for labels that are currently supposed to be visible based on zoom level.
       if (!label.visible) {
-        label.element.style.display = 'none'; // 👈 اضافه کن
+        label.element.style.display = 'none';
         return;
       }
       const labelPosition = new Vector3();
       label.getWorldPosition(labelPosition);
-
       const labelNormal = labelPosition.clone().normalize();
-
       const cameraPosition = new Vector3();
       camera.getWorldPosition(cameraPosition);
-
       const dotProduct = labelNormal.dot(cameraPosition.clone().normalize());
-
       if (dotProduct < 0.1) {
         label.element.style.display = 'none';
       } else {
