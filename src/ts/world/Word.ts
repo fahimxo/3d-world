@@ -231,6 +231,13 @@ export default class World {
       (label) => (label.visible = showCountries)
     );
 
+    this.earth.cityGroup.children.forEach((child) => {
+      if (child.name.startsWith('leader_line_')) {
+        // پیدا کردن بر اساس نام
+        child.visible = showCities; // فقط وقتی showCities true باشه نمایش بده
+      }
+    });
+
     // --- منطق تعویض تکسچر زمین (برای زوم بالا) ---
     const shouldBeZoomedIn = showCountries || showCities;
 
@@ -312,6 +319,7 @@ export default class World {
     }
 
     if (hit) {
+      document.body.style.cursor = 'pointer';
       if (this.currentlyHovered !== hit) {
         this.currentlyHovered = hit;
 
@@ -333,6 +341,7 @@ export default class World {
       this.tooltipElement.style.left = `${event.clientX}px`;
       this.tooltipElement.style.top = `${event.clientY - 60}px`;
     } else {
+      document.body.style.cursor = 'default';
       if (this.currentlyHovered) {
         this.tooltipElement.classList.add('hidden');
         this.currentlyHovered = null;
@@ -408,55 +417,47 @@ export default class World {
   }
 
   private onPointClick(event: MouseEvent) {
-    // If the earth hasn't been created yet, do nothing
-    if (!this.earth || !this.earth.clickablePoints) {
-      return;
-    }
+    if (!this.earth) return;
 
-    // 1. Calculate mouse position in normalized device coordinates (-1 to +1)
     this.mouse.x = (event.clientX / this.sizes.viewport.width) * 2 - 1;
     this.mouse.y = -(event.clientY / this.sizes.viewport.height) * 2 + 1;
 
-    // 2. Update the picking ray with the camera and mouse position
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
-    // 3. Get a list of objects the ray intersects
-    const intersects = this.raycaster.intersectObjects(
-      this.earth.clickablePoints
-    );
+    // مثل hover: روی کل گروه‌ها تست می‌کنیم
+    const roots: THREE.Object3D[] = [];
+    if ((this.earth as any).clubGroup)
+      roots.push((this.earth as any).clubGroup);
+    if (this.earth.markupPoint) roots.push(this.earth.markupPoint);
 
-    // 4. Check if we hit any of our markup points
+    const intersects = this.raycaster.intersectObjects(roots, true);
+
     if (intersects.length > 0) {
-      // The first object in the array is the closest one
-      const clickedObject = intersects[0].object;
+      let obj = intersects[0].object as THREE.Object3D;
 
-      // Access the data you stored earlier!
-      const { city, data } = clickedObject.userData;
+      // برو بالا تا برسی به pillar
+      while (
+        obj &&
+        obj.parent &&
+        !(
+          obj.userData?.type === 'Club' ||
+          obj.name === 'club_pillar' ||
+          obj.name === 'light_pillar'
+        )
+      ) {
+        obj = obj.parent;
+      }
 
-      // 👉 Here you can trigger your React state update
-      // For example, by calling a callback function passed in the constructor
-      if (this.option.onPointClick) {
-        this.option.onPointClick(data);
-      } else {
-        // Fallback: Vanilla JS modal trigger
-        const modal = document.getElementById('cityModal') as HTMLElement;
-        const cityName = document.getElementById('cityName') as HTMLElement;
-        const cityData = document.getElementById('cityData') as HTMLElement;
-
-        cityName.innerText = city;
-        cityData.innerText = JSON.stringify(data, null, 2);
-
-        modal.style.display = 'block';
-
-        const closeBtn = modal.querySelector('.close-button') as HTMLElement;
-        closeBtn.onclick = () => (modal.style.display = 'none');
-
-        // Close when clicking outside modal
-        window.onclick = (event: MouseEvent) => {
-          if (event.target === modal) {
-            modal.style.display = 'none';
-          }
-        };
+      if (
+        obj.userData?.type === 'Club' ||
+        obj.name === 'club_pillar' ||
+        obj.name === 'light_pillar'
+      ) {
+        // 🔥 اینجا می‌تونی مثل قبل دیتا رو پاس بدی
+        const { data } = obj.userData;
+        if (this.option.onPointClick) {
+          this.option.onPointClick(data);
+        }
       }
     }
   }

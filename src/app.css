@@ -279,3 +279,13 @@ input:-webkit-autofill:active {
     width: 12px;
   }
 }
+
+.toast-container {
+  width: 406px;
+  max-width: 90%;
+}
+
+.toast-svg {
+  width: 100%;
+  height: auto;
+}
