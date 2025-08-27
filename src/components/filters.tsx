@@ -169,7 +169,7 @@ export const Filters: React.FC<FiltersProps> = ({
   const areAnyComboboxesLoading = Object.values(loadingStates).some(Boolean);
 
   return (
-    <div className="absolute top-36 left-5 md:left-10 max-w-sm space-y-8 z-40">
+    <div className="absolute md:top-36 top-[200px] left-5 md:left-10 max-w-sm space-y-8 z-50">
       <FilterButton
         onClick={() => setFilterModalVisible((prev) => !prev)}
         className="hidden md:block mb-2"
@@ -178,7 +178,7 @@ export const Filters: React.FC<FiltersProps> = ({
 
       {filterModalVisible && (
         <div className="max-h-[calc(100vh-12rem)] overflow-y-auto">
-          <div className="relative w-[335px] h-[682px]">
+          <div className="relative md:w-[335px] w-[350px] md:h-[682px] h-[770px]">
             <Filter />
             <div className="absolute inset-x-6 top-7 z-10 space-y-4 ">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
