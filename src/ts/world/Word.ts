@@ -543,10 +543,30 @@ export default class World {
    * 渲染函数
    */
   public render() {
+    // فاصله فعلی دوربین تا مرکز کره را محاسبه کن
+    const distance = this.basic.camera.position.distanceTo(
+      this.basic.controls.target
+    );
+
+    // یک ضریب بین 0 و 1 بر اساس فاصله زوم ایجاد کن
+    // وقتی نزدیک هستیم (distance کم)، این ضریب به 0 نزدیک می‌شود
+    const zoomFactor = Math.max(
+      0,
+      (distance - this.basic.controls.minDistance) /
+        (this.basic.controls.maxDistance - this.basic.controls.minDistance)
+    );
+
+    // سرعت چرخش را بر اساس این ضریب تنظیم کن
+    // حداقل سرعت 0.04 (برای نزدیک‌ترین حالت) و حداکثر 0.7 (برای دورترین حالت) خواهد بود
+    const baseSpeed = 1; // سرعت پایه از فایل Basic.ts
+    const minSpeed = 0.04; // حداقل سرعت هنگام زوم کامل
+    this.basic.controls.rotateSpeed =
+      minSpeed + (baseSpeed - minSpeed) * zoomFactor;
+
     requestAnimationFrame(this.render.bind(this));
-    this.renderer.render(this.scene, this.camera); // Renders the 3D scene
-    this.labelRenderer.render(this.scene, this.camera);
-    this.controls && this.controls.update();
-    this.earth && this.earth.render(this.camera);
+    this.basic.renderer.render(this.basic.scene, this.basic.camera); // Renders the 3D scene
+    this.labelRenderer.render(this.basic.scene, this.basic.camera);
+    this.basic.controls && this.basic.controls.update();
+    this.earth && this.earth.render(this.basic.camera);
   }
 }

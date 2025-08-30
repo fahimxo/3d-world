@@ -3,8 +3,8 @@
  * 场景、相机、渲染器、控制器
  */
 
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export class Basic {
   public scene: THREE.Scene;
@@ -62,5 +62,7 @@ export class Basic {
     this.controls.maxDistance = 300;
     // 是否开启右键拖拽
     this.controls.enablePan = false;
+
+    this.controls.rotateSpeed = 1;
   }
 }
