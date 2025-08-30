@@ -96,8 +96,22 @@ export default class World {
     this.option.dom.appendChild(this.labelRenderer.domElement);
 
     this.tooltipElement = document.getElementById('tooltip');
+
+    const canvas = this.renderer.domElement;
+
+    const isTouchDevice =
+      'ontouchstart' in window || navigator.maxTouchPoints > 0;
     // Add the event listener for mouse movement
     window.addEventListener('mousemove', this.onMarkerHover.bind(this));
+
+    if (isTouchDevice) {
+      canvas.addEventListener('touchstart', this.onMarkerHover.bind(this));
+      canvas.addEventListener('touchmove', this.onMarkerHover.bind(this));
+      canvas.addEventListener('touchend', this.hideTooltip.bind(this)); // Separate hide method
+    } else {
+      canvas.addEventListener('mousemove', this.onMarkerHover.bind(this));
+      canvas.addEventListener('mouseleave', this.hideTooltip.bind(this));
+    }
 
     this.sizes = new Sizes({ dom: option.dom });
 
@@ -150,6 +164,13 @@ export default class World {
     this.raycaster = new Raycaster();
     this.mouse = new Vector2();
     window.addEventListener('click', this.onPointClick.bind(this)); // Use 'window' for global clicks
+  }
+
+  private hideTooltip() {
+    if (this.tooltipElement && this.currentlyHovered) {
+      this.tooltipElement.classList.add('hidden');
+      this.currentlyHovered = null;
+    }
   }
 
   // --- ADD THIS NEW METHOD TO CLEAR MARKERS ---
@@ -273,14 +294,24 @@ export default class World {
     });
   }
 
-  private onMarkerHover(event: MouseEvent) {
+  private onMarkerHover(event: MouseEvent | TouchEvent) {
     if (!this.tooltipElement || !this.earth) return;
 
     const width = Number(this.sizes.viewport.width);
     const height = Number(this.sizes.viewport.height);
 
-    this.mouse.x = (event.clientX / width) * 2 - 1;
-    this.mouse.y = -(event.clientY / height) * 2 + 1;
+    let clientX = 0;
+    let clientY = 0;
+    if ('touches' in event && event.touches.length > 0) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    } else {
+      clientX = (event as MouseEvent).clientX;
+      clientY = (event as MouseEvent).clientY;
+    }
+
+    this.mouse.x = (clientX / width) * 2 - 1;
+    this.mouse.y = -(clientY / height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
 
@@ -338,14 +369,12 @@ export default class World {
 
         this.tooltipElement.classList.remove('hidden');
       }
-      this.tooltipElement.style.left = `${event.clientX}px`;
-      this.tooltipElement.style.top = `${event.clientY - 60}px`;
+      this.tooltipElement.style.left = `${clientX}px`;
+      this.tooltipElement.style.top = `${clientY - 60}px`;
     } else {
       document.body.style.cursor = 'default';
-      if (this.currentlyHovered) {
-        this.tooltipElement.classList.add('hidden');
-        this.currentlyHovered = null;
-      }
+
+      this.hideTooltip();
     }
   }
 
