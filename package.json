@@ -1,14 +1,12 @@
 {
-  "name": "GhostCat",
+  "name": "anthem3000",
   "version": "1.0.0",
   "description": "3d-earth",
   "keywords": [
-    "GhostCat",
-    "3d",
-    "threejs",
-    "typescript"
+    "anthem3000",
+    "3d"
   ],
-  "author": "GhostCat",
+  "author": "anthem3000",
   "license": "MIT",
   "scripts": {
     "dev": "webpack serve --mode development",

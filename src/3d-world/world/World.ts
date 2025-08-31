@@ -7,22 +7,17 @@ import {
   Raycaster, // 👈 Import Raycaster
   Vector2,
   Vector3,
-  Quaternion,
-  Euler,
   MathUtils,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
 // interfaces
 import { IWord } from '../interfaces/IWord';
-
 import { Basic } from './Basic';
-import Sizes from '../Utils/Sizes';
+import Sizes from '../utils/Sizes';
 import { Resources } from './Resources';
-
 // earth
 import Earth from './Earth';
-import { lon2xyz } from '../Utils/common';
+import { lon2xyz } from '../utils/common';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import gsap from 'gsap';
 import { ComboboxOption } from 'src/components';
@@ -41,8 +36,8 @@ export default class World {
   public resources: Resources;
   public option: IWord;
   public earth: Earth;
-  public raycaster: Raycaster; // 👈 Add raycaster property
-  public mouse: Vector2; // 👈 Add mouse vector property
+  public raycaster: Raycaster;
+  public mouse: Vector2;
   public data: DataType[];
   public cityList: ComboboxOption[];
   public countryList: ComboboxOption[];
@@ -55,7 +50,6 @@ export default class World {
   private tooltipElement: HTMLElement | null;
   private currentlyHovered: THREE.Object3D | null = null;
 
-  // 👉 ADD THESE NEW PROPERTIES
   private detailedTexture: THREE.Texture;
   private originalTexture: THREE.Texture;
   private isZoomedIn = false;
@@ -71,9 +65,6 @@ export default class World {
   private readonly zoomForMinScale: number = 60; // فاصله‌ای که در آن مارکر به کوچک‌ترین اندازه می‌رسد
 
   constructor(option: IWord) {
-    /**
-     * 加载资源
-     */
     this.option = option;
 
     this.basic = new Basic(option.dom);
@@ -492,11 +483,7 @@ export default class World {
   }
 
   async createEarth() {
-    // 资源加载完成，开始制作地球，注释在new Earth()类型里面
-    // ...existing code...
-    // ...existing code...
     this.earth = new Earth({
-      // data: Data,
       data: this.data,
       cityList: this.cityList,
       countryList: this.countryList,
@@ -507,18 +494,6 @@ export default class World {
         rotateSpeed: 0.0,
         isRotation: true,
       },
-
-      // satellite: {
-      //   show: false,
-      //   number: 0,
-      //   rotateSpeed: 0,
-      //   size: 0.1,
-      // }, // Add this line
-      // flyLine: {
-      //   color: 0x3892ff,
-      //   speed: 0.002,
-      //   flyLineColor: 0x3892ff,
-      // }, // Add this line
       punctuation: {
         circleColor: 0x3892ff,
         lightColumn: {
@@ -527,21 +502,12 @@ export default class World {
         },
       },
     });
-    // ...existing code...
-    // ...existing code...
 
     this.scene.add(this.earth.group);
 
     await this.earth.init();
-
-    // 隐藏dom
-    // const loading = document.querySelector("#loading");
-    // loading.classList.add("out");
   }
 
-  /**
-   * 渲染函数
-   */
   public render() {
     // فاصله فعلی دوربین تا مرکز کره را محاسبه کن
     const distance = this.basic.camera.position.distanceTo(
@@ -558,7 +524,7 @@ export default class World {
 
     // سرعت چرخش را بر اساس این ضریب تنظیم کن
     // حداقل سرعت 0.04 (برای نزدیک‌ترین حالت) و حداکثر 0.7 (برای دورترین حالت) خواهد بود
-    const baseSpeed = 1; // سرعت پایه از فایل Basic.ts
+    const baseSpeed = 2; // سرعت پایه از فایل Basic.ts
     const minSpeed = 0.04; // حداقل سرعت هنگام زوم کامل
     this.basic.controls.rotateSpeed =
       minSpeed + (baseSpeed - minSpeed) * zoomFactor;

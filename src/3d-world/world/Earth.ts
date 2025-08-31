@@ -16,40 +16,27 @@ import {
   Sprite,
   SpriteMaterial,
   Texture,
-  TextureLoader,
   Vector3,
   CanvasTexture,
-  ConeGeometry,
   SphereGeometry,
   Shape,
   Path,
   ExtrudeGeometry,
-  MeshStandardMaterial,
   PerspectiveCamera,
   LineBasicMaterial,
   Line,
 } from 'three';
-
-import html2canvas from 'html2canvas';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
 import earthVertex from '../../shaders/earth/vertex.vs';
 import earthFragment from '../../shaders/earth/fragment.fs';
 import {
   createAnimateLine,
   createLightPillar,
-  createMarker,
   createPointMesh,
-  createWaveMesh,
   getCirclePoints,
   lon2xyz,
-} from '../Utils/common';
+} from '../utils/common';
 import gsap from 'gsap';
-import { flyArc } from '../Utils/arc';
-import {
-  CSS2DRenderer,
-  CSS2DObject,
-} from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { ComboboxOption } from 'src/components';
 import { DataType } from 'src/lib/usePublicClubs';
 import { lockClub } from '../../components/ClubInfo';
@@ -57,8 +44,8 @@ import { lockClub } from '../../components/ClubInfo';
 export type punctuation = {
   circleColor: number;
   lightColumn: {
-    startColor: number; // 起点颜色
-    endColor: number; // 终点颜色
+    startColor: number;
+    endColor: number;
   };
 };
 
@@ -66,7 +53,6 @@ export interface CityData {
   city: string;
   latitude: number;
   longitude: number;
-  // ... هر فیلد دیگه‌ای که بعداً لازم داری
 }
 
 type options = {
@@ -74,25 +60,15 @@ type options = {
   cityList: ComboboxOption[];
   countryList: ComboboxOption[];
   dom: HTMLElement;
-  textures: Record<string, Texture>; // 贴图
+  textures: Record<string, Texture>;
   earth: {
-    radius: number; // 地球半径
-    rotateSpeed: number; // 地球旋转速度
-    isRotation: boolean; // 地球组是否自转
+    radius: number;
+    rotateSpeed: number;
+    isRotation: boolean;
   };
-  // satellite: {
-  //   show: boolean; // 是否显示卫星
-  //   rotateSpeed: number; // 旋转速度
-  //   size: number; // 卫星大小
-  //   number: number; // 一个圆环几个球
-  // };
   punctuation: punctuation;
-  // flyLine: {
-  //   color: number; // 飞线的颜色
-  //   speed: number; // 飞机拖尾线速度
-  //   flyLineColor: number; // 飞行线的颜色
-  // };
 };
+
 type uniforms = {
   glowColor: { value: Color };
   scale: { type: string; value: number };
@@ -149,7 +125,6 @@ export default class earth {
     this.group.add(this.earthGroup);
     this.earthGroup.name = 'EarthGroup';
 
-    // 标注点效果
     this.markupPoint = new Group();
     this.markupPoint.name = 'markupPoint';
     this.waveMeshArr = [];
@@ -163,16 +138,13 @@ export default class earth {
     this.earthGroup.add(this.cityGroup);
     this.earthGroup.add(this.clubGroup);
 
-    // 卫星和标签
     this.circleLineList = [];
     this.circleList = [];
     this.x = 0;
     this.n = 0;
 
-    // 地球自转
     this.isRotation = this.options.earth.isRotation;
 
-    // 扫光动画 shader
     this.timeValue = 100;
     this.uniforms = {
       glowColor: {
@@ -205,16 +177,13 @@ export default class earth {
 
   async init(): Promise<void> {
     return new Promise(async (resolve) => {
-      this.createEarth(); // 创建地球
-      this.createStars(); // 添加星星
-      this.createEarthGlow(); // 创建地球辉光
-      this.createEarthAperture(); // 创建地球的大气层
-      await this.createMarkupPointsAndLabels(this.data, this.cityList); // 创建柱状点位
-      this.createSpriteLabel(); // 创建标签
+      this.createEarth();
+      this.createStars();
+      this.createEarthGlow();
+      this.createEarthAperture();
+      await this.createMarkupPointsAndLabels(this.data, this.cityList);
+      this.createSpriteLabel();
       this.createCountryLabels(this.countryList);
-      // this.createAnimateCircle(); // 创建环绕卫星
-      // this.createFlyLine(); // 创建飞线
-
       this.show();
       resolve();
     });
@@ -222,7 +191,6 @@ export default class earth {
 
   private createHTMLLabel(text: string): CSS2DObject {
     const div = document.createElement('div');
-    // Style the div using Tailwind CSS classes
     div.className =
       'text-primary-200 text-xs font-bold bg-secondary-700 px-2 py-1 rounded-md shadow-lg pointer-events-none';
     div.textContent = text;
@@ -245,21 +213,20 @@ export default class earth {
     );
 
     const pointMaterial = new PointsMaterial({
-      color: 0x81ffff, //设置颜色，默认 0xFFFFFF
+      color: 0x81ffff,
       transparent: true,
       sizeAttenuation: true,
       opacity: 0.1,
-      vertexColors: false, //定义材料是否使用顶点颜色，默认false ---如果该选项设置为true，则color属性失效
-      size: 0.01, //定义粒子的大小。默认为1.0
+      vertexColors: false,
+      size: 0.01,
     });
-    const points = new Points(earth_border, pointMaterial); //将模型添加到场景
+    const points = new Points(earth_border, pointMaterial);
 
     this.earthGroup.add(points);
 
     this.uniforms.map.value = this.options.textures.earth;
 
     const earth_material = new ShaderMaterial({
-      // wireframe:true, // 显示模型线条
       uniforms: this.uniforms,
       vertexShader: earthVertex,
       fragmentShader: earthFragment,
@@ -283,7 +250,6 @@ export default class earth {
       colors.push(new Color(1, 1, 1));
     }
 
-    // 星空效果
     this.around = new BufferGeometry();
     this.around.setAttribute(
       'position',
@@ -296,7 +262,7 @@ export default class earth {
 
     const aroundMaterial = new PointsMaterial({
       size: 2,
-      sizeAttenuation: true, // 尺寸衰减
+      sizeAttenuation: true,
       color: 0x4d76cf,
       transparent: true,
       opacity: 1,
@@ -310,23 +276,20 @@ export default class earth {
   }
 
   createEarthGlow() {
-    const R = this.options.earth.radius; //地球半径
+    const R = this.options.earth.radius;
 
-    // TextureLoader创建一个纹理加载器对象，可以加载图片作为纹理贴图
-    const texture = this.options.textures.glow; // 加载纹理贴图
+    const texture = this.options.textures.glow;
 
-    // 创建精灵材质对象SpriteMaterial
     const spriteMaterial = new SpriteMaterial({
-      map: texture, // 设置精灵纹理贴图
+      map: texture,
       color: 0x4390d1,
-      transparent: true, //开启透明
-      opacity: 0.7, // 可以通过透明度整体调节光圈
-      depthWrite: false, //禁止写入深度缓冲区数据
+      transparent: true,
+      opacity: 0.7,
+      depthWrite: false,
     });
 
-    // 创建表示地球光圈的精灵模型
     const sprite = new Sprite(spriteMaterial);
-    sprite.scale.set(R * 3.0, R * 3.0, 1); //适当缩放精灵
+    sprite.scale.set(R * 3.0, R * 3.0, 1);
     this.earthGroup.add(sprite);
   }
 
@@ -336,14 +299,13 @@ export default class earth {
       'varying vec3	vVertexNormal;',
       'varying vec4	vFragColor;',
       'void main(){',
-      '	vVertexNormal	= normalize(normalMatrix * normal);', //将法线转换到视图坐标系中
-      '	vVertexWorldPosition	= (modelMatrix * vec4(position, 1.0)).xyz;', //将顶点转换到世界坐标系中
+      '	vVertexNormal	= normalize(normalMatrix * normal);',
+      '	vVertexWorldPosition	= (modelMatrix * vec4(position, 1.0)).xyz;',
       '	// set gl_Position',
       '	gl_Position	= projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
       '}',
     ].join('\n');
 
-    //大气层效果
     const AeroSphere = {
       uniforms: {
         coeficient: {
@@ -371,15 +333,14 @@ export default class earth {
         'varying vec4	vFragColor;',
 
         'void main(){',
-        '	vec3 worldCameraToVertex = vVertexWorldPosition - cameraPosition;', //世界坐标系中从相机位置到顶点位置的距离
-        '	vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;', //视图坐标系中从相机位置到顶点位置的距离
-        '	viewCameraToVertex= normalize(viewCameraToVertex);', //规一化
+        '	vec3 worldCameraToVertex = vVertexWorldPosition - cameraPosition;',
+        '	vec3 viewCameraToVertex	= (viewMatrix * vec4(worldCameraToVertex, 0.0)).xyz;',
+        '	viewCameraToVertex= normalize(viewCameraToVertex);',
         '	float intensity	= pow(coeficient + dot(vVertexNormal, viewCameraToVertex), power);',
         '	gl_FragColor = vec4(glowColor, intensity);',
         '}',
       ].join('\n'),
     };
-    //球体 辉光 大气层
     const material1 = new ShaderMaterial({
       uniforms: AeroSphere.uniforms,
       vertexShader: AeroSphere.vertexShader,
@@ -396,30 +357,6 @@ export default class earth {
     const mesh = new Mesh(sphere, material1);
     this.earthGroup.add(mesh);
   }
-
-  // async createMarkupPoint() {
-  //   // Example city data
-  //   const cities = [
-  //     { name: "Tehran", E: 51.389, N: 35.689 }, // Longitude, Latitude
-  //     { name: "London", E: -0.1276, N: 51.5074 },
-  //     // Add more cities here
-  //   ];
-
-  //   cities.forEach((city) => {
-  //     // Convert lon/lat to 3D position
-  //     const pos = lon2xyz(this.options.earth.radius * 1.01, city.E, city.N);
-
-  //     // Create a marker mesh (e.g., a small sphere)
-  //     const marker = new Mesh(
-  //       new SphereBufferGeometry(1, 16, 16),
-  //       new MeshBasicMaterial({ color: 0xff0000 })
-  //     );
-  //     marker.position.set(pos.x, pos.y, pos.z);
-  //     marker.name = city.name;
-
-  //     this.earthGroup.add(marker);
-  //   });
-  // }
 
   createCustom3DMarker(color) {
     const markerGroup = new Group();
@@ -734,132 +671,6 @@ export default class earth {
     await this.createClubPillars(data);
 
     await this.createCityPoints(cityList);
-
-    // await Promise.all(
-    //   data?.map(async (item) => {
-    //     const radius = this.options.earth.radius;
-    //     const lon = item.longitude; //经度
-    //     const lat = item.latitude; //纬度
-    //     const color = 0xffa500;
-
-    //     const pointMaterial = new MeshBasicMaterial({
-    //       color: color,
-    //       map: this.options.textures.label,
-    //       transparent: true, //使用背景透明的png贴图，注意开启透明计算
-    //       depthWrite: false, //禁止写入深度缓冲区数据
-    //     });
-
-    //     const mesh = createPointMesh({
-    //       radius,
-    //       lon,
-    //       lat,
-    //       material: pointMaterial,
-    //     }); //光柱底座矩形平面
-
-    //     mesh.userData = { type: "MarkupPoint", city: item.city, data: item };
-
-    //     this.markupPoint.add(mesh);
-    //     this.clickablePoints.push(mesh); // Add to our special array
-
-    //     // --- Create the 3D marker using the code function ---
-    //     // const marker3D = this.createCustom3DMarker(color);
-
-    //     // marker3D.name = "city_marker";
-    //     // marker3D.userData = mesh.userData;
-
-    //     // Position the marker with a bit of distance from the surface
-    //     // const position = lon2xyz(
-    //     //   this.options.earth.radius + 0.4,
-    //     //   lon, lat
-    //     // ); // The '+ 2' controls distance
-    //     // marker3D.position.set(position.x, position.y, position.z);
-
-    //     // Scale it down to an appropriate size
-    //     // const scaleFactor = 0.5;
-    //     // marker3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-    //     // const surfaceNormal = new Vector3(
-    //     //   position.x,
-    //     //   position.y,
-    //     //   position.z
-    //     // ).normalize();
-    //     // const markerUp = new Vector3(0, 1, 0);
-    //     // marker3D.quaternion.setFromUnitVectors(markerUp, surfaceNormal);
-
-    //     // const angleInDegrees = 10; // مارکر را ۴۵ درجه به جلو خم کن
-    //     // const angleInRadians = angleInDegrees * (Math.PI / 180);
-    //     // marker3D.rotateX(angleInRadians);
-    //     // برای خم کردن به بغل می‌توانید از marker.rotateZ() استفاده کنید
-    //     // marker3D.rotateZ(70 * (Math.PI / 180));
-
-    //     // marker3D.rotateY(90 * (Math.PI / 180));
-    //     // --- پایان اعمال زاویه ---
-
-    //     // ۳. مقیاس مارکر را تنظیم کنید
-    //     // marker3D.scale.set(0.7, 0.7, 0.7);
-
-    //     // Orient it to point away from the Earth's center
-    //     // marker3D.lookAt(0, 0, 0); // Points towards the center
-    //     // marker3D.rotateX(Math.PI); // Flips it 180 degrees to point outwards
-
-    //     // this.markupPoint.add(marker3D);
-
-    //     // const textureLoader = new TextureLoader();
-    //     // const markerTexture = textureLoader.load(
-    //     //   "/static/images/earth/map-marker.webp"
-    //     // );
-
-    //     // const marker = createMarker({
-    //     //   radius: radius,
-    //     //   lon: lon, // Longitude for Hidden Hills, CA
-    //     //   lat: lat, // Latitude for Hidden Hills, CA
-    //     //   textures: { marker: markerTexture }, // Make sure this texture is white
-    //     //   color: color, // Now you can set any color you want
-    //     // });
-
-    //     const LightPillar = createLightPillar({
-    //       radius: this.options.earth.radius,
-    //       lon,
-    //       lat,
-    //       color: color,
-    //       index: 0,
-    //       textures: this.options.textures,
-    //       punctuation: this.options.punctuation,
-    //       data: item,
-    //     }); //光柱
-    //     this.markupPoint.add(LightPillar);
-    //     // const WaveMesh = createWaveMesh({
-    //     //   radius,
-    //     //   lon,
-    //     //   lat,
-    //     //   textures: this.options.textures,
-    //     //   color: item.color,
-    //     // }); //波动光圈
-    //     // this.markupPoint.add(WaveMesh);
-    //     // this.waveMeshArr.push(WaveMesh);
-
-    //     // const label = this.createCityLabel(item.name);
-    //     const fontSize = 12; // رزولوشن بالا برای کیفیت
-    //     const scalingFactor = 0.05; // کوچک کردن برای اندازه مناسب در صحنه
-
-    //     const label = this.createHTMLLabel(item.city);
-    //     // const label = this.createTextSprite(
-    //     //   item.name,
-    //     //   fontSize,
-    //     //   "#fff",
-    //     //   scalingFactor
-    //     // );
-    //     label.visible = false;
-    //     // Position the label slightly above the surface and offset to the side
-    //     const labelPos = lon2xyz(radius + 1, lon, lat); // Adjust radius offset as needed
-    //     label.position.set(labelPos.x, labelPos.y, labelPos.z);
-
-    //     this.markupPoint.add(label);
-    //     this.cityLabels.push(label);
-
-    //     this.earthGroup.add(this.markupPoint);
-    //   })
-    // );
   }
 
   public createSpriteLabel() {
@@ -908,21 +719,6 @@ export default class earth {
   }
 
   public createCountryLabels(countryList: ComboboxOption[]) {
-    // const countries = [
-    //   { name: 'United States', E: -100, N: 39 },
-    //   { name: 'Canada', E: -95, N: 56 },
-    //   { name: 'Brazil', E: -55, N: -10 },
-    //   { name: 'Germany', E: 10, N: 51 },
-    //   { name: 'Spain', E: -4, N: 40 },
-    //   { name: 'United Kingdom', E: -2, N: 54 },
-    //   { name: 'Russia', E: 90, N: 60 },
-    //   { name: 'China', E: 104, N: 35 },
-    //   { name: 'India', E: 78, N: 20 },
-    //   { name: 'Japan', E: 138, N: 36 },
-    //   { name: 'Egypt', E: 30, N: 27 },
-    //   { name: 'South Africa', E: 24, N: -29 },
-    // ];
-
     // استایل فونت برای کشورها (کمی بزرگتر از شهرها)
     const fontSize = 17;
     const color = '#FFFFFF';
@@ -1029,11 +825,10 @@ export default class earth {
   }
 
   createAnimateCircle() {
-    // 创建 圆环 点
     const list = getCirclePoints({
       radius: this.options.earth.radius + 15,
-      number: 150, //切割数
-      closed: true, // 闭合
+      number: 150,
+      closed: true,
     });
     const mat = new MeshBasicMaterial({
       color: '#0c3172',
@@ -1049,7 +844,6 @@ export default class earth {
     });
     this.earthGroup.add(line);
 
-    // 在clone两条线出来
     const l2 = line.clone();
     l2.scale.set(1.2, 1.2, 1.2);
     l2.rotateZ(Math.PI / 6);
@@ -1059,90 +853,7 @@ export default class earth {
     l3.scale.set(0.8, 0.8, 0.8);
     l3.rotateZ(-Math.PI / 6);
     this.earthGroup.add(l3);
-
-    /**
-     * 旋转的球
-     */
-    // const ball = new Mesh(
-    //   new SphereBufferGeometry(this.options.satellite.size, 32, 32),
-    //   new MeshBasicMaterial({
-    //     color: "#e0b187", // 745F4D
-    //   })
-    // );
-
-    // const ball2 = new Mesh(
-    //   new SphereBufferGeometry(this.options.satellite.size, 32, 32),
-    //   new MeshBasicMaterial({
-    //     color: "#628fbb", // 324A62
-    //   })
-    // );
-
-    // const ball3 = new Mesh(
-    //   new SphereBufferGeometry(this.options.satellite.size, 32, 32),
-    //   new MeshBasicMaterial({
-    //     color: "#806bdf", //6D5AC4
-    //   })
-    // );
-
-    // this.circleLineList.push(line, l2, l3);
-    // ball.name = ball2.name = ball3.name = "卫星";
-
-    // for (let i = 0; i < this.options.satellite.number; i++) {
-    //   const ball01 = ball.clone();
-    //   // 一根线上总共有几个球，根据数量平均分布一下
-    //   const num = Math.floor(list.length / this.options.satellite.number);
-    //   ball01.position.set(
-    //     list[num * (i + 1)][0] * 1,
-    //     list[num * (i + 1)][1] * 1,
-    //     list[num * (i + 1)][2] * 1
-    //   );
-    //   line.add(ball01);
-
-    //   const ball02 = ball2.clone();
-    //   const num02 = Math.floor(list.length / this.options.satellite.number);
-    //   ball02.position.set(
-    //     list[num02 * (i + 1)][0] * 1,
-    //     list[num02 * (i + 1)][1] * 1,
-    //     list[num02 * (i + 1)][2] * 1
-    //   );
-    //   l2.add(ball02);
-
-    //   const ball03 = ball2.clone();
-    //   const num03 = Math.floor(list.length / this.options.satellite.number);
-    //   ball03.position.set(
-    //     list[num03 * (i + 1)][0] * 1,
-    //     list[num03 * (i + 1)][1] * 1,
-    //     list[num03 * (i + 1)][2] * 1
-    //   );
-    //   l3.add(ball03);
-    // }
   }
-
-  // createFlyLine() {
-  //   this.flyLineArcGroup = new Group();
-  //   this.flyLineArcGroup.userData["flyLineArray"] = [];
-  //   this.earthGroup.add(this.flyLineArcGroup);
-
-  //   this.options.data.forEach((cities) => {
-  //     cities.endArray.forEach((item) => {
-  //       // 调用函数flyArc绘制球面上任意两点之间飞线圆弧轨迹
-  //       const arcline = flyArc(
-  //         this.options.earth.radius,
-  //         cities.startArray.E,
-  //         cities.startArray.N,
-  //         item.E,
-  //         item.N,
-  //         {}
-  //         // this.options.flyLine
-  //       );
-
-  //       this.flyLineArcGroup.add(arcline); // 飞线插入flyArcGroup中
-  //       this.flyLineArcGroup.userData["flyLineArray"].push(
-  //         arcline.userData["flyLine"]
-  //       );
-  //     });
-  //   });
-  // }
 
   show() {
     gsap.to(this.group.scale, {
@@ -1156,17 +867,12 @@ export default class earth {
 
   render(camera: PerspectiveCamera) {
     this.flyLineArcGroup?.userData['flyLineArray']?.forEach((fly) => {
-      // fly.rotation.z += this.options.flyLine.speed; // 调节飞线速度
       if (fly.rotation.z >= fly.flyEndAngle) fly.rotation.z = 0;
     });
 
     if (this.isRotation) {
       this.earthGroup.rotation.y += this.options.earth.rotateSpeed;
     }
-
-    // this.circleLineList.forEach((e) => {
-    //   e.rotateY(this.options.satellite.rotateSpeed);
-    // });
 
     this.uniforms.time.value =
       this.uniforms.time.value < -this.timeValue
@@ -1183,13 +889,13 @@ export default class earth {
         );
         if (mesh.userData['scale'] <= 1.5) {
           (mesh.material as Material).opacity =
-            (mesh.userData['scale'] - 1) * 2; //2等于1/(1.5-1.0)，保证透明度在0~1之间变化
+            (mesh.userData['scale'] - 1) * 2;
         } else if (
           mesh.userData['scale'] > 1.5 &&
           mesh.userData['scale'] <= 2
         ) {
           (mesh.material as Material).opacity =
-            1 - (mesh.userData['scale'] - 1.5) * 2; //2等于1/(2.0-1.5) mesh缩放2倍对应0 缩放1.5被对应1
+            1 - (mesh.userData['scale'] - 1.5) * 2;
         } else {
           mesh.userData['scale'] = 1;
         }

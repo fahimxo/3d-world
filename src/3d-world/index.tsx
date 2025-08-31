@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react';
-import World from './world/Word'; // Corrected import from 'Word' to 'World'
+import World from './world/World'; // Corrected import from 'Word' to 'World'
 import { ComboboxOption } from 'src/components';
 import { DataType } from 'src/lib/usePublicClubs';
 import { lockClub } from '../components/ClubInfo';

@@ -1,6 +1,6 @@
 // src/App.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import WorldComponent, { WorldHandle } from './ts/index';
+import WorldComponent, { WorldHandle } from './3d-world/index';
 import './app.css';
 import { Headers } from './layouts/header/Header';
 import { Filters } from './components/filters';
@@ -13,7 +13,7 @@ import {
 import { Loading } from './components/loading';
 import ClubsManagement from './components/ClubsManagement';
 import { Clubs } from './assets/icons/Locations';
-import ReactDOM from 'react-dom'; // اینو بالای فایل ایمپورت کن
+import ReactDOM from 'react-dom';
 
 const App: React.FC = () => {
   const [detailsModal, setDetailsModal] = useState(false);
@@ -86,14 +86,11 @@ const App: React.FC = () => {
   }, [clubData]);
 
   const handleFilterSubmit = async (filterPayload: PublicClubFilter) => {
-    // وقتی کاربر فیلتر می‌کند، دیگر بارگذاری اولیه نیست
     if (isInitialLoad) {
       setIsInitialLoad(false);
     }
     await fetchClubs(filterPayload);
   };
-
-  // This function can be passed to the WorldComponent to show the modal
 
   const showCityModal = useCallback((name: string, data: string) => {
     try {
@@ -125,7 +122,6 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    // <ClubsManagement onClose={() => setLocationsModalOpen(false)} />
     <div className="app-container">
       {/* The component that will render your Three.js world in the background */}
       <WorldComponent
@@ -181,7 +177,6 @@ const App: React.FC = () => {
         onClose={hideCityModal}
         clubData={selectedClubData}
       />
-      {/* Loading Indicator (can remain outside the main container) */}
       {loading && <Loading />}
     </div>
   );
